@@ -3,6 +3,7 @@
  */
 import React from 'react';
 import {Link} from 'react-router';
+import { withRouter } from 'react-router'
 import {isEmpty, map} from 'underscore';
 
 class Home extends React.Component {
@@ -49,7 +50,7 @@ class Home extends React.Component {
   onSignOut(e){
     e.preventDefault();
     firebase.auth().signOut().then(() => {
-      this.props.history.push('/login');
+      this.props.router.push('/login');
     }, (error) => {
       // An error happened.
     });
@@ -88,4 +89,4 @@ class Home extends React.Component {
   }
 }
 
-export default Home;
+export default withRouter(Home);

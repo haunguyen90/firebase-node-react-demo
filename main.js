@@ -2,13 +2,13 @@
  * Created by haunguyen on 9/2/16.
  */
 import React from 'react';
-import Router from 'react-router';
+import {Router, browserHistory} from 'react-router';
 import ReactDOM from 'react-dom';
-import createBrowserHistory from 'history/lib/createBrowserHistory';
+//import createBrowserHistory from 'history/lib/createBrowserHistory';
 import routes from './routes';
 import Navbar from './components/Navbar/Navbar.js';
 
-let history = createBrowserHistory();
+//let history = createBrowserHistory();
 import firebase from "firebase";
 
  //Initialize Firebase
@@ -20,4 +20,4 @@ var config = {
 };
 firebase.initializeApp(config);
 
-ReactDOM.render(<Router history={history}>{routes}</Router>, document.getElementById('container'));
+ReactDOM.render(<Router history={browserHistory}>{routes}</Router>, document.getElementById('container'));

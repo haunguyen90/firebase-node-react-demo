@@ -2,6 +2,25 @@ import React from 'react';
 import Navbar from '../Navbar/Navbar.js';
 import Footer from '../Footer/Footer.js';
 import firebase from "firebase";
+import { browserHistory } from 'react-router';
+import { withRouter } from 'react-router';
+
+import {Facebook, FacebookApiException} from 'fb';
+const options = {
+  version: 'v2.7',
+  appId: '1249631805087158',
+  appSecret: '3fdc31fb9cdd96624a09cef0be67deec'
+};
+
+const fb = new Facebook(options);
+
+import Twit from 'twit';
+
+let twitterOptions = {
+  consumer_key: 'hbpVFdDSDsReRP0GOfVqhqW5H',
+  consumer_secret: '4K3phHY5VoIyyw6515yZql88ijc1vaLoU1QLLdxdvGn6lR6XIf',
+  timeout_ms: 60*1000
+};
 
 class App extends React.Component {
   constructor(props) {
@@ -12,6 +31,60 @@ class App extends React.Component {
   }
 
   componentWillMount(){
+
+  }
+
+  convertImgToBase64URL(url, callback, outputFormat){
+    var img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = function(){
+      var canvas = document.createElement('CANVAS'),
+        ctx = canvas.getContext('2d'), dataURL;
+      canvas.height = img.height;
+      canvas.width = img.width;
+      ctx.drawImage(img, 0, 0);
+      dataURL = canvas.toDataURL(outputFormat);
+      callback(dataURL);
+      canvas = null;
+    };
+    img.src = url;
+  }
+
+  updateProfilePicture(){
+    firebase.database().ref('users').once('value').then((result) => {
+      let user = firebase.auth().currentUser;
+      let users = result.val();
+      if(!users) users = {};
+      if(users[user.uid] && !users[user.uid].picUrl && users[user.uid].socialImgUrl){
+        this.convertImgToBase64URL(users[user.uid].socialImgUrl, this.storeFileToCloud.bind(this));
+      }
+    });
+  }
+
+  storeFileToCloud(base64Img){
+    // Store profile picture to google cloud storage
+    const storageRef = firebase.storage().ref();
+
+    const fileName = `profile-picture-${firebase.auth().currentUser.uid}.jpg`;
+    const message = base64Img.split(",")[1];
+    storageRef.child('images/' + fileName).putString(message, "base64").then((snapshot) => {
+      const url = snapshot.metadata.downloadURLs[0];
+      this.updatePicUrlInDatabase(url);
+
+    }).catch((error) => {
+      // [START onfailure]
+      console.error('Upload failed:', error);
+      // [END onfailure]
+    });
+  }
+
+  updatePicUrlInDatabase(url){
+
+    const Database = firebase.database();
+
+    let updates = {};
+    updates['/users/' + firebase.auth().currentUser.uid + '/picUrl/'] = url;
+    Database.ref().update(updates);
   }
 
   componentDidMount(){
@@ -21,11 +94,15 @@ class App extends React.Component {
       // The observer is also triggered when the user's token has expired and is
       // automatically refreshed. In that case, the user hasn't changed so we should
       // not update the UI.
-      if (user && user.uid == this.state.currentUid) {
-        return;
-      }
+
       if(user){
         this.setState({currentUid: user.uid});
+        let usersRef = firebase.database().ref('users/' + user.uid + '/socialImgUrl');
+        usersRef.on("value", (result) => {
+          console.log("added");
+          this.updateProfilePicture();
+        });
+
       }else{
         this.setState({currentUid: null});
       }
@@ -48,42 +125,20 @@ class App extends React.Component {
 
 App.defaultProps = {
   uiConfig: {
+    signInSuccessUrl: "/",
     'callbacks': {
       // Called when the user has been successfully signed in.
-      'signInSuccess': function(user, credential, redirectUrl) {
+      'signInSuccess'(user, credential, redirectUrl) {
+        const socket = io.connect('http://localhost:4000');
+        const dataEmit = {
+          user: user,
+          credential: credential
+        };
+        socket.emit('checkAndUpdateUsersTable', user, credential);
         console.log(credential);
-        console.log("redirectUrl: " + redirectUrl);
-
-        if(credential.provider == "google.com"){
-          firebase.database().ref('users').once('value').then(function(users) {
-            if(!users[user.uid]){
-              gapi.client.load('plus','v1', function(){
-                var request = gapi.client.plus.people.get({
-                  'userId': "me",
-                  access_token: credential.accessToken
-                });
-                request.execute(function(resp) {
-                  console.log(resp);
-                  const newUser = {
-                    id: user.uid,
-                    name: resp.displayName,
-                    picUrl: resp.image.url
-                  };
-
-                  const Database = firebase.database();
-                  const newUserKey = Database.ref().child('users').push().key;
-
-                  let updates = {};
-                  updates['/users/' + newUserKey] = newUser;
-                  return Database.ref().update(updates);
-                });
-              });
-            }
-          });
-        }
         //handleSignedInUser(user);
         // Do not redirect.
-        //return false;
+        return false;
       }
     },
     // Opens IDP Providers sign-in flow in a popup.
@@ -103,13 +158,11 @@ App.defaultProps = {
           'user_friends'
         ]
       },
-      firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-      firebase.auth.EmailAuthProvider.PROVIDER_ID
+      firebase.auth.TwitterAuthProvider.PROVIDER_ID
     ],
     // Terms of service url.
-    'tosUrl': 'https://www.google.com',
-    signInSuccessUrl: "/"
+    'tosUrl': 'https://www.google.com'
   }
 };
 
-export default App;
+export default withRouter(App);

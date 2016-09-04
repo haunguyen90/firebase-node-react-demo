@@ -6,6 +6,7 @@
  */
 import React from 'react';
 import {Link} from 'react-router';
+import { withRouter } from 'react-router'
 
 class SignUp extends React.Component {
   constructor(props) {
@@ -81,9 +82,9 @@ class SignUp extends React.Component {
       console.log(user);
       user.updateProfile({
         displayName: fullName,
-        photoURL: "https://example.com/jane-q-user/profile.jpg"
+        photoURL: "https://firebasestorage.googleapis.com/v0/b/newauth-e3860.appspot.com/o/avatar_default.jpg?alt=media&token=684f1704-5d7b-4df9-8aab-e717bc4baeac"
       }).then(() => {
-        this.props.history.push('/');
+        this.props.router.push('/');
         this.setState({SIGN_UP_ERROR: null});
         this.writeNewUser(user.uid, fullName, user.photoURL);
       }, (error) => {
@@ -96,6 +97,10 @@ class SignUp extends React.Component {
 
     });
     // [END createwithemail]
+  }
+
+  switchToSocial(){
+    this.props.router.push("/login");
   }
 
   render(){
@@ -127,6 +132,10 @@ class SignUp extends React.Component {
               <button type="submit" className="firebaseui-id-submit firebaseui-button mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
                 Submit
               </button>
+              <button onClick={this.switchToSocial.bind(this)}
+                      type="type" className="firebaseui-id-submit firebaseui-button mdl-button mdl-js-button mdl-button--raised">
+                Switch to social login
+              </button>
             </div>
           </div>
         </form>
@@ -135,4 +144,4 @@ class SignUp extends React.Component {
   }
 }
 
-export default SignUp;
+export default withRouter(SignUp);

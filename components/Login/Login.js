@@ -2,7 +2,7 @@
  * Created by haunguyen on 9/2/16.
  */
 import React from 'react';
-import {Link} from 'react-router';
+import {Link, withRouter} from 'react-router';
 
 class Login extends React.Component {
   constructor(props) {
@@ -63,7 +63,7 @@ class Login extends React.Component {
   }
 
   goToSignUp(){
-    this.props.history.push('/sign-up');
+    this.props.router.push('/sign-up');
   }
 
   switchToLoginWithPassword(){
@@ -89,7 +89,7 @@ class Login extends React.Component {
     }
 
     firebase.auth().signInWithEmailAndPassword(email, password).then((user) => {
-      this.props.history.push('/');
+      this.props.router.push('/');
       this.setState({SIGN_UP_ERROR: null});
     }, (error) => {
       this.setState({SIGN_UP_ERROR: error});
@@ -174,4 +174,4 @@ class Login extends React.Component {
   }
 }
 
-export default Login;
+export default withRouter(Login);

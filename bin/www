@@ -7,6 +7,25 @@
 var app = require('../app');
 var debug = require('debug')('NodeJS-Starter:server');
 var http = require('http');
+var firebase = require("firebase");
+
+var google = require('googleapis');
+var FB = require('fb');
+
+var options = {
+  version: 'v2.7',
+  appId: '1249631805087158',
+  appSecret: '3fdc31fb9cdd96624a09cef0be67deec'
+};
+
+var fb = new FB.Facebook(options);
+
+var Twitter = require('twitter');
+
+var twitterOptions = {
+  consumer_key: 'hbpVFdDSDsReRP0GOfVqhqW5H',
+  consumer_secret: '4K3phHY5VoIyyw6515yZql88ijc1vaLoU1QLLdxdvGn6lR6XIf'
+};
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +39,7 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+var io = require('socket.io')(server);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -28,6 +48,109 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+
+/**
+ * Socket io function
+ * */
+// Initialize Firebase
+var config = {
+  serviceAccount: "./vincent-firebase.json",
+  databaseURL: "https://newauth-e3860.firebaseio.com",
+  storageBucket: "newauth-e3860.appspot.com"
+};
+firebase.initializeApp(config);
+var usersRef = firebase.database().ref("users");
+usersRef.on("child_added", function(snapshot, prevChildKey) {
+  var newPost = snapshot.val();
+  console.log("user : " + newPost);
+
+});
+
+io.on('connection', function (socket) {
+  socket.on('checkAndUpdateUsersTable', function (user, credential) {
+    console.log(credential);
+    switch (credential.provider) {
+      case "google.com":
+        firebase.database().ref('users').once('value').then(function(result) {
+          let users = result.val();
+          if(!users) users = {};
+          if(!users[user.uid]){
+            var plus = google.plus('v1');
+            plus.people.get({
+              'userId': "me",
+              access_token: credential.accessToken
+            }, function(err, resp){
+              console.log(resp);
+
+              var newUser = {
+                id: user.uid,
+                name: resp.displayName,
+                socialImgUrl: resp.image.url
+              };
+              var Database = firebase.database();
+              Database.ref('users/' + user.uid).set(newUser);
+            });
+
+          }
+        });
+        break;
+
+      case "facebook.com":
+        firebase.database().ref('users').once('value').then(function(result) {
+          let users = result.val();
+          if(!users) users = {};
+          if(!users[user.uid]){
+            fb.setAccessToken(credential.accessToken);
+            fb.api('me', { fields: ['id', 'name', 'picture', 'email'] }, function (res) {
+              if(!res || res.error) {
+                console.log(!res ? 'error occurred' : res.error);
+                return;
+              }
+              console.log(res);
+              const newUser = {
+                id: user.uid,
+                name: res.name,
+                socialImgUrl: res.picture.data.url
+              };
+
+              const Database = firebase.database();
+              Database.ref('users/' + user.uid).set(newUser);
+            });
+          }
+        });
+        break;
+
+      case "twitter.com":
+        firebase.database().ref('users').once('value').then(function(result) {
+          let users = result.val();
+          if(!users) users = {};
+          if(!users[user.uid]){
+            twitterOptions.access_token_key = "3317091535-uIoNUqaY4C38wRMA2noCfxX0lcwtmfG3BAUSWIK" //credential.accessToken;
+            twitterOptions.access_token_secret = "ehXXUFrqwngfvWGhIoC1BOT1715CNUuBsbdjM3UwCKby0" //credential.secret;
+            const twitterClient = new Twitter(twitterOptions);
+
+            twitterClient.get("account/verify_credentials", (error, data, response) => {
+              if (error) {
+                console.log(error);
+              } else {
+                console.log(data);
+                var newUser = {
+                  id: user.uid,
+                  name: data.name,
+                  socialImgUrl: data.profile_image_url
+                };
+                var Database = firebase.database();
+                Database.ref('users/' + user.uid).set(newUser);
+              }
+            })
+          }
+
+        });
+        break;
+    }
+  });
+});
 
 /**
  * Normalize a port into a number, string, or false.

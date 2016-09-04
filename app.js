@@ -3,7 +3,6 @@ require('babel-register');
 require("babel-polyfill");
 
 var express = require('express');
-var firebase = require("firebase");
 var path = require ('path');
 var favicon = require ('serve-favicon');
 var logger = require ('morgan');
@@ -27,14 +26,6 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'html');
-
-// Initialize Firebase
-var config = {
-  serviceAccount: "./vincent-firebase.json",
-  databaseURL: "https://newauth-e3860.firebaseio.com",
-  storageBucket: "newauth-e3860.appspot.com"
-};
-firebase.initializeApp(config);
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -83,7 +74,7 @@ app.use(function(req, res) {
     } else if (redirectLocation) {
       res.status(302).redirect(redirectLocation.pathname + redirectLocation.search)
     } else if (renderProps) {
-      var html = ReactDOM.renderToString(React.createElement(Router.RoutingContext, renderProps));
+      var html = ReactDOM.renderToString(React.createElement(Router.RouterContext, renderProps));
       var page = swig.renderFile('views/index.html', { html: html });
       res.status(200).send(page);
     } else {
