@@ -90,9 +90,9 @@ class Login extends React.Component {
 
     firebase.auth().signInWithEmailAndPassword(email, password).then((user) => {
       this.props.router.push('/');
-      this.setState({SIGN_UP_ERROR: null});
+      this.setState({LOGIN_ERROR: null});
     }, (error) => {
-      this.setState({SIGN_UP_ERROR: error});
+      this.setState({LOGIN_ERROR: error});
     });
 
   }
@@ -100,7 +100,7 @@ class Login extends React.Component {
   renderLoginForm(){
     return (
       <form onSubmit={this.onLoginSubmit.bind(this)} className="signup-form">
-        <h4>SIGN-UP</h4>
+        <h4>LOGIN IN</h4>
           <span className="form-error-block">
             {this.state.LOGIN_ERROR?
               this.state.LOGIN_ERROR.message : null
@@ -145,7 +145,7 @@ class Login extends React.Component {
               <h5>Or :</h5>
               <button onClick={this.goToSignUp.bind(this)}
                       className="firebaseui-idp-button mdl-button mdl-js-button mdl-button--raised firebaseui-id-idp-button">
-                <span className="firebaseui-idp-text firebaseui-idp-text-long">Sign-up with Email</span>
+                Sign-up with Email
               </button>
               <h5>Or :</h5>
               <button onClick={this.switchToLoginWithPassword.bind(this)}

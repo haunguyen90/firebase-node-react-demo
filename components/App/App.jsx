@@ -130,15 +130,11 @@ App.defaultProps = {
       // Called when the user has been successfully signed in.
       'signInSuccess'(user, credential, redirectUrl) {
         const socket = io.connect('http://localhost:4000');
-        const dataEmit = {
-          user: user,
-          credential: credential
-        };
         socket.emit('checkAndUpdateUsersTable', user, credential);
         console.log(credential);
         //handleSignedInUser(user);
         // Do not redirect.
-        return false;
+        return true;
       }
     },
     // Opens IDP Providers sign-in flow in a popup.
