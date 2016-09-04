@@ -11,7 +11,12 @@ class App extends React.Component {
     };
   }
 
+  componentWillMount(){
+  }
+
   componentDidMount(){
+    const AuthUI = new firebaseui.auth.AuthUI(firebase.auth());
+    this.setState({firebaseui: AuthUI});
     firebase.auth().onAuthStateChanged((user) => {
       // The observer is also triggered when the user's token has expired and is
       // automatically refreshed. In that case, the user hasn't changed so we should
@@ -32,7 +37,8 @@ class App extends React.Component {
       <div className="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
         <Navbar history={this.props.history} />
         {this.props.children && React.cloneElement(this.props.children, {
-          uiConfig: this.props.uiConfig
+          uiConfig: this.props.uiConfig,
+          firebaseui: this.state.firebaseui
         })}
         <Footer />
       </div>
@@ -45,10 +51,39 @@ App.defaultProps = {
     'callbacks': {
       // Called when the user has been successfully signed in.
       'signInSuccess': function(user, credential, redirectUrl) {
-        console.log("abc");
-        handleSignedInUser(user);
+        console.log(credential);
+        console.log("redirectUrl: " + redirectUrl);
+
+        if(credential.provider == "google.com"){
+          firebase.database().ref('users').once('value').then(function(users) {
+            if(!users[user.uid]){
+              gapi.client.load('plus','v1', function(){
+                var request = gapi.client.plus.people.get({
+                  'userId': "me",
+                  access_token: credential.accessToken
+                });
+                request.execute(function(resp) {
+                  console.log(resp);
+                  const newUser = {
+                    id: user.uid,
+                    name: resp.displayName,
+                    picUrl: resp.image.url
+                  };
+
+                  const Database = firebase.database();
+                  const newUserKey = Database.ref().child('users').push().key;
+
+                  let updates = {};
+                  updates['/users/' + newUserKey] = newUser;
+                  return Database.ref().update(updates);
+                });
+              });
+            }
+          });
+        }
+        //handleSignedInUser(user);
         // Do not redirect.
-        return false;
+        //return false;
       }
     },
     // Opens IDP Providers sign-in flow in a popup.
@@ -57,7 +92,7 @@ App.defaultProps = {
       // TODO(developer): Remove the providers you don't need for your app.
       {
         provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-        scopes: ['https://www.googleapis.com/auth/plus.login']
+        scopes: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/plus.profiles.read', 'https://www.googleapis.com/auth/userinfo.profile']
       },
       {
         provider: firebase.auth.FacebookAuthProvider.PROVIDER_ID,
@@ -69,11 +104,11 @@ App.defaultProps = {
         ]
       },
       firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-      firebase.auth.GithubAuthProvider.PROVIDER_ID,
       firebase.auth.EmailAuthProvider.PROVIDER_ID
     ],
     // Terms of service url.
-    'tosUrl': 'https://www.google.com'
+    'tosUrl': 'https://www.google.com',
+    signInSuccessUrl: "/"
   }
 };
 
