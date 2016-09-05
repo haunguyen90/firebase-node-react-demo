@@ -23,10 +23,18 @@ class Home extends React.Component {
     users.on("value", (result) => {
       const users = result.val();
       console.log(users);
-      const user = firebase.auth().currentUser;
-      if(users[user.uid] && !users[user.uid].email)
-        this.setState({socialUserMissingEmail: true});
       this.setState({users: users});
+    });
+
+    firebase.auth().onAuthStateChanged((user) => {
+      // The observer is also triggered when the user's token has expired and is
+      // automatically refreshed. In that case, the user hasn't changed so we should
+      // not update the UI.
+
+      if(user){
+        if(!user.email)
+          this.setState({socialUserMissingEmail: true});
+      }
     });
 
   }
