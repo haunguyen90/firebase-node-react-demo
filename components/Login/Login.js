@@ -152,7 +152,7 @@ class Login extends React.Component {
               <button onClick={this.switchToLoginWithPassword.bind(this)}
                       className="firebaseui-idp-button mdl-button mdl-js-button mdl-button--raised firebaseui-idp-password firebaseui-id-idp-button">
                 <img className="firebaseui-idp-icon" src="https://www.gstatic.com/firebasejs/staging/3.0.0/auth/images/mail.svg" data-pin-nopin="true"/>
-                <span className="firebaseui-idp-text firebaseui-idp-text-long">Sign in Email</span>
+                <span className="firebaseui-idp-text firebaseui-idp-text-long">Sign in with Email</span>
               </button> : null
             }
 

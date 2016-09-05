@@ -135,18 +135,24 @@ io.on('connection', function (socket) {
             twitterOptions.access_token_secret = credential.secret;
             const twitterClient = new Twitter(twitterOptions);
 
+            var newUser = {
+              id: user.uid,
+              name: user.displayName,
+              socialImgUrl: photoURL
+            };
+            var Database = firebase.database();
+            Database.ref('users/' + user.uid).set(newUser);
+
             twitterClient.get("account/verify_credentials", function(error, data, response) {
               if (error) {
                 console.log(error);
               } else {
                 console.log(data);
-                var newUser = {
-                  id: user.uid,
-                  name: data.name,
-                  socialImgUrl: data.profile_image_url
-                };
-                var Database = firebase.database();
-                Database.ref('users/' + user.uid).set(newUser);
+                //var updateUser = {
+                //  socialImgUrl: photoURL
+                //};
+                //var Database = firebase.database();
+                //Database.ref('users/' + user.uid).set(newUser);
               }
             })
           }
