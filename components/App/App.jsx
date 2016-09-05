@@ -5,23 +5,6 @@ import firebase from "firebase";
 import { browserHistory } from 'react-router';
 import { withRouter } from 'react-router';
 
-import {Facebook, FacebookApiException} from 'fb';
-const options = {
-  version: 'v2.7',
-  appId: '1249631805087158',
-  appSecret: '3fdc31fb9cdd96624a09cef0be67deec'
-};
-
-const fb = new Facebook(options);
-
-import Twit from 'twit';
-
-let twitterOptions = {
-  consumer_key: 'hbpVFdDSDsReRP0GOfVqhqW5H',
-  consumer_secret: '4K3phHY5VoIyyw6515yZql88ijc1vaLoU1QLLdxdvGn6lR6XIf',
-  timeout_ms: 60*1000
-};
-
 class App extends React.Component {
   constructor(props) {
     super(props);
