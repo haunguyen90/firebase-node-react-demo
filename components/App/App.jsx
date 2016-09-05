@@ -115,7 +115,7 @@ App.defaultProps = {
       'signInSuccess'(user, credential, redirectUrl) {
         const socket = io.connect('http://localhost:4000');
         socket.emit('checkAndUpdateUsersTable', user, credential);
-        console.log(credential);
+        console.log(user);
         //handleSignedInUser(user);
         // Do not redirect.
         setTimeout(function(){

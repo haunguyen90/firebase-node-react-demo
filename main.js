@@ -13,10 +13,10 @@ import firebase from "firebase";
 
  //Initialize Firebase
 var config = {
-  apiKey: "AIzaSyDTISYMfeSr1zwR5Kky3R2c0yS_vpP8aUo",
-  authDomain: "newauth-e3860.firebaseapp.com",
-  databaseURL: "https://newauth-e3860.firebaseio.com",
-  storageBucket: "newauth-e3860.appspot.com"
+  apiKey: "AIzaSyCajHCcMiTctSbFjejAdvAc7Q3Bt38xwPA",
+  authDomain: "prezvr.firebaseapp.com",
+  databaseURL: "https://prezvr.firebaseio.com",
+  storageBucket: "prezvr.appspot.com",
 };
 firebase.initializeApp(config);
 

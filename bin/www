@@ -23,8 +23,8 @@ var fb = new FB.Facebook(options);
 var Twitter = require('twitter');
 
 var twitterOptions = {
-  consumer_key: 'hbpVFdDSDsReRP0GOfVqhqW5H',
-  consumer_secret: '4K3phHY5VoIyyw6515yZql88ijc1vaLoU1QLLdxdvGn6lR6XIf'
+  consumer_key: 'AMhXIaxcGd5xlGpAH81LwZQ1k',
+  consumer_secret: '33453884-g9B8x8XWEENzVZon0CmccPSK2A560AepGLnO1rIq8'
 };
 
 /**
@@ -55,9 +55,10 @@ server.on('listening', onListening);
  * */
 // Initialize Firebase
 var config = {
-  serviceAccount: "./vincent-firebase.json",
-  databaseURL: "https://newauth-e3860.firebaseio.com",
-  storageBucket: "newauth-e3860.appspot.com"
+  apiKey: "AIzaSyCajHCcMiTctSbFjejAdvAc7Q3Bt38xwPA",
+  authDomain: "prezvr.firebaseapp.com",
+  databaseURL: "https://prezvr.firebaseio.com",
+  storageBucket: "prezvr.appspot.com"
 };
 firebase.initializeApp(config);
 var usersRef = firebase.database().ref("users");
@@ -78,6 +79,14 @@ io.on('connection', function (socket) {
           var users = result.val();
           if(!users) users = {};
           if(!users[user.uid]){
+            var newUser = {
+              id: user.uid,
+              name: user.displayName,
+              socialImgUrl: user.photoURL
+            };
+            var Database = firebase.database();
+            Database.ref('users/' + user.uid).set(newUser);
+
             var plus = google.plus('v1');
             plus.people.get({
               'userId': "me",
@@ -85,13 +94,7 @@ io.on('connection', function (socket) {
             }, function(err, resp){
               console.log(resp);
 
-              var newUser = {
-                id: user.uid,
-                name: resp.displayName,
-                socialImgUrl: resp.image.url
-              };
-              var Database = firebase.database();
-              Database.ref('users/' + user.uid).set(newUser);
+
             });
 
           }

@@ -108,7 +108,7 @@ class SignUp extends React.Component {
       <div className="login-page">
 
         <form onSubmit={this.onSignUpSubmit.bind(this)} className="signup-form">
-          <h4>SIGN-UP</h4>
+          <h4>Sign Up</h4>
           <span className="form-error-block">
             {this.state.SIGN_UP_ERROR?
               this.state.SIGN_UP_ERROR.message : null
@@ -130,11 +130,11 @@ class SignUp extends React.Component {
 
             <div className="firebaseui-list-item">
               <button type="submit" className="firebaseui-id-submit firebaseui-button mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
-                Submit
+                Create your free Account
               </button>
               <button onClick={this.switchToSocial.bind(this)}
                       type="type" className="firebaseui-id-submit firebaseui-button mdl-button mdl-js-button mdl-button--raised">
-                Switch to social login
+                Sign up with a social network
               </button>
             </div>
           </div>

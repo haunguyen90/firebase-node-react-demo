@@ -10,7 +10,8 @@ class Login extends React.Component {
     this.state = {
       currentUid: null,
       loginWithPassword: false,
-      LOGIN_ERROR: null
+      LOGIN_ERROR: null,
+      FIREBASEUI_DID_MOUNT: null
     };
   }
 
@@ -31,6 +32,8 @@ class Login extends React.Component {
   handleSignedOutUser(){
     document.getElementById('user-signed-out').style.display = 'block';
     this.props.firebaseui.start('#firebaseui-container', this.props.uiConfig);
+    console.log("did mount");
+    this.setState({FIREBASEUI_DID_MOUNT: true});
   }
 
   componentDidUpdate(preProps, preState){
@@ -40,6 +43,7 @@ class Login extends React.Component {
   }
 
   componentDidMount(){
+    this.setState({FIREBASEUI_DID_MOUNT: null});
     firebase.auth().onAuthStateChanged((user) => {
       // The observer is also triggered when the user's token has expired and is
       // automatically refreshed. In that case, the user hasn't changed so we should
@@ -107,7 +111,7 @@ class Login extends React.Component {
   renderLoginForm(){
     return (
       <form onSubmit={this.onLoginSubmit.bind(this)} className="signup-form">
-        <h4>LOGIN IN</h4>
+        <h4>Log In</h4>
           <span className="form-error-block">
             {this.state.LOGIN_ERROR?
               this.state.LOGIN_ERROR.message : null
@@ -123,12 +127,12 @@ class Login extends React.Component {
 
           <div className="firebaseui-list-item">
             <button type="submit" className="firebaseui-id-submit firebaseui-button mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
-              Submit
+              Sign in
             </button>
 
             <button onClick={this.switchToSocial.bind(this)}
               type="type" className="firebaseui-id-submit firebaseui-button mdl-button mdl-js-button mdl-button--raised">
-              Switch to social login
+              Sign in with a social network
             </button>
           </div>
         </div>
@@ -144,23 +148,25 @@ class Login extends React.Component {
           <div id="firebaseui-spa">
             <h5>Login With:</h5>
             <div id="firebaseui-container"></div>
+            {this.state.FIREBASEUI_DID_MOUNT?
+              <button onClick={this.switchToLoginWithPassword.bind(this)}
+                      className="firebaseui-idp-button mdl-button mdl-js-button mdl-button--raised firebaseui-idp-password firebaseui-id-idp-button">
+                <img className="firebaseui-idp-icon" src="https://www.gstatic.com/firebasejs/staging/3.0.0/auth/images/mail.svg" data-pin-nopin="true"/>
+                <span className="firebaseui-idp-text firebaseui-idp-text-long">Sign in Email</span>
+              </button> : null
+            }
+
           </div>
 
-          {this.state.currentUid?
-            null :
+          {this.state.FIREBASEUI_DID_MOUNT?
             <div className="sign-up-link">
               <h5>Or :</h5>
               <button onClick={this.goToSignUp.bind(this)}
                       className="firebaseui-idp-button mdl-button mdl-js-button mdl-button--raised firebaseui-id-idp-button">
-                Sign-up with Email
+                Create a new Account
               </button>
-              <h5>Or :</h5>
-              <button onClick={this.switchToLoginWithPassword.bind(this)}
-                      className="firebaseui-idp-button mdl-button mdl-js-button mdl-button--raised firebaseui-idp-password firebaseui-id-idp-button">
-                <img className="firebaseui-idp-icon" src="https://www.gstatic.com/firebasejs/staging/3.0.0/auth/images/mail.svg" data-pin-nopin="true"/>
-                <span className="firebaseui-idp-text firebaseui-idp-text-long">Sign in to your account</span>
-              </button>
-            </div>
+            </div> : null
+
           }
         </div>
       </div>
