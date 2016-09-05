@@ -69,7 +69,9 @@ usersRef.on("child_added", function(snapshot, prevChildKey) {
 
 io.on('connection', function (socket) {
   socket.on('checkAndUpdateUsersTable', function (user, credential) {
+    console.log("checkAndUpdateUsersTable");
     console.log(credential);
+    console.log(user);
     switch (credential.provider) {
       case "google.com":
         firebase.database().ref('users').once('value').then(function(result) {
@@ -149,6 +151,7 @@ io.on('connection', function (socket) {
         });
         break;
     }
+    //socket.emit('redirectUserToHome', user);
   });
 });
 

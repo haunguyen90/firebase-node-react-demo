@@ -60,6 +60,13 @@ class Login extends React.Component {
       else
         this.handleSignedOutUser();
     });
+
+    //const socket = io.connect('http://localhost:4000');
+    //socket.on('redirectUserToHome', (user) => {
+    //  const currentUser = firebase.auth().currentUser;
+    //  this.props.router.push("/");
+    //});
+
   }
 
   goToSignUp(){

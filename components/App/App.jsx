@@ -118,7 +118,10 @@ App.defaultProps = {
         console.log(credential);
         //handleSignedInUser(user);
         // Do not redirect.
-        return true;
+        setTimeout(function(){
+          browserHistory.push("/");
+        }, 300);
+        return false;
       }
     },
     // Opens IDP Providers sign-in flow in a popup.
