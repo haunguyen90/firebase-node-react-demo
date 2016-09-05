@@ -73,7 +73,7 @@ io.on('connection', function (socket) {
     switch (credential.provider) {
       case "google.com":
         firebase.database().ref('users').once('value').then(function(result) {
-          let users = result.val();
+          var users = result.val();
           if(!users) users = {};
           if(!users[user.uid]){
             var plus = google.plus('v1');
@@ -98,7 +98,7 @@ io.on('connection', function (socket) {
 
       case "facebook.com":
         firebase.database().ref('users').once('value').then(function(result) {
-          let users = result.val();
+          var users = result.val();
           if(!users) users = {};
           if(!users[user.uid]){
             fb.setAccessToken(credential.accessToken);
@@ -123,7 +123,7 @@ io.on('connection', function (socket) {
 
       case "twitter.com":
         firebase.database().ref('users').once('value').then(function(result) {
-          let users = result.val();
+          var users = result.val();
           if(!users) users = {};
           if(!users[user.uid]){
             twitterOptions.access_token_key = "3317091535-uIoNUqaY4C38wRMA2noCfxX0lcwtmfG3BAUSWIK" //credential.accessToken;
