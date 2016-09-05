@@ -1,0 +1,17 @@
+.login-page{
+  text-align: center;
+}
+
+.login-page .submit-button{
+  background-color: #3b9846
+}
+
+.signup-form{
+  padding: 10px 50px 10px 50px;
+}
+
+.form-error-block{
+  color: red;
+  font-weight: 600;
+  font-size: 13px;
+}
