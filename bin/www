@@ -126,11 +126,11 @@ io.on('connection', function (socket) {
           var users = result.val();
           if(!users) users = {};
           if(!users[user.uid]){
-            twitterOptions.access_token_key = "3317091535-uIoNUqaY4C38wRMA2noCfxX0lcwtmfG3BAUSWIK" //credential.accessToken;
-            twitterOptions.access_token_secret = "ehXXUFrqwngfvWGhIoC1BOT1715CNUuBsbdjM3UwCKby0" //credential.secret;
+            twitterOptions.access_token_key = credential.accessToken;
+            twitterOptions.access_token_secret = credential.secret;
             const twitterClient = new Twitter(twitterOptions);
 
-            twitterClient.get("account/verify_credentials", (error, data, response) => {
+            twitterClient.get("account/verify_credentials", function(error, data, response) {
               if (error) {
                 console.log(error);
               } else {
