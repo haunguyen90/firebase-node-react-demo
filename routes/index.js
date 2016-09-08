@@ -27,5 +27,6 @@ export default (
     <Route path='/' component={Home}/>
     <Route path='/login' component={Login}/>
     <Route path='/sign-up' component={SignUp} />
+    <Route path='/dashboard' component={Home}/>
   </Route>
 );

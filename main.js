@@ -20,4 +20,4 @@ var config = {
 };
 firebase.initializeApp(config);
 console.log(document.getElementById('container'));
-ReactDOM.render(<Router history={browserHistory}>{routes}</Router>, document.getElementById('container'));
+ReactDOM.render(<Router history={browserHistory}>{routes}</Router>, document.getElementById('prezent-app'));

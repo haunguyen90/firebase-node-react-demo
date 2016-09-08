@@ -5,8 +5,9 @@ import React from 'react';
 import {Link} from 'react-router';
 //import NavbarStore from '../stores/NavbarStore';
 //import NavbarActions from '../actions/NavbarActions';
+import {Navbar, Nav, NavItem, NavDropdown, MenuItem} from 'react-bootstrap';
 
-class Navbar extends React.Component {
+class AppNavbar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -29,15 +30,27 @@ class Navbar extends React.Component {
 
   render() {
     return (
-      <header className="mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
-        <div className="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
-          <div className="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--8-col-desktop">
-            <h3>Vincent Demo</h3>
-          </div>
-        </div>
-      </header>
+      <Navbar inverse>
+        <Navbar.Header>
+          <Navbar.Brand>
+            <a href="#">Prezent Logo</a>
+          </Navbar.Brand>
+          <Navbar.Toggle />
+        </Navbar.Header>
+        <Navbar.Collapse>
+          <Nav>
+            <NavItem eventKey={1} href="#">Dashboard</NavItem>
+          </Nav>
+          <Nav pullRight>
+            <NavDropdown eventKey={3} title="Dropdown" id="prezent-navbar-dropdown">
+              <MenuItem eventKey={3.1}>View Account</MenuItem>
+              <MenuItem eventKey={3.2}>Sign Out</MenuItem>
+            </NavDropdown>
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
     );
   }
 }
 
-export default Navbar;
+export default AppNavbar;

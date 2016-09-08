@@ -1,9 +1,11 @@
 import React from 'react';
-import Navbar from '../Navbar/Navbar.js';
+import AppNavbar from '../Navbar/Navbar.js';
 import Footer from '../Footer/Footer.js';
 import firebase from "firebase";
 import { browserHistory } from 'react-router';
 import { withRouter } from 'react-router';
+
+import {Grid, Row, Col} from 'react-bootstrap';
 
 class App extends React.Component {
   constructor(props) {
@@ -95,14 +97,16 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
-        <Navbar history={this.props.history} />
-        {this.props.children && React.cloneElement(this.props.children, {
-          uiConfig: this.props.uiConfig,
-          firebaseui: this.state.firebaseui
-        })}
-        <Footer />
-      </div>
+      <Grid fluid={true}>
+        <div className="row">
+          <AppNavbar history={this.props.history} />
+          {this.props.children && React.cloneElement(this.props.children, {
+            uiConfig: this.props.uiConfig,
+            firebaseui: this.state.firebaseui
+          })}
+          <Footer />
+        </div>
+      </Grid>
     );
   }
 }

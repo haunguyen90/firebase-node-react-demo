@@ -53,6 +53,7 @@ class Login extends React.Component {
       }
       if(user){
         this.setState({currentUid: user.uid});
+        this.props.router.push('/');
       }else{
         this.setState({currentUid: null});
       }
@@ -144,7 +145,6 @@ class Login extends React.Component {
     return (
       <div id="main">
         <div id="user-signed-out" className="">
-          <h4>You are signed out.</h4>
           <div id="firebaseui-spa">
             <h5>Login With:</h5>
             <div id="firebaseui-container"></div>
