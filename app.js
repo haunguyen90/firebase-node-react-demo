@@ -55,13 +55,13 @@ app.get('/bundle.js', function(req, res, next) {
 
   var production = process.env.NODE_ENV === 'production';
 
-  browserify()
-    .add('./main.js')
+  //.transform(literalify.configure({
+  //  'react': 'window.React',
+  //  'react-dom': 'window.ReactDOM'
+  //}))
+
+  browserify('./main.js', {debug: true})
     .transform(babelify, { presets: ['es2015', 'react'] })
-    .transform(literalify.configure({
-      'react': 'window.React',
-      'react-dom': 'window.ReactDOM'
-    }))
     .bundle()
     .pipe(res)
 
@@ -74,8 +74,10 @@ app.use(function(req, res) {
     } else if (redirectLocation) {
       res.status(302).redirect(redirectLocation.pathname + redirectLocation.search)
     } else if (renderProps) {
-      var html = ReactDOM.renderToString(React.createElement(Router.RouterContext, renderProps));
-      var page = swig.renderFile('views/index.html', { html: html });
+      res.setHeader('Content-Type', 'text/html');
+      //console.log(renderProps);
+      //var html = ReactDOM.renderToString(React.createElement(Router.RouterContext, renderProps));
+      var page = swig.renderFile('views/index.html');
       res.status(200).send(page);
     } else {
       res.status(404).send('Page Not Found')

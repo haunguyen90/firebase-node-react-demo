@@ -20,9 +20,11 @@ const isLoggedIn = (nextState, replace, callback) => {
   callback();
 };
 
+const test = {abd: "aa"};
+
 export default (
   <Route component={App}>
-    <Route path='/' component={Home} />
+    <Route path='/' component={Home}/>
     <Route path='/login' component={Login}/>
     <Route path='/sign-up' component={SignUp} />
   </Route>

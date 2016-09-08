@@ -16,8 +16,8 @@ var config = {
   apiKey: "AIzaSyCajHCcMiTctSbFjejAdvAc7Q3Bt38xwPA",
   authDomain: "prezvr.firebaseapp.com",
   databaseURL: "https://prezvr.firebaseio.com",
-  storageBucket: "prezvr.appspot.com",
+  storageBucket: "prezvr.appspot.com"
 };
 firebase.initializeApp(config);
-
+console.log(document.getElementById('container'));
 ReactDOM.render(<Router history={browserHistory}>{routes}</Router>, document.getElementById('container'));
