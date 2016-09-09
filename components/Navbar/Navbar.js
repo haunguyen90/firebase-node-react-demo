@@ -5,7 +5,7 @@ import React from 'react';
 import {Link} from 'react-router';
 //import NavbarStore from '../stores/NavbarStore';
 //import NavbarActions from '../actions/NavbarActions';
-import {Navbar, Nav, NavItem, NavDropdown, MenuItem} from 'react-bootstrap';
+import {Navbar, Nav, NavItem, NavDropdown, MenuItem, Image} from 'react-bootstrap';
 
 class AppNavbar extends React.Component {
   constructor(props) {
@@ -24,8 +24,18 @@ class AppNavbar extends React.Component {
     this.setState(state);
   }
 
-  handleSubmit(event) {
+  GoToDashboard(event) {
     event.preventDefault();
+    this.props.router.push('/dashboard');
+  }
+
+  goToUserAccount(event){
+    event.preventDefault();
+    this.props.router.push('/account');
+  }
+
+  getUserAvatar(){
+    return (<Image width={35} height={35} src="/images/avatar_default.jpg" circle />)
   }
 
   render() {
@@ -39,11 +49,11 @@ class AppNavbar extends React.Component {
         </Navbar.Header>
         <Navbar.Collapse>
           <Nav>
-            <NavItem eventKey={1} href="#">Dashboard</NavItem>
+            <NavItem eventKey={1} href="#" onClick={this.GoToDashboard.bind(this)}>Dashboard</NavItem>
           </Nav>
           <Nav pullRight>
-            <NavDropdown eventKey={3} title="Dropdown" id="prezent-navbar-dropdown">
-              <MenuItem eventKey={3.1}>View Account</MenuItem>
+            <NavDropdown eventKey={3} title={this.getUserAvatar()} id="prezent-navbar-dropdown">
+              <MenuItem eventKey={3.1} onClick={this.goToUserAccount.bind(this)}>View Account</MenuItem>
               <MenuItem eventKey={3.2}>Sign Out</MenuItem>
             </NavDropdown>
           </Nav>

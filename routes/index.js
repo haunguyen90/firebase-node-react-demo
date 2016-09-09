@@ -4,6 +4,8 @@ import App from '../components/App/App.jsx';
 import Home from '../components/Home/Home.js';
 import Login from '../components/Login/Login.js';
 import SignUp from '../components/SignUp/SignUp.js';
+import UserAccount from '../components/Account/UserAccount.js';
+
 import firebase from "firebase";
 
 const requiredLogin = (nextState, replace, callback) => {
@@ -28,5 +30,6 @@ export default (
     <Route path='/login' component={Login}/>
     <Route path='/sign-up' component={SignUp} />
     <Route path='/dashboard' component={Home}/>
+    <Route path='/account' component={UserAccount}/>
   </Route>
 );

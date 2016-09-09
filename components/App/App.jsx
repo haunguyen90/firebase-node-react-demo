@@ -95,11 +95,16 @@ class App extends React.Component {
     });
   }
 
+  isShowNavbar(){
+    const pathName = this.props.location.pathname;
+    return pathName != "/login";
+  }
+
   render() {
     return (
       <Grid fluid={true}>
         <div className="row">
-          <AppNavbar history={this.props.history} />
+          {this.isShowNavbar()? <AppNavbar history={this.props.history} /> : null}
           {this.props.children && React.cloneElement(this.props.children, {
             uiConfig: this.props.uiConfig,
             firebaseui: this.state.firebaseui
