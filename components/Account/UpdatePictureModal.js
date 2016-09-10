@@ -14,7 +14,8 @@ class EditAvatar extends React.Component {
     this.state = {
       scale: 1,
       preview: null,
-      img: "/images/drag-drop.gif"
+      img: "/images/drag-drop.gif",
+      isLoading: false
     };
   }
 
@@ -24,21 +25,22 @@ class EditAvatar extends React.Component {
   }
 
   handleSave(data) {
+    // Clear error
+    this.props.setError(null);
+    this.setState({isLoading: true});
+
     const img = this.refs.avatar.getImage().toDataURL();
 
     // Store profile picture to google cloud storage
     const storageRef = firebase.storage().ref();
-
     const fileName = `profile-picture-${firebase.auth().currentUser.uid}.jpg`;
-    const message = img.split(",")[1];;
+    const message = img.split(",")[1];
     storageRef.child('images/' + fileName).putString(message, "base64").then((snapshot) => {
       const url = snapshot.metadata.downloadURLs[0];
       this.updatePicUrlInDatabase(url);
-
+      this.setState({isLoading: false});
     }).catch((error) => {
-      // [START onfailure]
-      console.error('Upload failed:', error);
-      // [END onfailure]
+      this.props.setError(error);
     });
 
   }
@@ -50,6 +52,7 @@ class EditAvatar extends React.Component {
     let updates = {};
     updates['/users/' + firebase.auth().currentUser.uid + '/picUrl/'] = url;
     Database.ref().update(updates);
+    this.props.onCloseModal();
   }
 
   logCallback(e) {
@@ -57,6 +60,8 @@ class EditAvatar extends React.Component {
   }
 
   render(){
+    let isLoading = this.state.isLoading;
+
     return (
       <div className="edit-avatar-component">
         <AvatarEditor
@@ -79,16 +84,22 @@ class EditAvatar extends React.Component {
         </div>
         <br />
         <br />
-        <input type="button" onClick={this.handleSave.bind(this)} value="Upload" />
+        <Button
+          bsStyle="primary"
+          disabled={isLoading}
+          onClick={!isLoading ? this.handleSave.bind(this) : null}>
+          {isLoading ? 'Uploading...' : 'Upload'}
+        </Button>
         <br />
-        <img src={this.state.preview} style={{borderRadius: this.state.borderRadius + 5 /* because of the 5px padding */}}/>
       </div>
     )
   }
 }
 
 EditAvatar.propTypes = {
-  image: React.PropTypes.string
+  image: React.PropTypes.string,
+  setError: React.PropTypes.func,
+  onCloseModal: React.PropTypes.func
 };
 
 class UpdatePictureModal extends React.Component {
@@ -114,17 +125,17 @@ class UpdatePictureModal extends React.Component {
 
       let droppedFiles = false;
       const $form = $(this.refs.uploadForm);
-      $form.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
+      $form.on('drag dragstart dragend dragover dragenter dragleave drop', (e) => {
         e.preventDefault();
         e.stopPropagation();
       })
-        .on('dragover dragenter', function() {
+        .on('dragover dragenter', () => {
           $form.addClass('is-dragover');
         })
-        .on('dragleave dragend drop', function() {
+        .on('dragleave dragend drop', () => {
           $form.removeClass('is-dragover');
         })
-        .on('drop', function(e) {
+        .on('drop', (e) => {
           //droppedFiles = e.originalEvent.dataTransfer.files;
           this.readURL(e.originalEvent.dataTransfer);
         });
@@ -163,6 +174,8 @@ class UpdatePictureModal extends React.Component {
           {this.state.showAvatarEditor?
             <EditAvatar
               image={this.state.fileUploadDataURL}
+              setError={this.props.setError.bind(this)}
+              onCloseModal={this.props.onCloseModal.bind(this)}
             /> :
             <form ref="uploadForm" className={formClass}>
               <div className="box__input">
@@ -185,7 +198,8 @@ class UpdatePictureModal extends React.Component {
 
 UpdatePictureModal.propTypes = {
   showModal: React.PropTypes.bool,
-  onCloseModal: React.PropTypes.func
+  onCloseModal: React.PropTypes.func,
+  setError: React.PropTypes.func
 };
 
 export default UpdatePictureModal;

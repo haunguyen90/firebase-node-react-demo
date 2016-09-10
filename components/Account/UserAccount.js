@@ -17,14 +17,9 @@ class UserAccount extends React.Component {
       borderRadius: 0,
       preview: null,
       img: "/images/avatar_default.jpg",
-      showModal: false
+      showModal: false,
+      ACCOUNT_ERROR: null
     };
-  }
-
-  handleSave(data) {
-    const img = this.refs.avatar.getImage().toDataURL();
-    const rect = this.refs.avatar.getCroppingRect();
-    this.setState({preview: img, croppingRect: rect});
   }
 
   openUpdatePictureModal(e){
@@ -36,12 +31,22 @@ class UserAccount extends React.Component {
     this.setState({showModal: false});
   }
 
+  showError(){
+    if(this.state.ACCOUNT_ERROR){
+      return this.state.ACCOUNT_ERROR.message;
+    }
+  }
+
+  setError(error){
+    this.setState({ACCOUNT_ERROR: error});
+  }
+
   render(){
     return (
       <div className="user-account-component container">
         <PageHeader>PROFILE</PageHeader>
         <Alert bsStyle="warning">
-          Your changes have been saved.
+          {this.showError()}
         </Alert>
         <Image width={50} height={50} src="/images/avatar_default.jpg" circle />
         <span><a href="#" onClick={this.openUpdatePictureModal.bind(this)}>Update Profile Picture</a></span>
@@ -55,6 +60,7 @@ class UserAccount extends React.Component {
         <UpdatePictureModal
           showModal={this.state.showModal}
           onCloseModal={this.closeUpdatePictureModal.bind(this)}
+          setError={this.setError.bind(this)}
         />
       </div>
     )
