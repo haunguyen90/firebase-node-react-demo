@@ -39,8 +39,15 @@ class EditAvatar extends React.Component {
       const url = snapshot.metadata.downloadURLs[0];
       this.updatePicUrlInDatabase(url);
       this.setState({isLoading: false});
+      this.props.setError({
+        error: "success",
+        message: "Your profile picture has been updated"
+      });
     }).catch((error) => {
-      this.props.setError(error);
+      this.props.setError({
+        error: "error",
+        message: error.message
+      });
     });
 
   }

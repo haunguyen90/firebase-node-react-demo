@@ -75,6 +75,17 @@ Form upload profile picture
 }
 
 /**********************************
+user-account-component
+*/
+.user-account-component .upload-link{
+  margin-left: 10px;
+}
+
+.user-account-component .updateUserInfoFrm{
+  margin-top: 30px;
+}
+
+/**********************************
 edit-avatar-component
 */
 .edit-avatar-component{
