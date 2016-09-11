@@ -5,7 +5,8 @@ import React from 'react';
 import {withRouter} from 'react-router';
 import {PageHeader, Grid, Row, Col, Button, Modal} from 'react-bootstrap';
 import {CONST} from '~/lib/_required/enums.js';
-import { FacebookButton, FacebookCount } from "react-social";
+import { FacebookButton, FacebookCount, TwitterButton, GooglePlusButton } from "react-social";
+import CopyToClipboard from 'react-copy-to-clipboard';
 
 class NewFaceBookButton extends FacebookButton {
   constructor(props) {
@@ -25,12 +26,21 @@ class NewFaceBookButton extends FacebookButton {
 class SharingDeckModal extends React.Component {
   constructor (props) {
     super(props);
-    this.state = {}
+    this.state = {
+      copied: false
+    }
   }
 
-  facebookClick(socialEvent, url, target){
+  socialClick(socialEvent, url, target){
     console.log(socialEvent);
     window.open(url, 'name', 'width=600,height=400');
+  }
+
+  onCopy(){
+    this.setState({copied: true});
+    setTimeout(() => {
+      this.setState({copied: false});
+    }, 350)
   }
 
   render() {
@@ -46,7 +56,13 @@ class SharingDeckModal extends React.Component {
           <Grid>
             <Row className="link-wrapper">
               <div className="click-to-copy-link">
-                <span>Click to copy link</span>
+                <CopyToClipboard text={deckUrl}
+                                 onCopy={this.onCopy.bind(this)}>
+                  <span>Click to copy</span>
+                </CopyToClipboard>
+                {this.state.copied?
+                  <span className="copied-text-alert text-danger">Copied</span> : null
+                }
               </div>
               <Col xs={12} className="link-display">
                 <span>{deckUrl}</span>
@@ -59,10 +75,30 @@ class SharingDeckModal extends React.Component {
                 appId={CONST.APP.SOCIAL_SETTINGS.FACEBOOK.APP_ID}
                 target={"popup"}
                 _open={false}
-                onClick={this.facebookClick.bind(this)}
+                onClick={this.socialClick.bind(this)}
               >
                 <i className="fa fa-facebook"></i>
               </NewFaceBookButton>
+
+              <TwitterButton
+                className="btn btn-social-icon btn-twitter"
+                url={deckUrl}
+                target={"popup"}
+                _open={false}
+                onClick={this.socialClick.bind(this)}
+              >
+                <i className="fa fa-twitter"></i>
+              </TwitterButton>
+
+              <GooglePlusButton
+                className="btn btn-social-icon btn-google"
+                url={deckUrl}
+                target={"popup"}
+                _open={false}
+                onClick={this.socialClick.bind(this)}
+              >
+                <i className="fa fa-google"></i>
+              </GooglePlusButton>
             </Row>
           </Grid>
         </Modal.Body>

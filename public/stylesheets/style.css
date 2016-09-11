@@ -108,3 +108,11 @@ sharing-deck-modal-component
 .sharing-deck-modal-component .share-action{
   margin-top: 10px;
 }
+
+.sharing-deck-modal-component .copied-text-alert{
+  margin-left: 10px;
+}
+
+.sharing-deck-modal-component .click-to-copy-link{
+  cursor: pointer;
+}
