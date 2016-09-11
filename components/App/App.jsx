@@ -11,7 +11,8 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentUid: null
+      currentUid: null,
+      currentUserData: null
     };
   }
 
@@ -82,10 +83,15 @@ class App extends React.Component {
 
       if(user){
         this.setState({currentUid: user.uid});
-        let usersRef = firebase.database().ref('users/' + user.uid + '/socialImgUrl');
-        usersRef.on("value", (result) => {
+        let PicRef = firebase.database().ref('users/' + user.uid + '/socialImgUrl');
+        PicRef.on("value", (result) => {
           console.log("added");
           this.updateProfilePicture();
+        });
+
+        let userRef = firebase.database().ref('users/' + user.uid);
+        userRef.on("value", (result) => {
+          this.setState({currentUserData: result.val()});
         });
 
       }else{
@@ -104,7 +110,7 @@ class App extends React.Component {
     return (
       <Grid fluid={true}>
         <div className="row">
-          {this.isShowNavbar()? <AppNavbar history={this.props.history} /> : null}
+          <AppNavbar history={this.props.history} currentUserData={this.state.currentUserData}/>
           {this.props.children && React.cloneElement(this.props.children, {
             uiConfig: this.props.uiConfig,
             firebaseui: this.state.firebaseui
