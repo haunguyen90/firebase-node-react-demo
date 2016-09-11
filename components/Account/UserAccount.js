@@ -4,7 +4,7 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {PageHeader, FormGroup, ControlLabel, FormControl, HelpBlock, Alert, Image, Button} from 'react-bootstrap';
-import ENUMS from '~/lib/_required/enums.js';
+import {ENUMS} from '~/lib/_required/enums.js';
 
 import AvatarEditor from "react-avatar-editor";
 

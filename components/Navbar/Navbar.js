@@ -6,6 +6,7 @@ import {Link, withRouter} from 'react-router';
 //import NavbarStore from '../stores/NavbarStore';
 //import NavbarActions from '../actions/NavbarActions';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, Image} from 'react-bootstrap';
+import {ENUMS} from '~/lib/_required/enums.js';
 
 class AppNavbar extends React.Component {
   constructor(props) {

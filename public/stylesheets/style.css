@@ -95,3 +95,16 @@ edit-avatar-component
 .scale-range-input-wrapper{
   padding: 0 20%;
 }
+
+/**********************************
+sharing-deck-modal-component
+*/
+.sharing-deck-modal-component .link-display{
+  padding: 10px;
+  background-color: #ccc;
+  border: 1px solid grey;
+}
+
+.sharing-deck-modal-component .share-action{
+  margin-top: 10px;
+}
