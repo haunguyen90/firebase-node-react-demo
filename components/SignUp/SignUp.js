@@ -7,6 +7,7 @@
 import React from 'react';
 import {Link} from 'react-router';
 import { withRouter } from 'react-router'
+import {PageHeader, FormGroup, ControlLabel, FormControl, HelpBlock, Alert, Image, Button} from 'react-bootstrap';
 
 class SignUp extends React.Component {
   constructor(props) {
@@ -108,32 +109,59 @@ class SignUp extends React.Component {
       <div className="login-page">
 
         <form onSubmit={this.onSignUpSubmit.bind(this)} className="signup-form">
-          <h4>Sign Up</h4>
+          <h2>Sign Up</h2>
           <span className="form-error-block">
             {this.state.SIGN_UP_ERROR?
               this.state.SIGN_UP_ERROR.message : null
             }
           </span>
           <div className="">
-            <div className="input-field">
-              <input type="text" className="full-name validate" required ref="fullName" placeholder="Full Name"/>
-            </div>
-            <div className="input-field">
-              <input type="text" className="email validate" required ref="email" placeholder="Email"/>
-            </div>
-            <div className="input-field">
-              <input type="text" className="confirm-email validate" required ref="confirmEmail" placeholder="Confirm Email"/>
-            </div>
-            <div className="input-field">
-              <input type="password" className="password validate" required ref="password" placeholder="Password"/>
-            </div>
+            <FormGroup controlId="fullName">
+              <FormControl
+                type="text"
+                className="full-name validate"
+                required
+                ref="fullName"
+                placeholder="Full Name"
+              />
+            </FormGroup>
+
+            <FormGroup controlId="email">
+              <FormControl
+                type="text"
+                className="email validate"
+                required
+                ref="email"
+                placeholder="Email"
+                />
+            </FormGroup>
+
+            <FormGroup controlId="email">
+              <FormControl
+                type="text"
+                className="confirm-email validate"
+                required
+                ref="confirmEmail"
+                placeholder="Confirm Email"
+                />
+            </FormGroup>
+
+            <FormGroup controlId="email">
+              <FormControl
+                type="password"
+                className="password validate"
+                required
+                ref="password"
+                placeholder="Password"
+                />
+            </FormGroup>
 
             <div className="firebaseui-list-item">
-              <button type="submit" className="firebaseui-id-submit firebaseui-button mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+              <button type="submit" className="btn btn-lg btn-primary btn-block">
                 Create your free Account
               </button>
               <button onClick={this.switchToSocial.bind(this)}
-                      type="type" className="firebaseui-id-submit firebaseui-button mdl-button mdl-js-button mdl-button--raised">
+                      type="type" className="btn btn-lg btn-default btn-block">
                 Sign up with a social network
               </button>
             </div>

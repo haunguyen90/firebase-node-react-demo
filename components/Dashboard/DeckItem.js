@@ -46,6 +46,7 @@ class DeckItem extends React.Component {
           showModal={this.state.showModal}
           closeShareWindow={this.closeShareWindow.bind(this)}
           deckUrl={this.getDeckUrl()}
+          name={deckData.name}
         />
       </div>
     )

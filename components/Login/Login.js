@@ -3,6 +3,7 @@
  */
 import React from 'react';
 import {Link, withRouter} from 'react-router';
+import {PageHeader, FormGroup, ControlLabel, FormControl, HelpBlock, Alert, Image, Button} from 'react-bootstrap';
 
 class Login extends React.Component {
   constructor(props) {
@@ -83,6 +84,7 @@ class Login extends React.Component {
       // Unsubscribe auth change
       observerAuth();
     }
+    this.props.firebaseui.reset();
   }
 
   goToSignUp(){
@@ -123,27 +125,42 @@ class Login extends React.Component {
   renderLoginForm(){
     return (
       <form onSubmit={this.onLoginSubmit.bind(this)} className="signup-form">
-        <h4>Log In</h4>
+        <h2>Log In</h2>
           <span className="form-error-block">
             {this.state.LOGIN_ERROR?
               this.state.LOGIN_ERROR.message : null
             }
           </span>
         <div className="">
-          <div className="input-field">
-            <input type="text" className="email validate" required ref="email" placeholder="Email"/>
-          </div>
-          <div className="input-field">
-            <input type="password" className="password validate" required ref="password" placeholder="Password"/>
-          </div>
+          <FormGroup controlId="emailInput">
+            <FormControl
+              type="text"
+              className="email validate"
+              required
+              ref="email"
+              placeholder="Email"
+            />
+
+          </FormGroup>
+
+          <FormGroup controlId="passwordInput">
+            <FormControl
+              type="password"
+              className="password validate"
+              required
+              ref="password"
+              placeholder="Password"
+              />
+
+          </FormGroup>
 
           <div className="firebaseui-list-item">
-            <button type="submit" className="firebaseui-id-submit firebaseui-button mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+            <button type="submit" className="btn btn-lg btn-primary btn-block">
               Sign in
             </button>
 
             <button onClick={this.switchToSocial.bind(this)}
-              type="type" className="firebaseui-id-submit firebaseui-button mdl-button mdl-js-button mdl-button--raised">
+              type="type" className="btn btn-lg btn-default btn-block ">
               Sign in with a social network
             </button>
           </div>
@@ -158,7 +175,7 @@ class Login extends React.Component {
         <div id="user-signed-out" className="">
           <div id="firebaseui-spa">
             {this.state.FIREBASEUI_DID_MOUNT && !this.state.currentUid?
-              <h5>Login With:</h5> : null
+              <h2>Login With:</h2> : null
             }
 
             <div id="firebaseui-container"></div>
@@ -200,4 +217,4 @@ class Login extends React.Component {
   }
 }
 
-export default withRouter(Login);
+export default withRouter(Login, { withRef: true });

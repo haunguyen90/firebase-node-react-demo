@@ -10,10 +10,53 @@ import {Grid, Row, Col} from 'react-bootstrap';
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.signInSuccess = this.signInSuccess.bind(this);
     this.state = {
       currentUid: null,
-      currentUserData: null
+      currentUserData: null,
+      uiConfig: {
+        signInSuccessUrl: "/",
+        'callbacks': {
+          // Called when the user has been successfully signed in.
+          'signInSuccess': this.signInSuccess
+        },
+        // Opens IDP Providers sign-in flow in a popup.
+        'signInFlow': 'popup',
+        'signInOptions': [
+          // TODO(developer): Remove the providers you don't need for your app.
+          {
+            provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+            scopes: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/plus.profiles.read', 'https://www.googleapis.com/auth/userinfo.profile']
+          },
+          {
+            provider: firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+            scopes :[
+              'public_profile',
+              'email',
+              'user_likes',
+              'user_friends'
+            ]
+          },
+          firebase.auth.TwitterAuthProvider.PROVIDER_ID
+        ],
+        // Terms of service url.
+        'tosUrl': 'https://www.google.com'
+      }
     };
+  }
+
+  signInSuccess(user, credential, redirectUrl){
+    this.refs.mainContent.getWrappedInstance().setState({currentUid: {}});
+    const socket = io.connect('http://localhost:4000');
+    socket.emit('checkAndUpdateUsersTable', user, credential);
+    console.log(user);
+
+    //handleSignedInUser(user);
+    // Do not redirect.
+    setTimeout(function(){
+    //browserHistory.push("/");
+    }, 300);
+    return false;
   }
 
   componentWillMount(){
@@ -95,11 +138,16 @@ class App extends React.Component {
         });
 
       }else{
+        this.props.router.push("/login");
         this.setState({currentUid: null});
         this.setState({currentUserData: null});
-        this.props.router.push("/login");
       }
     });
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    //if(prevState.currentUid != this.state.currentUid && !this.state.currentUid)
+    //  this.props.router.push("/login");
   }
 
   isShowNavbar(){
@@ -113,8 +161,9 @@ class App extends React.Component {
         <div className="row">
           <AppNavbar history={this.props.history} currentUserData={this.state.currentUserData}/>
           {this.props.children && React.cloneElement(this.props.children, {
-            uiConfig: this.props.uiConfig,
-            firebaseui: this.state.firebaseui
+            uiConfig: this.state.uiConfig,
+            firebaseui: this.state.firebaseui,
+            ref: "mainContent"
           })}
           <Footer />
         </div>
@@ -122,46 +171,5 @@ class App extends React.Component {
     );
   }
 }
-
-App.defaultProps = {
-  uiConfig: {
-    signInSuccessUrl: "/",
-    'callbacks': {
-      // Called when the user has been successfully signed in.
-      'signInSuccess'(user, credential, redirectUrl) {
-        const socket = io.connect('http://localhost:4000');
-        socket.emit('checkAndUpdateUsersTable', user, credential);
-        console.log(user);
-        //handleSignedInUser(user);
-        // Do not redirect.
-        setTimeout(function(){
-          //browserHistory.push("/");
-        }, 300);
-        return false;
-      }
-    },
-    // Opens IDP Providers sign-in flow in a popup.
-    'signInFlow': 'popup',
-    'signInOptions': [
-      // TODO(developer): Remove the providers you don't need for your app.
-      {
-        provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-        scopes: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/plus.profiles.read', 'https://www.googleapis.com/auth/userinfo.profile']
-      },
-      {
-        provider: firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-        scopes :[
-          'public_profile',
-          'email',
-          'user_likes',
-          'user_friends'
-        ]
-      },
-      firebase.auth.TwitterAuthProvider.PROVIDER_ID
-    ],
-    // Terms of service url.
-    'tosUrl': 'https://www.google.com'
-  }
-};
 
 export default withRouter(App);

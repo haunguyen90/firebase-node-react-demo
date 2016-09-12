@@ -5,7 +5,7 @@ import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {PageHeader, Grid, Row, Col, Thumbnail, Button} from 'react-bootstrap';
 import {ENUMS} from '~/lib/_required/enums.js';
-import {isEmpty, map} from 'underscore';
+import {isEmpty, map, extend} from 'underscore';
 import DeckItem from './DeckItem.js';
 
 
@@ -23,7 +23,9 @@ class Dashboard extends React.Component {
     if(!isEmpty(decksObject)){
       const deckKeys = Object.keys(decksObject);
       return map(deckKeys, (deckKey) => {
-        return decksObject[deckKey];
+        let dataObject = decksObject[deckKey];
+        dataObject.id = deckKey;
+        return dataObject;
       });
     }
     return [];

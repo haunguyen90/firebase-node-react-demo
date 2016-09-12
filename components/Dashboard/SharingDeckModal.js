@@ -18,6 +18,7 @@ class NewFaceBookButton extends FacebookButton {
     return "https://www.facebook.com/dialog/share?"
       + "app_id=145634995501895"
       + "&display=popup"
+      + "&quote=" + encodeURIComponent(this.props.message)
       + "&href=" + encodeURIComponent(this.props.url)
       + "&redirect_uri=" + encodeURIComponent("https://developers.facebook.com/tools/explorer");
   }
@@ -44,7 +45,7 @@ class SharingDeckModal extends React.Component {
   }
 
   render() {
-    const {deckUrl} = this.props;
+    const {deckUrl, name} = this.props;
     return (
       <Modal className="sharing-deck-modal-component"
              show={this.props.showModal}
@@ -56,17 +57,17 @@ class SharingDeckModal extends React.Component {
           <div>
             <Row className="link-wrapper">
               <div className="click-to-copy-link">
-                <CopyToClipboard text={deckUrl}
-                                 onCopy={this.onCopy.bind(this)}>
                   <span>Click to copy</span>
-                </CopyToClipboard>
                 {this.state.copied?
                   <span className="copied-text-alert text-danger">Copied</span> : null
                 }
               </div>
-              <Col xs={12} className="link-display">
-                <span>{deckUrl}</span>
-              </Col>
+              <CopyToClipboard text={deckUrl}
+                               onCopy={this.onCopy.bind(this)}>
+                <Col xs={12} className="link-display">
+                  <span>{deckUrl}</span>
+                </Col>
+              </CopyToClipboard>
             </Row>
             <Row className="share-action">
               <NewFaceBookButton
@@ -75,6 +76,7 @@ class SharingDeckModal extends React.Component {
                 appId={CONST.APP.SOCIAL_SETTINGS.FACEBOOK.APP_ID}
                 target={"popup"}
                 _open={false}
+                message={name + " " + deckUrl}
                 onClick={this.socialClick.bind(this)}
                 >
                 <i className="fa fa-facebook"></i>
@@ -85,6 +87,7 @@ class SharingDeckModal extends React.Component {
                 url={deckUrl}
                 target={"popup"}
                 _open={false}
+                message={name}
                 onClick={this.socialClick.bind(this)}
                 >
                 <i className="fa fa-twitter"></i>
