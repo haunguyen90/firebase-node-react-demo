@@ -53,7 +53,7 @@ class SharingDeckModal extends React.Component {
           <Modal.Title>Share Presentation</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Grid>
+          <div>
             <Row className="link-wrapper">
               <div className="click-to-copy-link">
                 <CopyToClipboard text={deckUrl}
@@ -76,7 +76,7 @@ class SharingDeckModal extends React.Component {
                 target={"popup"}
                 _open={false}
                 onClick={this.socialClick.bind(this)}
-              >
+                >
                 <i className="fa fa-facebook"></i>
               </NewFaceBookButton>
 
@@ -86,7 +86,7 @@ class SharingDeckModal extends React.Component {
                 target={"popup"}
                 _open={false}
                 onClick={this.socialClick.bind(this)}
-              >
+                >
                 <i className="fa fa-twitter"></i>
               </TwitterButton>
 
@@ -96,11 +96,11 @@ class SharingDeckModal extends React.Component {
                 target={"popup"}
                 _open={false}
                 onClick={this.socialClick.bind(this)}
-              >
+                >
                 <i className="fa fa-google"></i>
               </GooglePlusButton>
             </Row>
-          </Grid>
+          </div>
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.props.closeShareWindow}>Close</Button>
