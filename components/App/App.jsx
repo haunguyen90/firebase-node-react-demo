@@ -134,7 +134,7 @@ App.defaultProps = {
         //handleSignedInUser(user);
         // Do not redirect.
         setTimeout(function(){
-          browserHistory.push("/");
+          //browserHistory.push("/");
         }, 300);
         return false;
       }

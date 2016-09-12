@@ -25,7 +25,9 @@ class UserAccount extends React.Component {
         name: "",
         bio: ""
       },
-      isLoading: false
+      isLoading: false,
+      currentUserId: null,
+      observerAuth: null
     };
   }
 
@@ -61,7 +63,7 @@ class UserAccount extends React.Component {
   }
 
   componentDidMount(){
-    firebase.auth().onAuthStateChanged((user) => {
+    const observerAuth = firebase.auth().onAuthStateChanged((user) => {
       if(user){
         let userRef = firebase.database().ref('users/' + user.uid);
         userRef.on("value", (result) => {
@@ -69,10 +71,26 @@ class UserAccount extends React.Component {
           this.setState({userUpdate: {
             name: result.val().name,
             bio: result.val().bio || ""
-          }})
+          }});
+          this.setState({currentUserId: user.uid});
         });
+      }else{
+        const userId = this.state.currentUserId;
+        if(userId){
+          let userRef = firebase.database().ref('users/' + user.uid);
+          userRef.off();
+        }
       }
     });
+    this.setState({observerAuth: observerAuth});
+  }
+
+  componentWillUnmount(){
+    const observerAuth = this.state.observerAuth;
+    if(observerAuth && typeof observerAuth == 'function'){
+      // Unsubscribe auth change
+      observerAuth();
+    }
   }
 
   getProfilePicture() {

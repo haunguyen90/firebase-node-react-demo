@@ -146,9 +146,12 @@ class Login extends React.Component {
       <div id="main">
         <div id="user-signed-out" className="">
           <div id="firebaseui-spa">
-            <h5>Login With:</h5>
+            {this.state.FIREBASEUI_DID_MOUNT && !this.state.currentUid?
+              <h5>Login With:</h5> : null
+            }
+
             <div id="firebaseui-container"></div>
-            {this.state.FIREBASEUI_DID_MOUNT?
+            {this.state.FIREBASEUI_DID_MOUNT && !this.state.currentUid?
               <button onClick={this.switchToLoginWithPassword.bind(this)}
                       className="firebaseui-idp-button mdl-button mdl-js-button mdl-button--raised firebaseui-idp-password firebaseui-id-idp-button">
                 <img className="firebaseui-idp-icon" src="https://www.gstatic.com/firebasejs/staging/3.0.0/auth/images/mail.svg" data-pin-nopin="true"/>
@@ -158,7 +161,7 @@ class Login extends React.Component {
 
           </div>
 
-          {this.state.FIREBASEUI_DID_MOUNT?
+          {this.state.FIREBASEUI_DID_MOUNT && !this.state.currentUid?
             <div className="sign-up-link">
               <h5>Or :</h5>
               <button onClick={this.goToSignUp.bind(this)}
@@ -166,7 +169,6 @@ class Login extends React.Component {
                 Create a new Account
               </button>
             </div> : null
-
           }
         </div>
       </div>

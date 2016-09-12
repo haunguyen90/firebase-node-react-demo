@@ -13,7 +13,8 @@ class Dashboard extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      decksObject: {}
+      decksObject: {},
+      observerAuth: null
     };
   }
 
@@ -29,10 +30,26 @@ class Dashboard extends React.Component {
   }
 
   componentDidMount(){
-    let decksRef = firebase.database().ref("decks");
-    decksRef.on("value", (result) => {
-      this.setState({decksObject: result.val()})
-    })
+    const observerAuth = firebase.auth().onAuthStateChanged((user) => {
+      if(user){
+        let decksRef = firebase.database().ref("decks");
+        decksRef.orderByChild("uid").equalTo(user.uid).on("value", (result) => {
+          this.setState({decksObject: result.val()});
+        })
+      }else{
+        let decksRef = firebase.database().ref("decks");
+        decksRef.off();
+      }
+    });
+    this.setState({observerAuth: observerAuth});
+  }
+
+  componentWillUnmount(){
+    const observerAuth = this.state.observerAuth;
+    if(observerAuth && typeof observerAuth == 'function'){
+      // Unsubscribe auth change
+      observerAuth();
+    }
   }
 
   render(){
