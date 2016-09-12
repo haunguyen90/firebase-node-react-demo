@@ -13,7 +13,8 @@ class Home extends React.Component {
       users: {},
       socket: null,
       socialUserMissingEmail: null,
-      COMPLETE_SIGN_UP_ERROR: null
+      COMPLETE_SIGN_UP_ERROR: null,
+      observerAuth: null
     };
     this.onChange = this.onChange.bind(this);
   }
@@ -26,7 +27,7 @@ class Home extends React.Component {
       this.setState({users: users});
     });
 
-    firebase.auth().onAuthStateChanged((user) => {
+    const observerAuth = firebase.auth().onAuthStateChanged((user) => {
       // The observer is also triggered when the user's token has expired and is
       // automatically refreshed. In that case, the user hasn't changed so we should
       // not update the UI.
@@ -37,13 +38,18 @@ class Home extends React.Component {
       }
     });
 
+    this.setState({observerAuth: observerAuth});
+
   }
 
-  componentWillUnmount() {
-    //const socket = io.connect('http://localhost:4000');
-    //socket.on('socialUserMissingEmail', () => {
-    //  this.setState({socialUserMissingEmail: true});
-    //});
+  componentWillUnmount(){
+    const observerAuth = this.state.observerAuth;
+    if(observerAuth && typeof observerAuth == 'function'){
+      // Unsubscribe auth change
+      observerAuth();
+    }
+    let users = firebase.database().ref('users');
+    users.off();
   }
 
   onChange(state) {

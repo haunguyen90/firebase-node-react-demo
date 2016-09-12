@@ -11,7 +11,8 @@ class Login extends React.Component {
       currentUid: null,
       loginWithPassword: false,
       LOGIN_ERROR: null,
-      FIREBASEUI_DID_MOUNT: null
+      FIREBASEUI_DID_MOUNT: null,
+      observerAuth: null
     };
   }
 
@@ -44,7 +45,7 @@ class Login extends React.Component {
 
   componentDidMount(){
     this.setState({FIREBASEUI_DID_MOUNT: null});
-    firebase.auth().onAuthStateChanged((user) => {
+    const observerAuth = firebase.auth().onAuthStateChanged((user) => {
       // The observer is also triggered when the user's token has expired and is
       // automatically refreshed. In that case, the user hasn't changed so we should
       // not update the UI.
@@ -66,12 +67,22 @@ class Login extends React.Component {
         this.handleSignedOutUser();
     });
 
+    this.setState({observerAuth: observerAuth});
+
     //const socket = io.connect('http://localhost:4000');
     //socket.on('redirectUserToHome', (user) => {
     //  const currentUser = firebase.auth().currentUser;
     //  this.props.router.push("/");
     //});
 
+  }
+
+  componentWillUnmount(){
+    const observerAuth = this.state.observerAuth;
+    if(observerAuth && typeof observerAuth == 'function'){
+      // Unsubscribe auth change
+      observerAuth();
+    }
   }
 
   goToSignUp(){

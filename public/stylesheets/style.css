@@ -99,6 +99,12 @@ edit-avatar-component
 /**********************************
 sharing-deck-modal-component
 */
+
+.sharing-deck-modal-component .modal-body{
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
 .sharing-deck-modal-component .link-display{
   padding: 10px;
   background-color: #ccc;
