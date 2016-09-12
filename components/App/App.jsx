@@ -96,6 +96,7 @@ class App extends React.Component {
 
       }else{
         this.setState({currentUid: null});
+        this.setState({currentUserData: null});
         this.props.router.push("/login");
       }
     });
