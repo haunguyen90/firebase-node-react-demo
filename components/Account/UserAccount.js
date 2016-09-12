@@ -105,7 +105,8 @@ class UserAccount extends React.Component {
     event.preventDefault();
     const {userUpdate} = this.state;
     if(userUpdate && field in userUpdate){
-      userUpdate[field] = event.target.value.trim();
+      const value = event.target.value;
+      userUpdate[field] = value;
       this.setState({ userUpdate: userUpdate });
     }
 
@@ -119,9 +120,13 @@ class UserAccount extends React.Component {
     const Database = firebase.database();
 
     let newUserUpdate = {
-      name: userUpdate.name,
-      bio: userUpdate.bio
+      name: userUpdate.name.trim(),
+      bio: userUpdate.bio.trim()
     };
+    if(!newUserUpdate.name || newUserUpdate.name == ""){
+      this.setState({isLoading: false});
+      return false;
+    }
 
     let updates = {};
     updates['/users/' + firebase.auth().currentUser.uid + '/name'] = newUserUpdate.name;
