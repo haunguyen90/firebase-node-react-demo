@@ -159,6 +159,16 @@ presentation-component
 
       .tab-content{
         background-color: white;
+        padding-top: 30px;
+
+        .deck-settings-component{
+          //margin: auto;
+          //width: 40%;
+
+          .button-group-visibility{
+            display: block;
+          }
+        }
       }
     }
 
