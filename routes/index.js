@@ -6,6 +6,7 @@ import Login from '../components/Login/Login.js';
 import SignUp from '../components/SignUp/SignUp.js';
 import UserAccount from '../components/Account/UserAccount.js';
 import Dashboard from '../components/Dashboard/Dashboard.js';
+import Presentation from '../components/Presentation/Presentation.js';
 
 import firebase from "firebase";
 
@@ -23,14 +24,13 @@ const isLoggedIn = (nextState, replace, callback) => {
   callback();
 };
 
-const test = {abd: "aa"};
-
 export default (
   <Route component={App}>
     <Route path='/' component={Home}/>
-    <Route path='/login' component={Login}/>
-    <Route path='/sign-up' component={SignUp} />
-    <Route path='/dashboard' component={Dashboard}/>
-    <Route path='/account' component={UserAccount}/>
+    <Route path='login' component={Login}/>
+    <Route path='sign-up' component={SignUp} />
+    <Route path='dashboard' component={Dashboard}/>
+    <Route path='account' component={UserAccount}/>
+    <Route path='presentation/:id' component={Presentation}/>
   </Route>
 );

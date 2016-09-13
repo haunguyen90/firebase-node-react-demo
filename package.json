@@ -35,6 +35,7 @@
     "mongoose": "~4.4.4",
     "morgan": "~1.6.1",
     "node-jsx": "^0.13.3",
+    "node-sass-middleware": "^0.9.8",
     "react": "^15.3.1",
     "react-avatar-cropper": "^0.1.2",
     "react-avatar-editor": "^4.1.3",
