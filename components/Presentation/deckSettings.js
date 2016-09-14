@@ -20,6 +20,10 @@ class DeckSettings extends React.Component {
   }
 
   getValidateDeckTitle(){
+    const {deckTitle} = this.state;
+    if (deckTitle === ""){
+      return 'error';
+    }
 
   }
 
@@ -58,7 +62,8 @@ class DeckSettings extends React.Component {
     switch (field){
       case "deckTitle":
         updates['/name/'] = value;
-        presentationRef.update(updates);
+        if(value)
+          presentationRef.update(updates);
         break;
 
       case "deckSummary":
@@ -97,7 +102,10 @@ class DeckSettings extends React.Component {
                   onBlur={this.handleBlur}
                 />
                 <FormControl.Feedback />
-                <HelpBlock></HelpBlock>
+                {this.getValidateDeckTitle() == 'error'?
+                  <HelpBlock>Please give your presentation a title.</HelpBlock> : null
+                }
+
               </FormGroup>
 
               <FormGroup controlId="deckSummary"

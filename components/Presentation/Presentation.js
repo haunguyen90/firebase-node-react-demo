@@ -4,7 +4,9 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {PageHeader, Row, Col, Tabs, Tab} from 'react-bootstrap';
+import {extend} from 'underscore';
 import {ENUMS} from '~/lib/_required/enums.js';
+import {makeCancelable} from '~/lib/promise/reactCancelPromise.js';
 
 import DeckSettings from './deckSettings.js';
 
@@ -57,6 +59,8 @@ class Presentation extends React.Component {
       // Unsubscribe auth change
       observerAuth();
     }
+    let presentationRef = firebase.database().ref('decks/' + this.props.params.id);
+    presentationRef.off();
   }
 
   render(){

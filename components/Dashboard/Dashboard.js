@@ -52,6 +52,8 @@ class Dashboard extends React.Component {
       // Unsubscribe auth change
       observerAuth();
     }
+    let decksRef = firebase.database().ref("decks");
+    decksRef.off();
   }
 
   render(){
