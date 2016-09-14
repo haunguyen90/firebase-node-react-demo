@@ -34,11 +34,12 @@ class Presentation extends React.Component {
       if(user){
         presentationRef.on("value", (result) => {
           const deckObject = result.val();
+          deckObject.id = this.props.params.id;
+          this.setState({deckObject: deckObject});
           if(deckObject.uid == user.uid){
-            deckObject.id = this.props.params.id;
-            this.setState({deckObject: deckObject});
+            // TODO
           }else{
-            alert("The presentation is not belong to you.");
+            //alert("The presentation is not belong to you.");
             // TODO
             // Need to discuss the flow for this case
           }
