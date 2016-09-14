@@ -45,6 +45,7 @@
     "react-mixin": "^2.0.2",
     "react-router": "^2.0.0",
     "react-social": "^1.4.3",
+    "react-sortable-hoc": "0.0.8",
     "serve-favicon": "~2.3.0",
     "socket.io": "^1.4.8",
     "swig": "^1.4.2",

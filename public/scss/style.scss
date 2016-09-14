@@ -159,11 +159,9 @@ presentation-component
 
       .tab-content{
         background-color: white;
-        padding-top: 30px;
 
         .deck-settings-component{
-          //margin: auto;
-          //width: 40%;
+          padding-top: 30px;
 
           .button-group-visibility{
             display: block;
@@ -197,4 +195,63 @@ presentation-component
       }
     }
   }
+}
+
+/**********************************
+deck-slides-component
+*/
+.deck-slides-component{
+  .slides-navigation{
+    width: 150px;
+    float: left;
+
+    .slides-header{
+      padding: 10px;
+      background-color: #101010;
+      color: white;
+
+      .title{
+        display: inline-block;
+      }
+
+      .add-slide{
+        display: inline-block;
+        float: right;
+      }
+    }
+
+    .slides-list.orderable{
+      background-color: #888888;
+      border-right: 1px solid black;
+      overflow-y: scroll;
+      height: calc(100vh - 200px);
+      padding-left: 0;
+
+      .slide-item-thumb{
+        padding: 5px;
+        height: 145px;
+        cursor: pointer;
+      }
+
+    }
+
+  }
+
+  .main-slide-editor{
+    width: calc(100% - 150px);
+    float: left;
+    padding: 10px 20px;
+    height: calc(100vh - 170px);
+    overflow-y: scroll;
+
+    .button-group-switch-view{
+      text-align: center;
+      padding-bottom: 20px;
+    }
+
+    .editor-view{
+
+    }
+  }
+
 }

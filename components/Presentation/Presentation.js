@@ -6,9 +6,9 @@ import {Link, withRouter} from 'react-router';
 import {PageHeader, Row, Col, Tabs, Tab} from 'react-bootstrap';
 import {extend} from 'underscore';
 import {ENUMS} from '~/lib/_required/enums.js';
-import {makeCancelable} from '~/lib/promise/reactCancelPromise.js';
 
 import DeckSettings from './deckSettings.js';
+import DeckSlides from './deckSlides.js';
 
 class Presentation extends React.Component {
   constructor(props) {
@@ -16,7 +16,8 @@ class Presentation extends React.Component {
     this.state = {
       observerAuth: null,
       presentationTabActive: 1,
-      deckObject: {}
+      deckObject: {},
+      deckData: {}
     };
 
     this.handlePresentationTabSelect = this.handlePresentationTabSelect.bind(this);
@@ -33,6 +34,7 @@ class Presentation extends React.Component {
 
     const observerAuth = firebase.auth().onAuthStateChanged((user) => {
       let presentationRef = firebase.database().ref('decks/' + this.props.params.id);
+      let deckDataRef = firebase.database().ref('deckData/' + this.props.params.id);
       if(user){
         presentationRef.on("value", (result) => {
           const deckObject = result.val();
@@ -46,8 +48,15 @@ class Presentation extends React.Component {
             // Need to discuss the flow for this case
           }
         });
+
+        deckDataRef.on("value", (result) => {
+          const deckData = result.val();
+          this.setState({deckData: deckData});
+        });
+
       }else{
         presentationRef.off();
+        deckDataRef.off();
       }
     });
     this.setState({observerAuth: observerAuth});
@@ -61,6 +70,8 @@ class Presentation extends React.Component {
     }
     let presentationRef = firebase.database().ref('decks/' + this.props.params.id);
     presentationRef.off();
+    let deckDataRef = firebase.database().ref('deckData/' + this.props.params.id);
+    deckDataRef.off();
   }
 
   render(){
@@ -77,7 +88,12 @@ class Presentation extends React.Component {
                   deckObject={this.state.deckObject}
                 />
               </Tab>
-              <Tab eventKey={2} title="SLIDES">SLIDES</Tab>
+              <Tab eventKey={2} title="SLIDES">
+                <DeckSlides
+                  deckObject={this.state.deckObject}
+                  deckData={this.state.deckData}
+                />
+              </Tab>
               <Tab eventKey={3} title="SHARE">SHARE</Tab>
             </Tabs>
           </Col>
