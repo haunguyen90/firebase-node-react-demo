@@ -4,7 +4,7 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
-import {extend} from 'underscore';
+import {extend, findIndex} from 'underscore';
 
 import SlideComponent from './SlideComponent.js';
 
@@ -29,7 +29,15 @@ class TitleComponent extends SlideComponent {
 
   handleBlur(event){
     event.preventDefault();
+    const {selectedSlide, keyId, deckId} = this.props;
 
+    if(selectedSlide.components && selectedSlide.components[keyId]){
+      let component = selectedSlide.components[keyId];
+      component.text = this.state.titleText;
+
+      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/' + keyId);
+      deckDataRef.set(component);
+    }
   }
 
   componentDidMount(){
@@ -69,7 +77,9 @@ class TitleComponent extends SlideComponent {
 
 TitleComponent.propTypes = {
   keyId: React.PropTypes.number,
-  componentData: React.PropTypes.object
+  componentData: React.PropTypes.object,
+  deckId: React.PropTypes.string,
+  selectedSlide: React.PropTypes.object
 };
 
 export default withRouter(TitleComponent, {withRef: true});

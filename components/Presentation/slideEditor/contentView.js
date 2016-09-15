@@ -15,26 +15,30 @@ class ContentView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this.renderSlideComponent = this.renderSlideComponent.bind(this);
   }
 
   getComponents(){
     const {selectedSlide} = this.props;
     if(selectedSlide.components && selectedSlide.components.length > 0){
-      const titleIndex = findIndex(selectedSlide.components, (component) => {
-        return component.type == "TITLE";
-      });
-      return arrayMove(selectedSlide.components, titleIndex, 0);
+      //const titleIndex = findIndex(selectedSlide.components, (component) => {
+      //  return component.type == "TITLE";
+      //});
+      //return arrayMove(selectedSlide.components, titleIndex, 0);
+      return selectedSlide.components;
     }
     return [];
   }
 
   renderSlideComponent(component, index){
+    const {selectedSlide} = this.props;
+
     if(component.type == "TITLE")
-      return (<TitleComponent keyId={index} key={index} componentData={component}/>);
+      return (<TitleComponent keyId={index} key={index} componentData={component} deckId={this.props.deckObject.id} selectedSlide={selectedSlide}/>);
     else if(component.type == "IMAGE")
-      return (<ImageComponent keyId={index} key={index} componentData={component}/>);
+      return (<ImageComponent keyId={index} key={index} componentData={component} deckId={this.props.deckObject.id} selectedSlide={selectedSlide}/>);
     else if(component.type == "TEXT")
-      return (<TextAreaComponent keyId={index} key={index} componentData={component}/>);
+      return (<TextAreaComponent keyId={index} key={index} componentData={component} deckId={this.props.deckObject.id} selectedSlide={selectedSlide}/>);
     else
       return null;
   }
@@ -51,5 +55,10 @@ class ContentView extends React.Component {
     )
   }
 }
+
+ContentView.propTypes = {
+  deckObject: React.PropTypes.object,
+  selectedSlide: React.PropTypes.object
+};
 
 export default withRouter(ContentView, {withRef: true});

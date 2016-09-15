@@ -5,6 +5,7 @@ import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
 import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
+import {map} from 'underscore';
 
 import ContentView from './slideEditor/contentView.js';
 import DesignView from './slideEditor/designView.js';
@@ -58,7 +59,10 @@ class DeckSlides extends React.Component {
   getSlides(){
     const {deckData} = this.props;
     if(deckData && deckData.slides && deckData.slides.length > 0){
-      return deckData.slides;
+      return map(deckData.slides, (slide, index) => {
+        slide.keyId = index;
+        return slide;
+      });
     }
     return [];
   }
@@ -111,6 +115,7 @@ class DeckSlides extends React.Component {
           <div className="editor-view col-sm-10 col-sm-offset-1">
             {this.state.viewState == 1?
               <ContentView
+                deckObject={this.props.deckObject}
                 selectedSlide={this.state.selectedSlide}
               />
               : <DesignView/>
