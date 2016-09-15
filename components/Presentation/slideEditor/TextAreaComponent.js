@@ -17,7 +17,7 @@ class TextAreaComponent extends SlideComponent {
       textArea = props.componentData.text;
 
     this.state = extend({
-      textArea: textArea
+      text: textArea
     }, this.state);
     this.handleChange = this.handleChange.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
@@ -26,24 +26,19 @@ class TextAreaComponent extends SlideComponent {
   handleChange(event){
     event.preventDefault();
     const value = event.target.value;
-    this.setState({textArea: value});
-  }
-
-  handleBlur(event){
-    event.preventDefault();
-
+    this.setState({text: value});
   }
 
   componentDidUpdate(prevProps, prevState){
     if(JSON.stringify(prevProps.componentData) && JSON.stringify(this.props.componentData)){
       if(this.props.componentData.text != prevProps.componentData.text)
-        this.setState({textArea: this.props.componentData.text});
+        this.setState({text: this.props.componentData.text});
     }
   }
 
   render(){
     const {componentData, keyId} = this.props;
-    const {textArea} = this.state;
+    const {text} = this.state;
 
     return (
       <div className="slide-component textarea-component row">
@@ -55,7 +50,7 @@ class TextAreaComponent extends SlideComponent {
               componentClass="textarea"
               className="textarea-text"
               placeholder="Description"
-              value={textArea}
+              value={text}
               onChange={this.handleChange}
               onBlur={this.handleBlur}
               />

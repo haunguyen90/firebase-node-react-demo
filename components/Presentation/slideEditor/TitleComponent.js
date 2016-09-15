@@ -15,7 +15,7 @@ class TitleComponent extends SlideComponent {
     if(props.componentData && props.componentData.text)
       titleText = props.componentData.text;
     this.state = extend({
-      titleText: titleText
+      text: titleText
     }, this.state);
     this.handleChange = this.handleChange.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
@@ -24,20 +24,7 @@ class TitleComponent extends SlideComponent {
   handleChange(event){
     event.preventDefault();
     const value = event.target.value;
-    this.setState({titleText: value});
-  }
-
-  handleBlur(event){
-    event.preventDefault();
-    const {selectedSlide, keyId, deckId} = this.props;
-
-    if(selectedSlide.components && selectedSlide.components[keyId]){
-      let component = selectedSlide.components[keyId];
-      component.text = this.state.titleText;
-
-      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/' + keyId);
-      deckDataRef.set(component);
-    }
+    this.setState({text: value});
   }
 
   componentDidMount(){
@@ -47,13 +34,13 @@ class TitleComponent extends SlideComponent {
   componentDidUpdate(prevProps, prevState){
     if(JSON.stringify(prevProps.componentData) && JSON.stringify(this.props.componentData)){
       if(this.props.componentData.text != prevProps.componentData.text)
-        this.setState({titleText: this.props.componentData.text});
+        this.setState({text: this.props.componentData.text});
     }
   }
 
   render(){
     const {componentData, keyId} = this.props;
-    const {titleText} = this.state;
+    const {text} = this.state;
     return (
       <div className="slide-component title-component row">
         <Col sm={12}>
@@ -62,7 +49,7 @@ class TitleComponent extends SlideComponent {
             <a href="#" className="remove-component">Remove</a>
             <FormControl
               type="text"
-              value={titleText}
+              value={text}
               placeholder="Enter slide title"
               onChange={this.handleChange}
               onBlur={this.handleBlur}

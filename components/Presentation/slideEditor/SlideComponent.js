@@ -8,14 +8,21 @@ import {Image, PageHeader, Row, Col, Panel, FormGroup, FormControl, ControlLabel
 class SlideComponent extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      abd: "hehe"
-    };
+    this.state = {};
 
   }
 
-  testParentFunction(){
-    console.log(this.state);
+  handleBlur(event){
+    event.preventDefault();
+    const {selectedSlide, keyId, deckId} = this.props;
+
+    if(selectedSlide.components && selectedSlide.components[keyId]){
+      let component = selectedSlide.components[keyId];
+      component.text = this.state.text;
+
+      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/' + keyId);
+      deckDataRef.set(component);
+    }
   }
 
   render(){

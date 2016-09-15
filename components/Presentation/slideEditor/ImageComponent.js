@@ -17,7 +17,7 @@ class ImageComponent extends SlideComponent {
       captionText = props.componentData.text;
 
     this.state = extend({
-      captionText: captionText
+      text: captionText
     }, this.state);
     this.handleChange = this.handleChange.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
@@ -26,24 +26,19 @@ class ImageComponent extends SlideComponent {
   handleChange(event){
     event.preventDefault();
     const value = event.target.value;
-    this.setState({captionText: value});
-  }
-
-  handleBlur(event){
-    event.preventDefault();
-
+    this.setState({text: value});
   }
 
   componentDidUpdate(prevProps, prevState){
     if(JSON.stringify(prevProps.componentData) && JSON.stringify(this.props.componentData)){
       if(this.props.componentData.text != prevProps.componentData.text)
-        this.setState({captionText: this.props.componentData.text});
+        this.setState({text: this.props.componentData.text});
     }
   }
 
   render(){
     const {componentData, keyId} = this.props;
-    const {captionText} = this.state;
+    const {text} = this.state;
 
     return (
       <div className="slide-component image-component row">
@@ -62,7 +57,7 @@ class ImageComponent extends SlideComponent {
               componentClass="textarea"
               className="caption-area"
               placeholder="caption"
-              value={captionText}
+              value={text}
               onChange={this.handleChange}
               onBlur={this.handleBlur}
             />
