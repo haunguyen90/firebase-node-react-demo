@@ -255,3 +255,44 @@ deck-slides-component
   }
 
 }
+
+/**********************************
+content-view-component
+*/
+.content-view-component{
+  .slide-component{
+    border-top: 2px solid #ccc;
+    padding-top: 10px;
+
+    &:first-child{
+      border-top: none !important;
+      padding-top: 0 !important;
+    }
+
+    .remove-component{
+      display: inline-block;
+      cursor: pointer;
+      text-decoration: none;
+      float: right;
+      margin-bottom: 5px;
+    }
+
+    &.image-component{
+      .image-thumbnail{
+        margin-bottom: 5px;
+      }
+
+      .caption-area{
+        min-height: 150px;
+        resize: none;
+      }
+    }
+
+    &.textarea-component{
+      .textarea-text{
+        min-height: 150px;
+        resize: none;
+      }
+    }
+  }
+}

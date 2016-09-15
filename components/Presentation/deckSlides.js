@@ -9,18 +9,20 @@ import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc'
 import ContentView from './slideEditor/contentView.js';
 import DesignView from './slideEditor/designView.js';
 
-const SortableItem = SortableElement(({value, onSelectSlide}) => (
-  <div className="slide-item-thumb" onClick={onSelectSlide}>
-    <Image src="https://firebasestorage.googleapis.com/v0/b/prezvr.appspot.com/o/images%2Fslide-cover3.png?alt=media&token=406ea219-2ef6-46f1-bce0-ab0db17635f4" thumbnail />
-    <span>{value.title}</span>
-  </div>
-));
+const SortableItem = SortableElement(({value}) => {
+  return (
+   <div className="slide-item-thumb">
+     <Image src="https://firebasestorage.googleapis.com/v0/b/prezvr.appspot.com/o/images%2Fslide-cover3.png?alt=media&token=406ea219-2ef6-46f1-bce0-ab0db17635f4" thumbnail />
+     <span>{value.title}</span>
+   </div>
+ )
+});
 
-const SortableList = SortableContainer(({items, onSelectSlide}) => {
+const SortableList = SortableContainer(({items}) => {
   return (
     <ul className="slides-list orderable">
       {items.map((value, index) =>
-          <SortableItem onSelectSlide={onSelectSlide} key={`item-${index}`} index={index} value={value} />
+          <SortableItem key={`item-${index}`} index={index} value={value} />
       )}
     </ul>
   );
@@ -31,7 +33,8 @@ class DeckSlides extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      viewState: 1
+      viewState: 1,
+      selectedSlide: {}
     };
     this.onSortEnd = this.onSortEnd.bind(this);
     this.getViewActive = this.getViewActive.bind(this);
@@ -43,6 +46,11 @@ class DeckSlides extends React.Component {
     const {deckObject} = this.props;
 
     const newSlides = arrayMove(slides, oldIndex, newIndex);
+    this.onSelectSlide(newSlides[newIndex]);
+
+    if(oldIndex == newIndex)
+      return;
+
     let deckDataRef = firebase.database().ref('deckData/' + deckObject.id + '/slides/');
     deckDataRef.set(newSlides);
   };
@@ -66,7 +74,16 @@ class DeckSlides extends React.Component {
   }
 
   onSelectSlide(slide){
-    console.log(slide)
+    this.setState({selectedSlide: slide});
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    if(JSON.stringify(prevProps.deckData) != JSON.stringify(this.props.deckData)){
+      const slides = this.getSlides();
+      if(slides.length > 0){
+        this.onSelectSlide(slides[0]);
+      }
+    }
   }
 
   render(){
@@ -93,7 +110,10 @@ class DeckSlides extends React.Component {
 
           <div className="editor-view col-sm-10 col-sm-offset-1">
             {this.state.viewState == 1?
-              <ContentView/> : <DesignView/>
+              <ContentView
+                selectedSlide={this.state.selectedSlide}
+              />
+              : <DesignView/>
             }
           </div>
         </div>
