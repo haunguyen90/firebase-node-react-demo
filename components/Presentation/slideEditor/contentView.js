@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import {Link, withRouter} from 'react-router';
-import {Image, PageHeader, Row, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
+import {Image, PageHeader, Popover, OverlayTrigger, Row, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
 import {arrayMove} from 'react-sortable-hoc';
 import {findIndex} from 'underscore';
 
@@ -30,6 +30,42 @@ class ContentView extends React.Component {
     return [];
   }
 
+  getAddComponentPopover(){
+    return (
+      <Popover id="popoverAddComponent" className="add-component-popover-container">
+        <Row>
+          <Col xs={4}>
+            <a href="#" className="add-component-action add-title">Title</a>
+          </Col>
+          <Col xs={4}>
+            <a href="#" className="add-component-action add-text">Text</a>
+          </Col>
+          <Col xs={4}>
+            <a href="#" className="add-component-action add-image">Image</a>
+          </Col>
+          <Col xs={4}>
+            <a href="#" className="add-component-action add-bar-graph">Bar Graph</a>
+          </Col>
+          <Col xs={4}>
+            <a href="#" className="add-component-action add-pie-graph">Pie Graph</a>
+          </Col>
+        </Row>
+      </Popover>
+    )
+  }
+
+  getSlideFooter(){
+    return (
+      <div className="slide-footer-config">
+        <a href="#" className="duplicate-slide">Duplicate</a>
+        <a href="#" className="delete-slide">Delete</a>
+        <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={this.getAddComponentPopover()}>
+          <a href="#" onClick={(e) => e.preventDefault()} className="show-add-components-popover">Add Component</a>
+        </OverlayTrigger>
+      </div>
+    )
+  }
+
   renderSlideComponent(component, index){
     const {selectedSlide} = this.props;
 
@@ -46,7 +82,7 @@ class ContentView extends React.Component {
   render(){
     return (
       <div className="content-view-component">
-        <Panel header={this.props.selectedSlide.title} footer="Panel footer">
+        <Panel header={this.props.selectedSlide.title} footer={this.getSlideFooter()}>
           <div className="slide-detail">
             {this.getComponents().map(this.renderSlideComponent)}
           </div>

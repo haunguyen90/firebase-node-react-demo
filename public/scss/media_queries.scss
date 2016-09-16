@@ -1,0 +1,26 @@
+/**
+  Global media queries for devices
+**/
+/************************************************
+  VARIABLES
+*************************************************/
+$media-small-phone: "screen and (min-width : 320px) and (max-width: 367px)";
+$media-medium-phone-and-tablet: "screen and (min-width : 368px) and (max-width: 768px)";
+$media-large-phone: "screen and (min-width: 768px) and (max-width: 991px)";
+$media-ipad-tablet: "screen and (min-width : 992px) and (max-width: 1200px)";
+$media-large-screen-and-tablet: "screen and (min-width : 992px)";
+
+$media-small-screen: "screen and (max-width: 441px)";
+
+$media-extra-small-devices-phones: "(max-width: 767px)";
+$media-small-devices-tablets: "(min-width: 768px)";
+$media-medium-devices-desktops: "(min-width: 992px)";
+$media-large-devices-desktops : "(min-width: 1200px)";
+
+$screen-sm-min: 768px;
+$screen-md-min: 9920px;
+$screen-lg-min: 1200px;
+
+$grid-columns:              12;
+$grid-gutter-width:         30px;
+$grid-float-breakpoint:     768px;

@@ -1,3 +1,5 @@
+@import "media_queries";
+
 /**********************************
 Global style
 */
@@ -289,6 +291,20 @@ content-view-component
 
       .uploadButton{
         padding: 0;
+        .fa.fa-upload{
+          display: none;
+        }
+
+        @media #{$media-large-phone}{
+          .fa.fa-upload{
+            display: block;
+          }
+
+          .label-text{
+            display: none;
+          }
+        }
+
       }
 
       .fileInputLabel{
@@ -310,4 +326,34 @@ content-view-component
       }
     }
   }
+
+  .slide-footer-config{
+    padding: 10px 0;
+
+    a{
+      text-decoration: none;
+    }
+
+    .duplicate-slide{
+      margin-right: 20px;
+    }
+
+    .show-add-components-popover{
+      float: right;
+    }
+
+  }
+
+  .add-component-popover-container{
+    .add-component-action{
+      text-decoration: none;
+    }
+  }
+
+}
+
+#popoverAddComponent{
+  max-width: 320px;
+  width: 320px;
+  padding-left: 15px;
 }
