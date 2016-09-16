@@ -286,6 +286,21 @@ content-view-component
         min-height: 150px;
         resize: none;
       }
+
+      .uploadButton{
+        padding: 0;
+      }
+
+      .fileInputLabel{
+        display: block;
+        margin-bottom: 0;
+        padding: 6px 12px;
+      }
+
+      .circular-progress{
+        width: 50px;
+        margin: auto;
+      }
     }
 
     &.textarea-component{
