@@ -39,7 +39,7 @@ class DeckSlides extends React.Component {
     };
     this.onSortEnd = this.onSortEnd.bind(this);
     this.getViewActive = this.getViewActive.bind(this);
-    this.onSelectSlide = this.onSelectSlide.bind(this)
+    this.onSelectSlide = this.onSelectSlide.bind(this);
   }
 
   onSortEnd({oldIndex, newIndex}){
@@ -85,7 +85,11 @@ class DeckSlides extends React.Component {
     if(JSON.stringify(prevProps.deckData) != JSON.stringify(this.props.deckData)){
       const slides = this.getSlides();
       if(slides.length > 0){
-        this.onSelectSlide(slides[0]);
+        const {selectedSlide} = this.state;
+        if(selectedSlide && selectedSlide.keyId)
+          this.onSelectSlide(slides[selectedSlide.keyId]);
+        else
+          this.onSelectSlide(slides[0]);
       }
     }
   }

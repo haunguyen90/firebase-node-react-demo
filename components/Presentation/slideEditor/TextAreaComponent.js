@@ -64,7 +64,9 @@ class TextAreaComponent extends SlideComponent {
 
 TextAreaComponent.propTypes = {
   keyId: React.PropTypes.number,
-  componentData: React.PropTypes.object
+  componentData: React.PropTypes.object,
+  deckId: React.PropTypes.string,
+  selectedSlide: React.PropTypes.object
 };
 
 export default withRouter(TextAreaComponent, {withRef: true});

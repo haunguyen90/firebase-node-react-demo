@@ -14,6 +14,8 @@ class SlideComponent extends React.Component {
 
   handleBlur(event){
     event.preventDefault();
+
+    // Update single component
     const {selectedSlide, keyId, deckId} = this.props;
 
     if(selectedSlide.components && selectedSlide.components[keyId]){

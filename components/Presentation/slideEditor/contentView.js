@@ -5,7 +5,8 @@ import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Popover, OverlayTrigger, Row, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
 import {arrayMove} from 'react-sortable-hoc';
-import {findIndex} from 'underscore';
+import {findIndex, extend, isArray, findWhere} from 'underscore';
+import {ENUMS} from '~/lib/_required/enums.js';
 
 import TitleComponent from './TitleComponent.js';
 import ImageComponent from './ImageComponent.js';
@@ -30,24 +31,108 @@ class ContentView extends React.Component {
     return [];
   }
 
+  onAddComponent(componentType, event){
+    event.preventDefault();
+
+    let components = [];
+    const {selectedSlide} = this.props;
+
+    if(selectedSlide.components && isArray(selectedSlide.components))
+      components = selectedSlide.components;
+
+    // Only add max 3 components
+    if(components.length >= 3){
+      alert("You can only add max 3 components");
+      return;
+    }
+
+    let componentData = {
+      fontSize: "12pt"
+    };
+
+    switch (componentType) {
+      case "title":
+        componentData = extend(componentData, {
+          type: "TITLE",
+          text: ""
+        });
+
+        const existedComponent = findWhere(components, {type: "TITLE"});
+        if(existedComponent){
+          alert("Title has been added already");
+          return;
+        }
+
+        components.unshift(componentData);
+        break;
+
+      case "text":
+        componentData = extend(componentData, {
+          type: "TEXT",
+          text: ""
+        });
+        components.push(componentData);
+        break;
+
+      case "image":
+        componentData = extend(componentData, {
+          type: "IMAGE",
+          text: "",
+          image: ENUMS.MISC.NO_IMAGE_AVAILABLE
+        });
+        components.push(componentData);
+        break;
+
+      case "barGraph":
+        componentData = extend(componentData, {
+          type: "BARGRAPH",
+          text: "",
+          image: ""
+        });
+        components.push(componentData);
+        return false;
+        break;
+
+      case "pieGraph":
+        componentData = extend(componentData, {
+          type: "PIEGRAPH",
+          text: "",
+          image: ""
+        });
+        components.push(componentData);
+        return false;
+        break;
+
+      default :
+        console.error("Component type is invalid");
+        return false;
+        break;
+    }
+
+    // Update firebase database
+    const deckId = this.props.deckObject.id;
+    let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/');
+    deckDataRef.set(components);
+  }
+
   getAddComponentPopover(){
     return (
       <Popover id="popoverAddComponent" className="add-component-popover-container">
         <Row>
           <Col xs={4}>
-            <a href="#" className="add-component-action add-title">Title</a>
+            <a href="#" onClick={this.onAddComponent.bind(this, "title")} className="add-component-action add-title">Title</a>
           </Col>
           <Col xs={4}>
-            <a href="#" className="add-component-action add-text">Text</a>
+            <a href="#" onClick={this.onAddComponent.bind(this, "text")} className="add-component-action add-text">Text</a>
           </Col>
           <Col xs={4}>
-            <a href="#" className="add-component-action add-image">Image</a>
+            <a href="#" onClick={this.onAddComponent.bind(this, "image")} className="add-component-action add-image">Image</a>
           </Col>
           <Col xs={4}>
-            <a href="#" className="add-component-action add-bar-graph">Bar Graph</a>
+            <a href="#" onClick={this.onAddComponent.bind(this, "barGraph")} className="add-component-action add-bar-graph">Bar Graph</a>
           </Col>
           <Col xs={4}>
-            <a href="#" className="add-component-action add-pie-graph">Pie Graph</a>
+            <a href="#" onClick={this.onAddComponent.bind(this, "pieGraph")} className="add-component-action add-pie-graph">Pie Graph</a>
           </Col>
         </Row>
       </Popover>
@@ -59,7 +144,7 @@ class ContentView extends React.Component {
       <div className="slide-footer-config">
         <a href="#" className="duplicate-slide">Duplicate</a>
         <a href="#" className="delete-slide">Delete</a>
-        <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={this.getAddComponentPopover()}>
+        <OverlayTrigger trigger="focus" placement="bottom" overlay={this.getAddComponentPopover()}>
           <a href="#" onClick={(e) => e.preventDefault()} className="show-add-components-popover">Add Component</a>
         </OverlayTrigger>
       </div>

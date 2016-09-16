@@ -7,6 +7,7 @@ import {Image, PageHeader, Row, Thumbnail, Col, Panel, FormGroup, FormControl, C
 import {extend} from 'underscore';
 import {isMounted} from '~/lib/react/reactLib.js';
 import { Circle } from 'rc-progress';
+import {ENUMS} from '~/lib/_required/enums.js';
 
 import SlideComponent from './SlideComponent.js';
 
@@ -119,7 +120,7 @@ class ImageComponent extends SlideComponent {
     const {componentData, keyId} = this.props;
     const {text, isUploading, uploadPercent} = this.state;
 
-    let imageURL = "/images/avatar_default.jpg";
+    let imageURL = ENUMS.MISC.NO_IMAGE_AVAILABLE;
     if(componentData.image)
       imageURL = componentData.image;
 
@@ -169,7 +170,9 @@ class ImageComponent extends SlideComponent {
 
 ImageComponent.propTypes = {
   keyId: React.PropTypes.number,
-  componentData: React.PropTypes.object
+  componentData: React.PropTypes.object,
+  deckId: React.PropTypes.string,
+  selectedSlide: React.PropTypes.object
 };
 
 export default withRouter(ImageComponent, {withRef: true});
