@@ -161,9 +161,9 @@ class ContentView extends React.Component {
         <a href="#" className="duplicate-slide">Duplicate</a>
         <Confirm
           onConfirm={this.onDeleteSlide}
-          body="Are you sure you want to delete this?"
+          body="Are you sure you want to delete this slide?"
           confirmText="Confirm Delete"
-          title="Deleting Stuff">
+          title={"Deleting Slide " + this.props.selectedSlide.title}>
           <a href="#" className="delete-slide">Delete</a>
         </Confirm>
 
