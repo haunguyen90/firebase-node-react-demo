@@ -27,9 +27,7 @@ class SlideComponent extends React.Component {
     }
   }
 
-  onRemoveComponent(event){
-    event.preventDefault();
-
+  onRemoveComponent(){
     // Remove single component
     const {selectedSlide, keyId, deckId} = this.props;
     if(selectedSlide.components && selectedSlide.components[keyId]){

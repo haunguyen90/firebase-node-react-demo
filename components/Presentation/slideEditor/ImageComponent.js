@@ -8,6 +8,7 @@ import {extend} from 'underscore';
 import {isMounted} from '~/lib/react/reactLib.js';
 import { Circle } from 'rc-progress';
 import {ENUMS} from '~/lib/_required/enums.js';
+import Confirm from 'react-confirm-bootstrap';
 
 import SlideComponent from './SlideComponent.js';
 
@@ -152,7 +153,14 @@ class ImageComponent extends SlideComponent {
 
         <Col sm={10}>
           <FormGroup controlId={"componentImageText-" + keyId}>
-            <a href="#" className="remove-component" onClick={this.onRemoveComponent}>Remove</a>
+            <Confirm
+              onConfirm={this.onRemoveComponent}
+              body="Are you sure you want to remove this component?"
+              confirmText="Confirm Delete"
+              title={"Deleting Component"}>
+              <a href="#" className="remove-component">Remove</a>
+            </Confirm>
+
             <FormControl
               componentClass="textarea"
               className="caption-area"

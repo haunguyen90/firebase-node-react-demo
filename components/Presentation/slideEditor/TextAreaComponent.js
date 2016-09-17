@@ -5,6 +5,7 @@ import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Thumbnail, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
 import {extend} from 'underscore';
+import Confirm from 'react-confirm-bootstrap';
 
 import SlideComponent from './SlideComponent.js';
 
@@ -46,7 +47,13 @@ class TextAreaComponent extends SlideComponent {
         <Col sm={12}>
           <FormGroup controlId={"componentTextArea-" + keyId}>
             <ControlLabel>TEXT</ControlLabel>
-            <a href="#" className="remove-component" onClick={this.onRemoveComponent}>Remove</a>
+            <Confirm
+              onConfirm={this.onRemoveComponent}
+              body="Are you sure you want to remove this component?"
+              confirmText="Confirm Delete"
+              title={"Deleting Component"}>
+              <a href="#" className="remove-component">Remove</a>
+            </Confirm>
             <FormControl
               componentClass="textarea"
               className="textarea-text"
