@@ -219,7 +219,32 @@ deck-slides-component
       .add-slide{
         display: inline-block;
         float: right;
+        cursor: pointer;
       }
+    }
+
+    .slide-animation-enter {
+      opacity: 0.01;
+    }
+
+    .slide-animation-enter {
+      &.slide-animation-enter-active{
+        opacity: 1;
+        transition: opacity 500ms ease-in;
+      }
+
+    }
+
+    .slide-animation-leave {
+      opacity: 1;
+    }
+
+    .slide-animation-leave {
+      &.slide-animation-leave-active{
+        opacity: 0.01;
+        transition: opacity 300ms ease-in;
+      }
+
     }
 
     .slides-list.orderable{
@@ -262,6 +287,31 @@ deck-slides-component
 content-view-component
 */
 .content-view-component{
+  .slide-animation-enter {
+    opacity: 0.01;
+  }
+
+  .slide-animation-enter {
+    &.slide-animation-enter-active{
+      opacity: 1;
+      transition: opacity 500ms ease-in;
+    }
+
+  }
+
+  .slide-animation-leave {
+    opacity: 1;
+  }
+
+  .slide-animation-leave {
+    &.slide-animation-leave-active{
+      opacity: 0.01;
+      transition: opacity 300ms ease-in;
+    }
+
+  }
+
+
   .slide-component{
     border-top: 2px solid #ccc;
     padding-top: 10px;

@@ -27,6 +27,19 @@ class SlideComponent extends React.Component {
     }
   }
 
+  onRemoveComponent(event){
+    event.preventDefault();
+
+    // Remove single component
+    const {selectedSlide, keyId, deckId} = this.props;
+    if(selectedSlide.components && selectedSlide.components[keyId]){
+      selectedSlide.components.splice(keyId,1);
+      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/');
+      deckDataRef.set(selectedSlide.components);
+    }
+
+  }
+
   render(){
     return (
       <div className="slide-component">

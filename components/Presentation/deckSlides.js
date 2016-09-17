@@ -6,25 +6,34 @@ import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
 import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
 import {map} from 'underscore';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import ContentView from './slideEditor/contentView.js';
 import DesignView from './slideEditor/designView.js';
 
 const SortableItem = SortableElement(({value}) => {
   return (
-   <div className="slide-item-thumb">
-     <Image src="https://firebasestorage.googleapis.com/v0/b/prezvr.appspot.com/o/images%2Fslide-cover3.png?alt=media&token=406ea219-2ef6-46f1-bce0-ab0db17635f4" thumbnail />
-     <span>{value.title}</span>
-   </div>
- )
+    <div className="slide-item-thumb">
+      <Image src="https://firebasestorage.googleapis.com/v0/b/prezvr.appspot.com/o/images%2Fslide-cover3.png?alt=media&token=406ea219-2ef6-46f1-bce0-ab0db17635f4" thumbnail />
+      <span>{value.title}</span>
+    </div>
+  )
 });
 
 const SortableList = SortableContainer(({items}) => {
   return (
     <ul className="slides-list orderable">
-      {items.map((value, index) =>
-          <SortableItem key={`item-${index}`} index={index} value={value} />
-      )}
+      <ReactCSSTransitionGroup
+        transitionName="slide-animation"
+        transitionEnterTimeout={500}
+        transitionAppear={true}
+        transitionAppearTimeout={500}
+        transitionLeaveTimeout={300}
+        >
+        {items.map((value, index) =>
+            <SortableItem key={`item-${index}`} index={index} value={value} />
+        )}
+      </ReactCSSTransitionGroup>
     </ul>
   );
 });
@@ -40,6 +49,8 @@ class DeckSlides extends React.Component {
     this.onSortEnd = this.onSortEnd.bind(this);
     this.getViewActive = this.getViewActive.bind(this);
     this.onSelectSlide = this.onSelectSlide.bind(this);
+    this.onAddSlide = this.onAddSlide.bind(this);
+    this.getSlides = this.getSlides.bind(this);
   }
 
   onSortEnd({oldIndex, newIndex}){
@@ -81,14 +92,60 @@ class DeckSlides extends React.Component {
     this.setState({selectedSlide: slide});
   }
 
+  onAddSlide(event){
+    event.preventDefault();
+    const slides = this.getSlides();
+    const newSlideIndex = slides.length;
+    const newSlide = {
+      keyId: newSlideIndex,
+      title: `Slide ${slides.length + 1}`,
+      type: "COMPONENT",
+      components: [
+        {
+          fontSize: "12pt",
+          text: `Title for slide ${slides.length + 1}`,
+          type: "TITLE"
+        },
+        {
+          fontSize: "12pt",
+          text: "",
+          type: "TEXT"
+        }
+      ]
+    };
+    slides.push(newSlide);
+
+    // Update firebase database
+    const deckId = this.props.deckObject.id;
+    let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/');
+    deckDataRef.set(slides);
+  }
+
+  findExistedSlide(keyId){
+    const slides = this.getSlides();
+    if(slides.length > 0){
+      if(slides[keyId]){
+        return keyId;
+      }else{
+        const newKey = keyId - 1;
+        return this.findExistedSlide(newKey);
+      }
+    }
+    return false;
+  }
+
   componentDidUpdate(prevProps, prevState){
     if(JSON.stringify(prevProps.deckData) != JSON.stringify(this.props.deckData)){
       const slides = this.getSlides();
       if(slides.length > 0){
         const {selectedSlide} = this.state;
-        if(selectedSlide && selectedSlide.keyId)
-          this.onSelectSlide(slides[selectedSlide.keyId]);
-        else
+        if(selectedSlide && selectedSlide.keyId){
+          const selectedKeyId = this.findExistedSlide(selectedSlide.keyId);
+          if(selectedKeyId)
+            this.onSelectSlide(slides[selectedKeyId]);
+          else
+            this.onSelectSlide({});
+        }else
           this.onSelectSlide(slides[0]);
       }
     }
@@ -100,7 +157,7 @@ class DeckSlides extends React.Component {
         <div className="slides-navigation">
           <div className="slides-header">
             <span className="title">SLIDES</span>
-            <span className="add-slide">
+            <span className="add-slide" onClick={this.onAddSlide}>
               <i className="fa fa-plus-square"></i>
             </span>
           </div>
@@ -121,6 +178,7 @@ class DeckSlides extends React.Component {
               <ContentView
                 deckObject={this.props.deckObject}
                 selectedSlide={this.state.selectedSlide}
+                getSlides={this.getSlides}
               />
               : <DesignView/>
             }

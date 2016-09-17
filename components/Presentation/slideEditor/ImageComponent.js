@@ -26,6 +26,7 @@ class ImageComponent extends SlideComponent {
     }, this.state);
     this.handleChange = this.handleChange.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
+    this.onRemoveComponent = this.onRemoveComponent.bind(this);
   }
 
   handleChange(event){
@@ -151,7 +152,7 @@ class ImageComponent extends SlideComponent {
 
         <Col sm={10}>
           <FormGroup controlId={"componentImageText-" + keyId}>
-            <a href="#" className="remove-component">Remove</a>
+            <a href="#" className="remove-component" onClick={this.onRemoveComponent}>Remove</a>
             <FormControl
               componentClass="textarea"
               className="caption-area"

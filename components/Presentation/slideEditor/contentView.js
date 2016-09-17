@@ -7,6 +7,8 @@ import {Image, PageHeader, Popover, OverlayTrigger, Row, Col, Panel, FormGroup, 
 import {arrayMove} from 'react-sortable-hoc';
 import {findIndex, extend, isArray, findWhere} from 'underscore';
 import {ENUMS} from '~/lib/_required/enums.js';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import Confirm from 'react-confirm-bootstrap';
 
 import TitleComponent from './TitleComponent.js';
 import ImageComponent from './ImageComponent.js';
@@ -17,6 +19,7 @@ class ContentView extends React.Component {
     super(props);
     this.state = {};
     this.renderSlideComponent = this.renderSlideComponent.bind(this);
+    this.onDeleteSlide = this.onDeleteSlide.bind(this);
   }
 
   getComponents(){
@@ -115,6 +118,19 @@ class ContentView extends React.Component {
     deckDataRef.set(components);
   }
 
+  onDeleteSlide(){
+    const {selectedSlide, getSlides} = this.props;
+    const slides = getSlides();
+    if(slides && isArray(slides) && slides.length > 0){
+      slides.splice(selectedSlide.keyId, 1);
+
+      const deckId = this.props.deckObject.id;
+      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/');
+      deckDataRef.set(slides);
+    }
+
+  }
+
   getAddComponentPopover(){
     return (
       <Popover id="popoverAddComponent" className="add-component-popover-container">
@@ -143,7 +159,15 @@ class ContentView extends React.Component {
     return (
       <div className="slide-footer-config">
         <a href="#" className="duplicate-slide">Duplicate</a>
-        <a href="#" className="delete-slide">Delete</a>
+        <Confirm
+          onConfirm={this.onDeleteSlide}
+          body="Are you sure you want to delete this?"
+          confirmText="Confirm Delete"
+          title="Deleting Stuff">
+          <a href="#" className="delete-slide">Delete</a>
+        </Confirm>
+
+
         <OverlayTrigger trigger="focus" placement="bottom" overlay={this.getAddComponentPopover()}>
           <a href="#" onClick={(e) => e.preventDefault()} className="show-add-components-popover">Add Component</a>
         </OverlayTrigger>
@@ -169,7 +193,16 @@ class ContentView extends React.Component {
       <div className="content-view-component">
         <Panel header={this.props.selectedSlide.title} footer={this.getSlideFooter()}>
           <div className="slide-detail">
-            {this.getComponents().map(this.renderSlideComponent)}
+            <ReactCSSTransitionGroup
+              transitionName="slide-animation"
+              transitionEnterTimeout={500}
+              transitionAppear={true}
+              transitionAppearTimeout={500}
+              transitionLeaveTimeout={300}
+              >
+              {this.getComponents().map(this.renderSlideComponent)}
+            </ReactCSSTransitionGroup>
+
           </div>
         </Panel>
       </div>
@@ -179,7 +212,8 @@ class ContentView extends React.Component {
 
 ContentView.propTypes = {
   deckObject: React.PropTypes.object,
-  selectedSlide: React.PropTypes.object
+  selectedSlide: React.PropTypes.object,
+  getSlides: React.PropTypes.func
 };
 
 export default withRouter(ContentView, {withRef: true});

@@ -19,6 +19,7 @@ class TitleComponent extends SlideComponent {
     }, this.state);
     this.handleChange = this.handleChange.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
+    this.onRemoveComponent = this.onRemoveComponent.bind(this);
   }
 
   handleChange(event){
@@ -46,7 +47,7 @@ class TitleComponent extends SlideComponent {
         <Col sm={12}>
           <FormGroup controlId={"componentTitleText-" + keyId}>
             <ControlLabel>TITLE</ControlLabel>
-            <a href="#" className="remove-component">Remove</a>
+            <a href="#" className="remove-component" onClick={this.onRemoveComponent}>Remove</a>
             <FormControl
               type="text"
               value={text}

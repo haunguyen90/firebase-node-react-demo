@@ -21,6 +21,7 @@ class TextAreaComponent extends SlideComponent {
     }, this.state);
     this.handleChange = this.handleChange.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
+    this.onRemoveComponent = this.onRemoveComponent.bind(this);
   }
 
   handleChange(event){
@@ -45,7 +46,7 @@ class TextAreaComponent extends SlideComponent {
         <Col sm={12}>
           <FormGroup controlId={"componentTextArea-" + keyId}>
             <ControlLabel>TEXT</ControlLabel>
-            <a href="#" className="remove-component">Remove</a>
+            <a href="#" className="remove-component" onClick={this.onRemoveComponent}>Remove</a>
             <FormControl
               componentClass="textarea"
               className="textarea-text"
