@@ -287,6 +287,11 @@ deck-slides-component
 content-view-component
 */
 .content-view-component{
+  .empty-slide{
+    color: #777;
+    font-style: italic;
+  }
+  
   .slide-animation-enter {
     opacity: 0.01;
   }

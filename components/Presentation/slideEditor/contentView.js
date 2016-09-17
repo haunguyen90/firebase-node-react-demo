@@ -200,7 +200,13 @@ class ContentView extends React.Component {
               transitionAppearTimeout={500}
               transitionLeaveTimeout={300}
               >
-              {this.getComponents().map(this.renderSlideComponent)}
+              {this.getComponents().length > 0?
+                this.getComponents().map(this.renderSlideComponent) :
+                <div className="empty-slide">
+                  There are no components on this slide. Let’s add some to make it
+                  useful.
+                </div>
+              }
             </ReactCSSTransitionGroup>
 
           </div>
