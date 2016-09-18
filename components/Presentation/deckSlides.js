@@ -144,7 +144,7 @@ class DeckSlides extends React.Component {
           if(selectedKeyId)
             this.onSelectSlide(slides[selectedKeyId]);
           else
-            this.onSelectSlide({});
+            this.onSelectSlide(slides[0]);
         }else
           this.onSelectSlide(slides[0]);
       }
