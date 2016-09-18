@@ -28,6 +28,12 @@ class Presentation extends React.Component {
     this.setState({presentationTabActive: key});
   }
 
+  getPresentationName(){
+    const {deckObject} = this.state;
+    if(deckObject && deckObject.name)
+      return deckObject.name;
+  }
+
   componentDidMount(){
     if(!this.props.params.id)
       return false;
@@ -78,10 +84,12 @@ class Presentation extends React.Component {
     return (
       <div className="presentation-component">
         <Row className="presentation-header">
-          <h1 className="header-title">PrezentVR Pitch Deck</h1>
+          <Col xs={12}>
+            <h1 className="header-title">{this.getPresentationName()}</h1>
+          </Col>
         </Row>
         <Row>
-          <Col xs={12} className="presentation-tabs">
+          <div className="presentation-tabs">
             <Tabs activeKey={this.state.presentationTabActive} onSelect={this.handlePresentationTabSelect} id="presentationTabs">
               <Tab eventKey={1} title="SETTINGS">
                 <DeckSettings
@@ -96,7 +104,7 @@ class Presentation extends React.Component {
               </Tab>
               <Tab eventKey={3} title="SHARE">SHARE</Tab>
             </Tabs>
-          </Col>
+          </div>
         </Row>
       </div>
     )

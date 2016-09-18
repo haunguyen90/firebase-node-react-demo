@@ -7,6 +7,11 @@ Global style
   margin-bottom: 0 !important;
 }
 
+textarea.textarea-non-resize{
+  min-height: 150px;
+  resize: none;
+}
+
 /**********************************
 Form Login Page
 */
@@ -291,7 +296,7 @@ content-view-component
     color: #777;
     font-style: italic;
   }
-  
+
   .slide-animation-enter {
     opacity: 0.01;
   }

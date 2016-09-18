@@ -86,8 +86,8 @@ class DeckSettings extends React.Component {
 
   render() {
     return (
-      <div className="deck-settings-component col-sm-6 col-sm-offset-3">
-        <Row>
+      <div className="deck-settings-component">
+        <div className="col-sm-6 col-sm-offset-3">
           <Panel header="DECK SETTINGS">
             <form className="deck-setting-frm">
               <FormGroup controlId="deckTitle"
@@ -100,7 +100,7 @@ class DeckSettings extends React.Component {
                   name="deckTitle"
                   onChange={this.handleChange}
                   onBlur={this.handleBlur}
-                />
+                  />
                 <FormControl.Feedback />
                 {this.getValidateDeckTitle() == 'error'?
                   <HelpBlock>Please give your presentation a title.</HelpBlock> : null
@@ -112,13 +112,14 @@ class DeckSettings extends React.Component {
                          validationState={this.getValidateDeckSummary()}>
                 <ControlLabel>SUMMARY</ControlLabel>
                 <FormControl
-                  type="text"
+                  componentClass="textarea"
+                  className="textarea-non-resize"
                   value={this.state.deckSummary}
                   placeholder="Enter deck title"
                   name="deckSummary"
                   onChange={this.handleChange}
                   onBlur={this.handleBlur}
-                />
+                  />
                 <FormControl.Feedback />
                 <HelpBlock></HelpBlock>
               </FormGroup>
@@ -132,7 +133,7 @@ class DeckSettings extends React.Component {
               </FormGroup>
             </form>
           </Panel>
-        </Row>
+        </div>
       </div>
     )
   }
