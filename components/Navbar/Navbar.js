@@ -56,18 +56,24 @@ class AppNavbar extends React.Component {
   }
 
   render() {
+    let isLoggedInClass = "";
+    if(this.props.currentUserData)
+      isLoggedInClass = "logged-in";
+
     return (
       <Navbar inverse>
         <Navbar.Header>
           <Navbar.Brand>
-            <a href="#">Prezent Logo</a>
+            <a className={"prezent-vr-logo " + isLoggedInClass} href="#">
+
+            </a>
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>
         <Navbar.Collapse>
           {this.props.currentUserData?
             <Nav>
-              <NavItem eventKey={1} href="#" onClick={this.GoToDashboard.bind(this)}>Dashboard</NavItem>
+              <NavItem className="left-menu-item" eventKey={1} href="#" onClick={this.GoToDashboard.bind(this)}>Dashboard</NavItem>
             </Nav> : null
           }
 

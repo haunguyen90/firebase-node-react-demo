@@ -59,6 +59,13 @@ class ImageComponent extends SlideComponent {
     evt.stopPropagation();
     evt.preventDefault();
 
+    const pattern = /^image\/(gif|jpg|jpeg|tiff|png)$/i;
+
+    if(!pattern.test(file.type)){
+      this.props.handleAlertShow("File type not support");
+      return false;
+    }
+
     const storageRef = firebase.storage().ref();
     const file = evt.target.files[0];
 
@@ -181,7 +188,8 @@ ImageComponent.propTypes = {
   keyId: React.PropTypes.number,
   componentData: React.PropTypes.object,
   deckId: React.PropTypes.string,
-  selectedSlide: React.PropTypes.object
+  selectedSlide: React.PropTypes.object,
+  handleAlertShow: React.PropTypes.func
 };
 
 export default withRouter(ImageComponent, {withRef: true});

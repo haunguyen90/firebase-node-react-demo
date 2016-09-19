@@ -12,6 +12,32 @@ textarea.textarea-non-resize{
   resize: none;
 }
 
+.prezent-vr-logo{
+  background-image: url(/images/prezentvr_logo.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-left: 10px;
+
+}
+
+@media #{$media-small-devices-tablets}{
+  .prezent-vr-logo{
+    &.logged-in{
+      background-position: center 15px !important;
+    }
+  }
+
+  .navbar-collapse{
+    .navbar-nav{
+      li.left-menu-item{
+        a{
+          padding-top: 22px;
+        }
+      }
+    }
+  }
+}
+
 /**********************************
 Form Login Page
 */

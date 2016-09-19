@@ -24,6 +24,7 @@ class ContentView extends React.Component {
     this.renderSlideComponent = this.renderSlideComponent.bind(this);
     this.onDeleteSlide = this.onDeleteSlide.bind(this);
     this.handleAlertDismiss = this.handleAlertDismiss.bind(this);
+    this.handleAlertShow = this.handleAlertShow.bind(this);
   }
 
   getComponents(){
@@ -239,7 +240,15 @@ class ContentView extends React.Component {
     if(component.type == "TITLE")
       return (<TitleComponent keyId={index} key={index} componentData={component} deckId={this.props.deckObject.id} selectedSlide={selectedSlide}/>);
     else if(component.type == "IMAGE")
-      return (<ImageComponent keyId={index} key={index} componentData={component} deckId={this.props.deckObject.id} selectedSlide={selectedSlide}/>);
+      return (
+        <ImageComponent
+          keyId={index} key={index}
+          componentData={component}
+          deckId={this.props.deckObject.id}
+          selectedSlide={selectedSlide}
+          handleAlertShow={this.handleAlertShow}
+        />
+      );
     else if(component.type == "TEXT")
       return (<TextAreaComponent keyId={index} key={index} componentData={component} deckId={this.props.deckObject.id} selectedSlide={selectedSlide}/>);
     else
