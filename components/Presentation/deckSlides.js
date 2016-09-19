@@ -16,10 +16,19 @@ const SortableItem = SortableElement(({value, selectedSlide}) => {
   if(selectedSlide.slideId == value.slideId)
     activeClass = "slide-active";
 
+  let title = "";
+  if(value.components){
+    const titleComponent = findWhere(value.components, {type: "TITLE"});
+    if(titleComponent){
+      title = titleComponent.text;
+    }
+  }
+
+
   return (
     <div className="slide-item-thumb">
       <Image className={activeClass} src="https://firebasestorage.googleapis.com/v0/b/prezvr.appspot.com/o/images%2Fslide-cover3.png?alt=media&token=406ea219-2ef6-46f1-bce0-ab0db17635f4" thumbnail />
-      <span>{value.title}</span>
+      <span>{title}</span>
     </div>
   )
 });
@@ -153,7 +162,7 @@ class DeckSlides extends React.Component {
         const {selectedSlide} = this.state;
         if(selectedSlide && selectedSlide.slideId){
           const currentSelectedSlide = findWhere(slides, {slideId: selectedSlide.slideId});
-          if(currentSelectedSlide){
+          if(currentSelectedSlide >= 0){
             this.onSelectSlide(currentSelectedSlide);
           }else if(selectedSlide && selectedSlide.keyId){
             const selectedKeyId = this.findExistedSlide(selectedSlide.keyId);

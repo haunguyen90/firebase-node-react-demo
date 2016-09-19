@@ -139,7 +139,7 @@ class ImageComponent extends SlideComponent {
             }
 
             <div className="box__input">
-              <input className="box__file" onChange={this.onInputFileChange.bind(this)} type="file" name="file" id="fileInput" />
+              <input className="box__file" onChange={this.onInputFileChange.bind(this)} type="file" name="file" id="fileInput" accept='image/*'/>
               <Button className="uploadButton" bsStyle="primary" block>
 
                 <label htmlFor="fileInput" className="fileInputLabel">

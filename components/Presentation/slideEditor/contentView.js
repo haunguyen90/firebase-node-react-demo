@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import {Link, withRouter} from 'react-router';
-import {Image, PageHeader, Popover, OverlayTrigger, Row, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
+import {Image, Alert, PageHeader, Popover, OverlayTrigger, Row, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
 import {arrayMove} from 'react-sortable-hoc';
 import {findIndex, extend, isArray, findWhere} from 'underscore';
 import {ENUMS} from '~/lib/_required/enums.js';
@@ -17,9 +17,13 @@ import TextAreaComponent from './TextAreaComponent.js'
 class ContentView extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      alertVisible: false,
+      alertMessage: ""
+    };
     this.renderSlideComponent = this.renderSlideComponent.bind(this);
     this.onDeleteSlide = this.onDeleteSlide.bind(this);
+    this.handleAlertDismiss = this.handleAlertDismiss.bind(this);
   }
 
   getComponents(){
@@ -43,9 +47,23 @@ class ContentView extends React.Component {
     if(selectedSlide.components && isArray(selectedSlide.components))
       components = selectedSlide.components;
 
+    const titleComponent = findWhere(components, (component) => {
+      return component.type == "TITLE";
+    });
+
+    let maxComponents = 3;
+
+    if(titleComponent){
+      maxComponents = 4;
+      if(componentType == "title"){
+        this.handleAlertShow("Title has been added already !!!!");
+        return;
+      }
+    }
+
     // Only add max 3 components
-    if(components.length >= 3){
-      alert("You can only add max 3 components");
+    if(components.length >= maxComponents){
+      this.handleAlertShow("You can only add a maximum of 3 components to each slide");
       return;
     }
 
@@ -62,7 +80,7 @@ class ContentView extends React.Component {
 
         const existedComponent = findWhere(components, {type: "TITLE"});
         if(existedComponent){
-          alert("Title has been added already");
+          this.handleAlertShow("Title has been added already");
           return;
         }
 
@@ -119,7 +137,7 @@ class ContentView extends React.Component {
       return slide.slideId == selectedSlide.slideId
     });
 
-    if(currentSlideIndex){
+    if(currentSlideIndex >= 0){
       let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/');
       deckDataRef.set(components);
     }else{
@@ -135,7 +153,7 @@ class ContentView extends React.Component {
         return slide.slideId == selectedSlide.slideId
       });
 
-      if(currentSlideIndex){
+      if(currentSlideIndex >= 0){
         slides.splice(currentSlideIndex, 1);
         const deckId = this.props.deckObject.id;
         let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/');
@@ -171,6 +189,19 @@ class ContentView extends React.Component {
     )
   }
 
+  getSlideHeader(){
+    const {selectedSlide, getSlides} = this.props;
+    const slides = getSlides();
+    const currentSlideIndex = findIndex(slides, (slide) => {
+      return slide.slideId == selectedSlide.slideId
+    });
+    if(currentSlideIndex >= 0){
+      return `Slide ${currentSlideIndex + 1}`;
+    }else{
+      return `Slide unknown`;
+    }
+  }
+
   getSlideFooter(){
     return (
       <div className="slide-footer-config">
@@ -191,6 +222,17 @@ class ContentView extends React.Component {
     )
   }
 
+  handleAlertDismiss(){
+    this.setState({alertVisible: false});
+    this.setState({alertMessage: ""});
+  }
+
+  handleAlertShow(message) {
+    this.setState({alertVisible: true});
+    this.setState({alertMessage: message});
+    $(".main-slide-editor").animate({scrollTop: 0});
+  }
+
   renderSlideComponent(component, index){
     const {selectedSlide} = this.props;
 
@@ -207,7 +249,13 @@ class ContentView extends React.Component {
   render(){
     return (
       <div className="content-view-component">
-        <Panel header={this.props.selectedSlide.title} footer={this.getSlideFooter()}>
+        {this.state.alertVisible?
+          <Alert bsStyle="danger" onDismiss={this.handleAlertDismiss}>
+            <p>{this.state.alertMessage}</p>
+          </Alert> : null
+        }
+
+        <Panel header={this.getSlideHeader()} footer={this.getSlideFooter()}>
           <div className="slide-detail">
             <ReactCSSTransitionGroup
               transitionName="slide-animation"
