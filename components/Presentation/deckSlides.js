@@ -5,7 +5,7 @@ import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
 import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
-import {map} from 'underscore';
+import {map, findWhere} from 'underscore';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import ContentView from './slideEditor/contentView.js';
@@ -13,7 +13,7 @@ import DesignView from './slideEditor/designView.js';
 
 const SortableItem = SortableElement(({value, selectedSlide}) => {
   let activeClass = "";
-  if(selectedSlide.keyId == value.keyId)
+  if(selectedSlide.slideId == value.slideId)
     activeClass = "slide-active";
 
   return (
@@ -67,13 +67,13 @@ class DeckSlides extends React.Component {
     const {deckObject} = this.props;
 
     const newSlides = arrayMove(slides, oldIndex, newIndex);
-    this.onSelectSlide(newSlides[newIndex]);
-
-    if(oldIndex == newIndex)
-      return;
-
-    let deckDataRef = firebase.database().ref('deckData/' + deckObject.id + '/slides/');
-    deckDataRef.set(newSlides);
+    if(oldIndex == newIndex){
+      this.onSelectSlide(newSlides[newIndex]);
+    }else{
+      let deckDataRef = firebase.database().ref('deckData/' + deckObject.id + '/slides/');
+      deckDataRef.set(newSlides);
+      //this.onSelectSlide(newSlides[newIndex]);
+    }
   };
 
   getSlides(){
@@ -83,6 +83,7 @@ class DeckSlides extends React.Component {
         slide.keyId = index;
         return slide;
       });
+      //return deckData.slides;
     }
     return [];
   }
@@ -104,9 +105,12 @@ class DeckSlides extends React.Component {
   onAddSlide(event){
     event.preventDefault();
     const slides = this.getSlides();
-    const newSlideIndex = slides.length;
+
+    const deckId = this.props.deckObject.id;
+    const slideId = firebase.database().ref('deckData/' + deckId + '/slides/').push().key;
+
     const newSlide = {
-      keyId: newSlideIndex,
+      slideId: slideId,
       title: `Slide ${slides.length + 1}`,
       type: "COMPONENT",
       components: [
@@ -125,7 +129,6 @@ class DeckSlides extends React.Component {
     slides.push(newSlide);
 
     // Update firebase database
-    const deckId = this.props.deckObject.id;
     let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/');
     deckDataRef.set(slides);
   }
@@ -148,12 +151,17 @@ class DeckSlides extends React.Component {
       const slides = this.getSlides();
       if(slides.length > 0){
         const {selectedSlide} = this.state;
-        if(selectedSlide && selectedSlide.keyId){
-          const selectedKeyId = this.findExistedSlide(selectedSlide.keyId);
-          if(selectedKeyId)
-            this.onSelectSlide(slides[selectedKeyId]);
-          else
-            this.onSelectSlide(slides[0]);
+        if(selectedSlide && selectedSlide.slideId){
+          const currentSelectedSlide = findWhere(slides, {slideId: selectedSlide.slideId});
+          if(currentSelectedSlide){
+            this.onSelectSlide(currentSelectedSlide);
+          }else if(selectedSlide && selectedSlide.keyId){
+            const selectedKeyId = this.findExistedSlide(selectedSlide.keyId);
+            if(selectedKeyId)
+              this.onSelectSlide(slides[selectedKeyId]);
+            else
+              this.onSelectSlide(slides[0]);
+          }
         }else
           this.onSelectSlide(slides[0]);
       }

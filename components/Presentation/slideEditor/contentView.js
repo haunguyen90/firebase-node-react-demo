@@ -114,19 +114,35 @@ class ContentView extends React.Component {
 
     // Update firebase database
     const deckId = this.props.deckObject.id;
-    let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/');
-    deckDataRef.set(components);
+    const slides = this.props.getSlides();
+    const currentSlideIndex = findIndex(slides, (slide) => {
+      return slide.slideId == selectedSlide.slideId
+    });
+
+    if(currentSlideIndex){
+      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/');
+      deckDataRef.set(components);
+    }else{
+      console.error("Could not find slide index when add component");
+    }
   }
 
   onDeleteSlide(){
     const {selectedSlide, getSlides} = this.props;
     const slides = getSlides();
     if(slides && isArray(slides) && slides.length > 0){
-      slides.splice(selectedSlide.keyId, 1);
+      const currentSlideIndex = findIndex(slides, (slide) => {
+        return slide.slideId == selectedSlide.slideId
+      });
 
-      const deckId = this.props.deckObject.id;
-      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/');
-      deckDataRef.set(slides);
+      if(currentSlideIndex){
+        slides.splice(currentSlideIndex, 1);
+        const deckId = this.props.deckObject.id;
+        let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/');
+        deckDataRef.set(slides);
+      }else{
+        console.error("Could not find slide index when delete slide");
+      }
     }
 
   }
