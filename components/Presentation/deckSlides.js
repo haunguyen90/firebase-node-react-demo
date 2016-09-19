@@ -11,16 +11,20 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import ContentView from './slideEditor/contentView.js';
 import DesignView from './slideEditor/designView.js';
 
-const SortableItem = SortableElement(({value}) => {
+const SortableItem = SortableElement(({value, selectedSlide}) => {
+  let activeClass = "";
+  if(selectedSlide.keyId == value.keyId)
+    activeClass = "slide-active";
+
   return (
     <div className="slide-item-thumb">
-      <Image src="https://firebasestorage.googleapis.com/v0/b/prezvr.appspot.com/o/images%2Fslide-cover3.png?alt=media&token=406ea219-2ef6-46f1-bce0-ab0db17635f4" thumbnail />
+      <Image className={activeClass} src="https://firebasestorage.googleapis.com/v0/b/prezvr.appspot.com/o/images%2Fslide-cover3.png?alt=media&token=406ea219-2ef6-46f1-bce0-ab0db17635f4" thumbnail />
       <span>{value.title}</span>
     </div>
   )
 });
 
-const SortableList = SortableContainer(({items}) => {
+const SortableList = SortableContainer(({items, selectedSlide}) => {
   return (
     <ul className="slides-list orderable">
       <ReactCSSTransitionGroup
@@ -29,9 +33,14 @@ const SortableList = SortableContainer(({items}) => {
         transitionAppear={true}
         transitionAppearTimeout={500}
         transitionLeaveTimeout={300}
-        >
+      >
         {items.map((value, index) =>
-            <SortableItem key={`item-${index}`} index={index} value={value} />
+            <SortableItem
+              key={`item-${index}`}
+              index={index}
+              value={value}
+              selectedSlide={selectedSlide}
+            />
         )}
       </ReactCSSTransitionGroup>
     </ul>
@@ -161,7 +170,12 @@ class DeckSlides extends React.Component {
               <i className="fa fa-plus-square"></i>
             </span>
           </div>
-          <SortableList onSelectSlide={this.onSelectSlide} items={this.getSlides()} onSortEnd={this.onSortEnd}/>
+          <SortableList
+            onSelectSlide={this.onSelectSlide}
+            items={this.getSlides()}
+            onSortEnd={this.onSortEnd}
+            selectedSlide={this.state.selectedSlide}
+          />
 
         </div>
 

@@ -263,6 +263,11 @@ deck-slides-component
         padding: 5px;
         height: 145px;
         cursor: pointer;
+
+        .slide-active{
+          border: 3px solid #6c069e;
+          border-radius: 5px;
+        }
       }
 
     }
