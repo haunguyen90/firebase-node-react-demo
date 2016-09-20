@@ -61,13 +61,13 @@ class ImageComponent extends SlideComponent {
 
     const pattern = /^image\/(gif|jpg|jpeg|tiff|png)$/i;
 
+    const storageRef = firebase.storage().ref();
+    const file = evt.target.files[0];
+
     if(!pattern.test(file.type)){
       this.props.handleAlertShow("File type not support");
       return false;
     }
-
-    const storageRef = firebase.storage().ref();
-    const file = evt.target.files[0];
 
     const metadata = {
       'contentType': file.type
