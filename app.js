@@ -3,6 +3,7 @@ require('babel-register');
 require("babel-polyfill");
 
 var express = require('express');
+var sassMiddleware = require('node-sass-middleware');
 var path = require ('path');
 var favicon = require ('serve-favicon');
 var logger = require ('morgan');
@@ -20,6 +21,13 @@ var babelify = require('babelify');
 var routes = require('./routes/index.js');
 
 var app = express();
+app.use("/stylesheets", sassMiddleware({
+  /* Options */
+  src: __dirname + '/public/scss',
+  dest: path.join(__dirname, 'public/stylesheets'),
+  debug: true,
+  outputStyle: 'compressed'
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

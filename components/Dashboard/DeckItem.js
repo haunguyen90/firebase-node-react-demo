@@ -30,6 +30,10 @@ class DeckItem extends React.Component {
     return baseUrl;
   }
 
+  onEditDeck(){
+    this.props.router.push("presentation/" + this.props.deckData.id);
+  }
+
   render() {
     const {deckData} = this.props;
     return (
@@ -38,7 +42,7 @@ class DeckItem extends React.Component {
           <h3>{deckData.name}</h3>
           <p>{deckData.description}</p>
           <p>
-            <Button bsStyle="primary">Edit</Button>&nbsp;
+            <Button bsStyle="primary" onClick={this.onEditDeck.bind(this)}>Edit</Button>&nbsp;
             <Button bsStyle="default" onClick={this.openShareWindow.bind(this)}>Share</Button>
           </p>
         </Thumbnail>

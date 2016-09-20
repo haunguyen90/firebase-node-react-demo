@@ -35,7 +35,7 @@ class Dashboard extends React.Component {
     const observerAuth = firebase.auth().onAuthStateChanged((user) => {
       if(user){
         let decksRef = firebase.database().ref("decks");
-        decksRef.orderByChild("uid").equalTo(user.uid).on("value", (result) => {
+        decksRef.orderByChild("uid").equalTo("XXX").on("value", (result) => {
           this.setState({decksObject: result.val()});
         })
       }else{
@@ -52,6 +52,8 @@ class Dashboard extends React.Component {
       // Unsubscribe auth change
       observerAuth();
     }
+    let decksRef = firebase.database().ref("decks");
+    decksRef.off();
   }
 
   render(){

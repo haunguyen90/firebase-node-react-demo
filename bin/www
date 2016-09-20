@@ -48,7 +48,7 @@ var io = require('socket.io')(server);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-
+console.log("server started at " + port);
 
 /**
  * Socket io function
@@ -73,6 +73,7 @@ io.on('connection', function (socket) {
     console.log("checkAndUpdateUsersTable");
     console.log(credential);
     console.log(user);
+
     switch (credential.provider) {
       case "google.com":
         firebase.database().ref('users').once('value').then(function(result) {
@@ -113,13 +114,13 @@ io.on('connection', function (socket) {
                 return;
               }
               console.log(res);
-              const newUser = {
+              var newUser = {
                 id: user.uid,
                 name: res.name,
                 socialImgUrl: res.picture.data.url
               };
 
-              const Database = firebase.database();
+              var Database = firebase.database();
               Database.ref('users/' + user.uid).set(newUser);
             });
           }
@@ -129,36 +130,41 @@ io.on('connection', function (socket) {
       case "twitter.com":
         firebase.database().ref('users').once('value').then(function(result) {
           var users = result.val();
+          console.log("userID: " + user.uid);
           if(!users) users = {};
           if(!users[user.uid]){
-            twitterOptions.access_token_key = credential.accessToken;
-            twitterOptions.access_token_secret = credential.secret;
-            const twitterClient = new Twitter(twitterOptions);
+            console.log("update twitter");
+            //twitterOptions.access_token_key = credential.accessToken;
+            //twitterOptions.access_token_secret = credential.secret;
+            //const twitterClient = new Twitter(twitterOptions);
 
             var newUser = {
               id: user.uid,
               name: user.displayName,
-              socialImgUrl: photoURL
+              socialImgUrl: user.photoURL
             };
             var Database = firebase.database();
+            console.log(newUser);
             Database.ref('users/' + user.uid).set(newUser);
 
-            twitterClient.get("account/verify_credentials", function(error, data, response) {
-              if (error) {
-                console.log(error);
-              } else {
-                console.log(data);
-                //var updateUser = {
-                //  socialImgUrl: photoURL
-                //};
-                //var Database = firebase.database();
-                //Database.ref('users/' + user.uid).set(newUser);
-              }
-            })
+            //twitterClient.get("account/verify_credentials", function(error, data, response) {
+            //  if (error) {
+            //    console.log(error);
+            //  } else {
+            //    console.log(data);
+            //    //var updateUser = {
+            //    //  socialImgUrl: photoURL
+            //    //};
+            //    //var Database = firebase.database();
+            //    //Database.ref('users/' + user.uid).set(newUser);
+            //  }
+            //})
           }
 
         });
         break;
+
+      default : break;
     }
     //socket.emit('redirectUserToHome', user);
   });

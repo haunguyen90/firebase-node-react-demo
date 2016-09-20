@@ -158,15 +158,19 @@ class App extends React.Component {
   render() {
     return (
       <Grid fluid={true}>
-        <div className="row">
+        <Row>
           <AppNavbar history={this.props.history} currentUserData={this.state.currentUserData}/>
-          {this.props.children && React.cloneElement(this.props.children, {
-            uiConfig: this.state.uiConfig,
-            firebaseui: this.state.firebaseui,
-            ref: "mainContent"
-          })}
+        </Row>
+
+        {this.props.children && React.cloneElement(this.props.children, {
+          uiConfig: this.state.uiConfig,
+          firebaseui: this.state.firebaseui,
+          ref: "mainContent"
+        })}
+
+        <Row>
           <Footer />
-        </div>
+        </Row>
       </Grid>
     );
   }
