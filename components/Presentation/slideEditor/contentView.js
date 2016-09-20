@@ -9,6 +9,7 @@ import {findIndex, extend, isArray, findWhere} from 'underscore';
 import {ENUMS} from '~/lib/_required/enums.js';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import Confirm from 'react-confirm-bootstrap';
+import {isMounted} from '~/lib/react/reactLib.js';
 
 import TitleComponent from './TitleComponent.js';
 import ImageComponent from './ImageComponent.js';
@@ -232,6 +233,11 @@ class ContentView extends React.Component {
     this.setState({alertVisible: true});
     this.setState({alertMessage: message});
     $(".main-slide-editor").animate({scrollTop: 0});
+    setTimeout(() => {
+      if(isMounted(this)){
+        this.handleAlertDismiss();
+      }
+    }, 2000)
   }
 
   renderSlideComponent(component, index){

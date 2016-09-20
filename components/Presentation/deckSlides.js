@@ -108,7 +108,12 @@ class DeckSlides extends React.Component {
   }
 
   onSelectSlide(slide){
-    this.setState({selectedSlide: slide});
+    const slides = this.getSlides();
+    const currentSelectedSlide = findWhere(slides, {slideId: slide.slideId});
+    if(currentSelectedSlide)
+      this.setState({selectedSlide: slide});
+    else
+      console.error("Could not find the current slide");
   }
 
   onAddSlide(event){
@@ -162,7 +167,7 @@ class DeckSlides extends React.Component {
         const {selectedSlide} = this.state;
         if(selectedSlide && selectedSlide.slideId){
           const currentSelectedSlide = findWhere(slides, {slideId: selectedSlide.slideId});
-          if(currentSelectedSlide >= 0){
+          if(currentSelectedSlide){
             this.onSelectSlide(currentSelectedSlide);
           }else if(selectedSlide && selectedSlide.keyId){
             const selectedKeyId = this.findExistedSlide(selectedSlide.keyId);
