@@ -58,7 +58,7 @@ class ContentView extends React.Component {
     if(titleComponent){
       maxComponents = 4;
       if(componentType == "title"){
-        this.handleAlertShow("Title has been added already !!!!");
+        this.handleAlertShow("Each slide can only have one title.");
         return;
       }
     }
