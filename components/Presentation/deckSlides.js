@@ -75,9 +75,11 @@ class DeckSlides extends React.Component {
     const slides = this.getSlides();
     const {deckObject} = this.props;
 
+
     const newSlides = arrayMove(slides, oldIndex, newIndex);
+    this.onSelectSlide(newSlides[newIndex]);
     if(oldIndex == newIndex){
-      this.onSelectSlide(newSlides[newIndex]);
+
     }else{
       let deckDataRef = firebase.database().ref('deckData/' + deckObject.id + '/slides/');
       deckDataRef.set(newSlides);
