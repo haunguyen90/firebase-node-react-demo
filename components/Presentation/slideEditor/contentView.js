@@ -11,9 +11,9 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import Confirm from 'react-confirm-bootstrap';
 import {isMounted} from '~/lib/react/reactLib.js';
 
-import TitleComponent from './TitleComponent.js';
-import ImageComponent from './ImageComponent.js';
-import TextAreaComponent from './TextAreaComponent.js'
+import TitleComponent from './slideComponents/TitleComponent.js';
+import ImageComponent from './slideComponents/ImageComponent.js';
+import TextAreaComponent from './slideComponents/TextAreaComponent.js'
 
 class ContentView extends React.Component {
   constructor(props) {
