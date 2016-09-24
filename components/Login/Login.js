@@ -34,7 +34,6 @@ class Login extends React.Component {
   handleSignedOutUser(){
     document.getElementById('user-signed-out').style.display = 'block';
     this.props.firebaseui.start('#firebaseui-container', this.props.uiConfig);
-    console.log("did mount");
     this.setState({FIREBASEUI_DID_MOUNT: true});
   }
 

@@ -27,7 +27,6 @@ class ImageComponent extends SlideComponent {
     }, this.state);
     this.handleChange = this.handleChange.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
-    this.onRemoveComponent = this.onRemoveComponent.bind(this);
   }
 
   handleChange(event){

@@ -128,7 +128,6 @@ class App extends React.Component {
         this.setState({currentUid: user.uid});
         let PicRef = firebase.database().ref('users/' + user.uid + '/socialImgUrl');
         PicRef.on("value", (result) => {
-          console.log("added");
           this.updateProfilePicture();
         });
 

@@ -23,7 +23,6 @@ class Home extends React.Component {
     let users = firebase.database().ref('users');
     users.on("value", (result) => {
       const users = result.val();
-      console.log(users);
       this.setState({users: users});
     });
 

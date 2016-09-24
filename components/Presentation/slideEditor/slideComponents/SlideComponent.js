@@ -4,12 +4,14 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
+import Confirm from 'react-confirm-bootstrap';
 
 class SlideComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
     this.onUpdateComponent = (text) => this._onUpdateComponent(text);
+    this.onRemoveComponent = this._onRemoveComponent.bind(this);
   }
 
   _onUpdateComponent(text) {
@@ -40,7 +42,7 @@ class SlideComponent extends React.Component {
     }
   }
 
-  onRemoveComponent(){
+  _onRemoveComponent(){
     // Remove single component
     const {selectedSlide, keyId, deckId} = this.props;
     if(selectedSlide.components && selectedSlide.components[keyId]){
@@ -49,6 +51,18 @@ class SlideComponent extends React.Component {
       deckDataRef.set(selectedSlide.components);
     }
 
+  }
+
+  renderConfirmDeleteComponent(){
+    return (
+      <Confirm
+        onConfirm={this.onRemoveComponent}
+        body="Are you sure you want to remove this component?"
+        confirmText="Confirm Delete"
+        title={"Deleting Component"}>
+        <a href="#" className="remove-component">Remove</a>
+      </Confirm>
+    )
   }
 
   render(){

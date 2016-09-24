@@ -1,59 +1,47 @@
 /**
- * Created by haunguyen on 9/15/16.
+ * Created by haunguyen on 9/25/16.
  */
 import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Thumbnail, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
 import {extend} from 'underscore';
 import ReactDOM from 'react-dom';
-import {Editor, EditorState} from 'draft-js';
+import {Editor, RichUtils} from 'draft-js';
 
 import RichTextComponent from '../richText/richTextComponent.js';
 
-class TextAreaComponent extends RichTextComponent {
+class BulletComponent extends RichTextComponent {
   constructor(props){
     super(props);
 
+    this.onTab = this._onTab.bind(this);
+
     this.state = extend({}, this.state);
+
   }
 
-  componentDidUpdate(prevProps, prevState){
-    //if(JSON.stringify(prevProps.componentData) && JSON.stringify(this.props.componentData)){
-    //  if(this.props.componentData.text != prevProps.componentData.text)
-    //    this.setState({text: this.props.componentData.text});
-    //}
-  }
-
-  componentDidMount(){
-    //const textArea = ReactDOM.findDOMNode(this.refs.textComponentField);
-    //const editor = new Squire( textArea , {
-    //  blockTag: 'p',
-    //  blockAttributes: {'class': 'paragraph'},
-    //  tagAttributes: {
-    //    ul: {'class': 'UL'},
-    //    ol: {'class': 'OL'},
-    //    li: {'class': 'listItem'},
-    //    a: {'target': '_blank'}
-    //  }
-    //});
-    //
-    //console.log(editor);
-
-    //this.toggleInlineStyle("font14");
+  _onTab(event) {
+    console.log(event);
+    let maxDepth = 4;
+    console.log(this._convertToRaw());
+    const newEditor = RichUtils.onTab(event, this.state.editorState, 4);
+    console.log(this._convertToRaw(newEditor));
+    this.handleChange(RichUtils.onTab(event, this.state.editorState, 4));
   }
 
   render(){
-    const {componentData, keyId} = this.props;
+    const {keyId} = this.props;
     const {editorState} = this.state;
 
     return (
-      <div className="slide-component textarea-component row">
+      <div className="slide-component bullet-component row">
         <Col sm={12}>
-          <FormGroup controlId={"componentTextArea-" + keyId}>
-            <ControlLabel>TEXT</ControlLabel>
+          <FormGroup controlId={"bulletComponent-" + keyId}>
+            <ControlLabel>BULLETS</ControlLabel>
             {this.renderConfirmDeleteComponent()}
 
             <div className="RichEditor-root">
+              {this.renderBlockType()}
               {this.renderInlineStyle()}
               <div className="RichEditor-editor">
                 <Editor
@@ -61,6 +49,7 @@ class TextAreaComponent extends RichTextComponent {
                   editorState={editorState}
                   handleKeyCommand={this.handleKeyCommand}
                   onChange={this.handleChange}
+                  onTab={this.onTab}
                   onBlur={this.handleBlur}
                 />
               </div>
@@ -71,13 +60,14 @@ class TextAreaComponent extends RichTextComponent {
       </div>
     )
   }
+
 }
 
-TextAreaComponent.propTypes = {
+BulletComponent.propTypes = {
   keyId: React.PropTypes.number,
   componentData: React.PropTypes.object,
   deckId: React.PropTypes.string,
   selectedSlide: React.PropTypes.object
 };
 
-export default withRouter(TextAreaComponent, {withRef: true});
+export default withRouter(BulletComponent, {withRef: true});

@@ -12,7 +12,11 @@ import SlideComponent from '../slideComponents/SlideComponent.js';
 class RichTextComponent extends SlideComponent {
   constructor(props) {
     super(props);
-    this.state = extend({}, this.state);
+
+    this.handleBlur = () => {
+      const {editorState} = this.state;
+      this.onUpdateComponent(editorState);
+    };
 
     this.handleChange = (editorState) => this._handleChange(editorState);
     this.handleKeyCommand = (command) => this._handleKeyCommand(command);
@@ -22,6 +26,25 @@ class RichTextComponent extends SlideComponent {
     this.convertToRaw = (editorState) => this._convertToRaw(editorState);
     this.convertFromRaw = (rawContent) => this._convertFromRaw(rawContent);
     this.onUpdateComponent = (editorState) => this.__onUpdateComponent(editorState);
+
+
+    let editorState = EditorState.createEmpty();
+    if(props.componentData && props.componentData.rawContent){
+      let rawContent;
+      try{
+        rawContent = JSON.parse(props.componentData.rawContent)
+      }catch(e){
+        console.warn("rawContent JSON is not valid");
+      }
+      if(rawContent){
+        const contentState = this.convertFromRaw(rawContent);
+        editorState = this.getEditorStateFromRaw(contentState);
+      }
+    }
+
+    this.state = extend({
+      editorState: editorState
+    }, this.state);
 
   }
 
@@ -52,13 +75,11 @@ class RichTextComponent extends SlideComponent {
     if(!editorState)
       editorState = this.state.editorState;
     const rawContent = convertToRaw(editorState.getCurrentContent());
-    console.log(rawContent);
     return rawContent;
   }
 
   _convertFromRaw(rawContent){
     const contentState = convertFromRaw(rawContent);
-    console.log(contentState);
     return contentState;
   }
 
@@ -100,7 +121,6 @@ class RichTextComponent extends SlideComponent {
       editorState = this.state.editorState;
 
     let html = stateToHTML(editorState.getCurrentContent(), options);
-    console.log(html);
     return html;
   }
 
@@ -207,8 +227,8 @@ RichTextComponent.defaultProps = {
     //{label: 'H5', style: 'header-five'},
     //{label: 'H6', style: 'header-six'},
     //{label: 'Blockquote', style: 'blockquote'},
-    //{label: 'UL', style: 'unordered-list-item'},
-    //{label: 'OL', style: 'ordered-list-item'},
+    {label: 'UL', style: 'unordered-list-item'},
+    {label: 'OL', style: 'ordered-list-item'}
     //{label: 'Code Block', style: 'code-block'}
   ],
   INLINE_STYLES: [
