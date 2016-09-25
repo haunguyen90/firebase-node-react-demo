@@ -335,10 +335,39 @@ class FontSizeSelect extends React.Component {
   constructor() {
     super();
     this.onToggle = (e) => {
+      // Deprecated
+      console.warn("This function is deprecated. Please use onChangeSize");
       e.preventDefault();
       const style = e.target.value;
       this.props.onToggle(style);
     };
+
+    this.onChangeSize = (action, e) => {
+      e.preventDefault();
+      const {active} = this.state;
+      const pattern = /^font/i;
+      if(active && pattern.test(active)){
+        let size = parseInt(active.slice(4));
+        if(action == "up"){
+          size++;
+        }else{
+          size--;
+        }
+        if(size < 1 || size > 14)
+          return;
+
+        const newStyle = `${active.slice(0, 4)}${size}`;
+        this.props.onToggle(newStyle);
+        this.updateSelectBox(newStyle);
+      }else{
+        if(action == "up"){
+          const newStyle = 'font2';
+          this.props.onToggle(newStyle);
+          this.updateSelectBox(newStyle);
+        }
+      }
+    };
+
     this.state = {
       active: ""
     };
@@ -359,7 +388,16 @@ class FontSizeSelect extends React.Component {
     }
   }
 
-  render() {
+  render(){
+    return (
+      <span className="fontSize-root">
+        <span className="RichEditor-styleButton" onMouseDown={this.onChangeSize.bind(this, "down")}>Text-</span>
+        <span className="RichEditor-styleButton" onMouseDown={this.onChangeSize.bind(this, "up")}>Text+</span>
+      </span>
+    )
+  }
+
+  renderTest() {
     return (
       <select name="fontSize" onChange={this.onToggle} value={this.state.active}>
         {this.props.fontSizeArray.map((size, index) => {
