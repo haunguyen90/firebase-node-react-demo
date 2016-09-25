@@ -17,27 +17,29 @@ class BulletComponent extends RichTextComponent {
     this.onTab = this._onTab.bind(this);
 
     this.state = extend({}, this.state);
-    this.toggleBlockType = (type) => {
-      if(!this.hasBlockType(type)){
-        this._toggleBlockType(type)
-      }
-    };
+    this.toggleBlockType = (type) => this.toggleBlockType(type);
+    this.handleKeyCommand = (command) => this.handleKeyCommand(command);
 
-    this.handleKeyCommand = (command) => {
-      if(command == "backspace"){
-        const {editorState} = this.state;
-        const newState = RichUtils.handleKeyCommand(editorState, command);
-        if(newState){
-          const blockType = newState.getCurrentContent().getFirstBlock().getType();
-          if(blockType == "unstyled"){
-            return;
-          }
+  }
+
+  toggleBlockType(type){
+    if(!this.hasBlockType(type)){
+      this._toggleBlockType(type)
+    }
+  }
+
+  handleKeyCommand(command){
+    if(command == "backspace"){
+      const {editorState} = this.state;
+      const newState = RichUtils.handleKeyCommand(editorState, command);
+      if(newState){
+        const blockType = newState.getCurrentContent().getFirstBlock().getType();
+        if(blockType == "unstyled"){
+          return;
         }
       }
-      this._handleKeyCommand(command);
-
-    };
-
+    }
+    this._handleKeyCommand(command);
   }
 
   _onTab(event) {

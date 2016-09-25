@@ -227,8 +227,8 @@ RichTextComponent.defaultProps = {
     //{label: 'H5', style: 'header-five'},
     //{label: 'H6', style: 'header-six'},
     //{label: 'Blockquote', style: 'blockquote'},
-    {label: 'UL', style: 'unordered-list-item'},
-    {label: 'OL', style: 'ordered-list-item'}
+    {label: "UL", style: 'unordered-list-item'},
+    {label: "OL", style: 'ordered-list-item'}
     //{label: 'Code Block', style: 'code-block'}
   ],
   INLINE_STYLES: [
@@ -297,6 +297,18 @@ class StyleButton extends React.Component {
     };
   }
 
+  renderButtonLabel(){
+    if(this.props.label == "UL"){
+      return (
+        <i className="fa fa-list-ul"></i>
+      );
+    }else if(this.props.label == "OL"){
+      return (<i className="fa fa-list-ol"></i>)
+    }else{
+      return this.props.label;
+    }
+  }
+
   render() {
     let className = 'RichEditor-styleButton';
     if (this.props.active) {
@@ -305,7 +317,7 @@ class StyleButton extends React.Component {
 
     return (
       <span className={className} onMouseDown={this.onToggle}>
-        {this.props.label}
+        {this.renderButtonLabel()}
       </span>
     );
   }
