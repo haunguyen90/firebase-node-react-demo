@@ -4,9 +4,9 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Thumbnail, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
-import {extend} from 'underscore';
+import {extend, map, isArray, each} from 'underscore';
 import ReactDOM from 'react-dom';
-import {Editor, RichUtils} from 'draft-js';
+import {Editor, RichUtils, ContentState, EditorState} from 'draft-js';
 
 import RichTextComponent from '../richText/richTextComponent.js';
 
@@ -19,7 +19,21 @@ class BulletComponent extends RichTextComponent {
     this.state = extend({}, this.state);
     this.toggleBlockType = (type) => this.toggleBlockType(type);
     this.handleKeyCommand = (command) => this.handleKeyCommand(command);
+    this.onUpdateComponent = this.onBulletUpdateComponent.bind(this);
+  }
 
+  onBulletUpdateComponent(){
+    const {editorState} = this.state;
+    const RTFMarkup = this.convertEditorToJSON();
+    let RTFMarkupString = "";
+    try {
+      RTFMarkupString = JSON.stringify(RTFMarkup);
+    }catch(e){
+      console.warn("RTFMarkup JSON is not valid");
+    }
+
+    const rawContent = this.convertToRaw(editorState);
+    this._updateDatabase(RTFMarkupString, rawContent);
   }
 
   toggleBlockType(type){
@@ -40,6 +54,34 @@ class BulletComponent extends RichTextComponent {
       }
     }
     this._handleKeyCommand(command);
+  }
+
+  convertEditorToJSON(){
+    const {editorState} = this.state;
+    var blockArray = editorState.getCurrentContent().getBlocksAsArray();
+    let points = [];
+    if(isArray(blockArray)){
+      points = map(blockArray, (block) => {
+        const newContentState = ContentState.createFromBlockArray([block]);
+        const newEditorState = EditorState.createWithContent(newContentState);
+        const RTFMarkup = this.getRTFContent(newEditorState);
+        const DOM = $.parseHTML(RTFMarkup);
+        let htmlContent = block.text;
+        if(DOM[0] && DOM[0].firstElementChild){
+          htmlContent = DOM[0].firstElementChild.innerHTML;
+        }
+        let bulletType = "numeric";
+        if(block.type == "unordered-list-item")
+          bulletType = "bulletPoint";
+
+        return {
+          text: htmlContent,
+          bulletType: bulletType,
+          depth: block.depth
+        };
+      });
+    }
+    return points;
   }
 
   _onTab(event) {

@@ -26,7 +26,7 @@ class RichTextComponent extends SlideComponent {
     this.convertToRaw = (editorState) => this._convertToRaw(editorState);
     this.convertFromRaw = (rawContent) => this._convertFromRaw(rawContent);
     this.onUpdateComponent = (editorState) => this.__onUpdateComponent(editorState);
-
+    this._updateDatabase = this._updateDatabase.bind(this);
 
     let editorState = EditorState.createEmpty();
     if(props.componentData && props.componentData.rawContent){
@@ -53,7 +53,11 @@ class RichTextComponent extends SlideComponent {
       editorState = this.state.editorState;
     const RTFMarkup = this.getRTFContent(editorState);
     const rawContent = this.convertToRaw(editorState);
+    this._updateDatabase(RTFMarkup, rawContent);
 
+  }
+
+  _updateDatabase(RTFMarkup, rawContent){
     // Update single component
     const {selectedSlide, keyId, deckId} = this.props;
 
@@ -83,6 +87,10 @@ class RichTextComponent extends SlideComponent {
     return contentState;
   }
 
+  convertFromHTML(html){
+    return convertFromHTML(html);
+  }
+
   getEditorStateFromRaw(contentState){
     const editorState = EditorState.createWithContent(contentState);
     return editorState;
@@ -100,20 +108,20 @@ class RichTextComponent extends SlideComponent {
           //style: {fontSize: 12}
         },
         // Use a custom inline style. Default element is `span`.
-        font7: {style: {"font-size": '7px'}},
-        font8: {style: {"font-size": '8px'}},
-        font9: {style: {"font-size": '9px'}},
-        font10: {style: {"font-size": '10px'}},
-        font11: {style: {"font-size": '11px'}},
-        font12: {style: {"font-size": '12px'}},
-        font13: {style: {"font-size": '13px'}},
-        font14: {style: {"font-size": '14px'}},
-        font15: {style: {"font-size": '15px'}},
-        font16: {style: {"font-size": '16px'}},
-        font17: {style: {"font-size": '17px'}},
-        font18: {style: {"font-size": '18px'}},
-        font19: {style: {"font-size": '19px'}},
-        font20: {style: {"font-size": '20px'}}
+        font1: {style: {"font-size": '1em'}},
+        font2: {style: {"font-size": '2em'}},
+        font3: {style: {"font-size": '3em'}},
+        font4: {style: {"font-size": '4em'}},
+        font5: {style: {"font-size": '5em'}},
+        font6: {style: {"font-size": '6em'}},
+        font7: {style: {"font-size": '7em'}},
+        font8: {style: {"font-size": '8em'}},
+        font9: {style: {"font-size": '9pem'}},
+        font10: {style: {"font-size": '10em'}},
+        font11: {style: {"font-size": '11em'}},
+        font12: {style: {"font-size": '12em'}},
+        font13: {style: {"font-size": '13em'}},
+        font14: {style: {"font-size": '14em'}}
       }
     };
 
@@ -235,52 +243,52 @@ RichTextComponent.defaultProps = {
     {label: 'B', style: 'BOLD'},
     {label: 'I', style: 'ITALIC'},
     {label: 'Font size', style: 'fontSize', sizes: [
-      "font7", "font8", "font9", "font10", "font11", "font12", "font13",
-      "font14", "font15", "font16", "font17", "font18", "font19", "font20"
+      "font1", "font2", "font3", "font4", "font5", "font6", "font7",
+      "font8", "font9", "font10", "font11", "font12", "font13", "font14"
     ]}
   ],
   customStyleMap: {
+    font1: {
+      "fontSize": "1em"
+    },
+    font2: {
+      "fontSize": "2em"
+    },
+    font3: {
+      "fontSize": "3em"
+    },
+    font4: {
+      "fontSize": "4em"
+    },
+    font5: {
+      "fontSize": "5em"
+    },
+    font6: {
+      "fontSize": "6em"
+    },
     font7: {
-      "fontSize": "7px"
+      "fontSize": "7em"
     },
     font8: {
-      "fontSize": "8px"
+      "fontSize": "8em"
     },
     font9: {
-      "fontSize": "9px"
+      "fontSize": "9em"
     },
     font10: {
-      "fontSize": "10px"
+      "fontSize": "10em"
     },
     font11: {
-      "fontSize": "11px"
+      "fontSize": "11em"
     },
     font12: {
-      "fontSize": "12px"
+      "fontSize": "12em"
     },
     font13: {
-      "fontSize": "13px"
+      "fontSize": "13em"
     },
     font14: {
-      "fontSize": "14px"
-    },
-    font15: {
-      "fontSize": "15px"
-    },
-    font16: {
-      "fontSize": "16px"
-    },
-    font17: {
-      "fontSize": "17px"
-    },
-    font18: {
-      "fontSize": "18px"
-    },
-    font19: {
-      "fontSize": "19px"
-    },
-    font20: {
-      "fontSize": "20px"
+      "fontSize": "14em"
     }
   },
   defaultStyles: {
