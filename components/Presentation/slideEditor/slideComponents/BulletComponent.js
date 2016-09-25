@@ -17,16 +17,52 @@ class BulletComponent extends RichTextComponent {
     this.onTab = this._onTab.bind(this);
 
     this.state = extend({}, this.state);
+    this.toggleBlockType = (type) => {
+      if(!this.hasBlockType(type)){
+        this._toggleBlockType(type)
+      }
+    };
+
+    this.handleKeyCommand = (command) => {
+      if(command == "backspace"){
+        const {editorState} = this.state;
+        const newState = RichUtils.handleKeyCommand(editorState, command);
+        if(newState){
+          const blockType = newState.getCurrentContent().getFirstBlock().getType();
+          if(blockType == "unstyled"){
+            return;
+          }
+        }
+      }
+      this._handleKeyCommand(command);
+
+    };
 
   }
 
   _onTab(event) {
-    console.log(event);
     let maxDepth = 4;
-    console.log(this._convertToRaw());
-    const newEditor = RichUtils.onTab(event, this.state.editorState, 4);
-    console.log(this._convertToRaw(newEditor));
-    this.handleChange(RichUtils.onTab(event, this.state.editorState, 4));
+    this.handleChange(RichUtils.onTab(event, this.state.editorState, maxDepth));
+  }
+
+  hasBlockType(blockType){
+    const {editorState} = this.state;
+    const selection = editorState.getSelection();
+    const key = selection.getAnchorKey();
+    const content = editorState.getCurrentContent();
+    const block = content.getBlockForKey(key);
+    const type = block.getType();
+
+    if(blockType){
+      return (type == blockType);
+    }
+
+    return (type == 'unordered-list-item' || type == 'ordered-list-item');
+  }
+
+  componentDidMount(){
+    if(!this.hasBlockType())
+      this.toggleBlockType("unordered-list-item");
   }
 
   render(){
