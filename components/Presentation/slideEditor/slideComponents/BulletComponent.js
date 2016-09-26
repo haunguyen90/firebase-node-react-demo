@@ -17,8 +17,8 @@ class BulletComponent extends RichTextComponent {
     this.onTab = this._onTab.bind(this);
 
     this.state = extend({}, this.state);
-    this.toggleBlockType = (type) => this.toggleBlockType(type);
-    this.handleKeyCommand = (command) => this.handleKeyCommand(command);
+    this.toggleBlockType = (type) => this.onBulletToggleBlockType(type);
+    this.handleKeyCommand = (command) => this.onBulletHandleKeyCommand(command);
     this.onUpdateComponent = this.onBulletUpdateComponent.bind(this);
   }
 
@@ -36,13 +36,13 @@ class BulletComponent extends RichTextComponent {
     this._updateDatabase(RTFMarkupString, rawContent);
   }
 
-  toggleBlockType(type){
+  onBulletToggleBlockType(type){
     if(!this.hasBlockType(type)){
       this._toggleBlockType(type)
     }
   }
 
-  handleKeyCommand(command){
+  onBulletHandleKeyCommand(command){
     if(command == "backspace"){
       const {editorState} = this.state;
       const newState = RichUtils.handleKeyCommand(editorState, command);
