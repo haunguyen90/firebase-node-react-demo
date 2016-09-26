@@ -83,11 +83,6 @@ class BulletComponent extends RichTextComponent {
 
 
     if(isArray(blockArray)){
-      blockArray = map(blockArray, (block) => {
-        block.id = block.getKey();
-        return block;
-      });
-
       points = map(blockArray, (block) => {
         const newContentState = ContentState.createFromBlockArray([block]);
         const newEditorState = EditorState.createWithContent(newContentState);
@@ -104,8 +99,7 @@ class BulletComponent extends RichTextComponent {
         return {
           text: htmlContent,
           bulletType: bulletType,
-          depth: block.getDepth(),
-          id: block.getKey()
+          depth: block.getDepth()
         };
       });
 
@@ -118,6 +112,7 @@ class BulletComponent extends RichTextComponent {
           if(!parentBlock.points)
             parentBlock.points = [];
 
+          delete currentBlock.depth;
           parentBlock.points.unshift(currentBlock);
           points[parentIndex] = parentBlock;
         }
@@ -126,6 +121,11 @@ class BulletComponent extends RichTextComponent {
       points = filter(points, (block) => {
         return block.depth == 0;
       });
+
+      points = map(points, (block) => {
+        delete block.depth;
+        return block;
+      })
 
     }
     return points;
