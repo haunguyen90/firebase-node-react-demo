@@ -6,8 +6,8 @@ import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Thumbnail, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
 import {extend, map, isArray, each, chain, findIndex, filter} from 'underscore';
 import ReactDOM from 'react-dom';
-import {Editor, RichUtils, ContentState, EditorState} from 'draft-js';
-
+import {Editor, RichUtils, ContentState, EditorState, getDefaultKeyBinding, KeyBindingUtil} from 'draft-js';
+import adjustBlockDepthForContentState from "~/node_modules/draft-js/lib/adjustBlockDepthForContentState.js"
 import RichTextComponent from '../richText/richTextComponent.js';
 
 class BulletComponent extends RichTextComponent {
@@ -21,6 +21,73 @@ class BulletComponent extends RichTextComponent {
     this.handleKeyCommand = (command) => this.onBulletHandleKeyCommand(command);
     this.onUpdateComponent = this.onBulletUpdateComponent.bind(this);
     this.getParentBlock = this.getParentBlock.bind(this);
+    this.KeyBindingUtil = KeyBindingUtil;
+    const {hasCommandModifier} = this.KeyBindingUtil;
+    this.hasCommandModifier = hasCommandModifier;
+    this.myKeyBindingFn = this.myKeyBindingFn.bind(this);
+  }
+
+  myKeyBindingFn(e: SyntheticKeyboardEvent): string {
+    if(e.keyCode == 13){
+      const {editorState} = this.state;
+      let maxDepth = 4;
+      const selection = editorState.getSelection();
+      const key = selection.getAnchorKey();
+      if (key !== selection.getFocusKey()) {
+        return "not-handle";
+      }
+
+      const content = editorState.getCurrentContent();
+      const block = content.getBlockForKey(key);
+      const type = block.getType();
+      if (type !== 'unordered-list-item' && type !== 'ordered-list-item') {
+        return "not-handle";
+      }
+
+      e.preventDefault();
+
+      // Only allow indenting one level beyond the block above, and only if
+      // the block above is a list item as well.
+      const blockAbove = content.getBlockBefore(key);
+      if (!blockAbove) {
+        return "not-handle";
+      }
+
+      const typeAbove = blockAbove.getType();
+      if (
+        typeAbove !== 'unordered-list-item' &&
+        typeAbove !== 'ordered-list-item'
+      ) {
+        return "not-handle";
+      }
+
+      const depth = block.getDepth();
+      //if (!event.shiftKey && depth === maxDepth) {
+      //  return editorState;
+      //}
+      const textAbove = blockAbove.getText();
+      const currentText = block.getText();
+
+      if(textAbove == "" || currentText == ""){
+        maxDepth = Math.min(blockAbove.getDepth() + 1, maxDepth);
+        const withAdjustment = adjustBlockDepthForContentState(
+          content,
+          selection,
+          -1,
+          maxDepth
+        );
+
+        const nextEditorState = EditorState.push(
+          editorState,
+          withAdjustment,
+          'adjust-depth'
+        );
+
+        this.handleChange(nextEditorState);
+        return "not-handle";
+      }
+    }
+    return getDefaultKeyBinding(e);
   }
 
   onBulletUpdateComponent(){
@@ -44,14 +111,20 @@ class BulletComponent extends RichTextComponent {
   }
 
   onBulletHandleKeyCommand(command){
+    const {editorState} = this.state;
+    const newState = RichUtils.handleKeyCommand(editorState, command);
     if(command == "backspace"){
-      const {editorState} = this.state;
-      const newState = RichUtils.handleKeyCommand(editorState, command);
       if(newState){
         const blockType = newState.getCurrentContent().getFirstBlock().getType();
         if(blockType == "unstyled"){
           return;
         }
+      }
+    }
+    if(command == "split-block"){
+      if(newState){
+        const contentState = newState.getCurrentContent();
+        const currentBlock = contentState.getFirstBlock();
       }
     }
     this._handleKeyCommand(command);
@@ -131,7 +204,7 @@ class BulletComponent extends RichTextComponent {
     return points;
   }
 
-  _onTab(event) {
+  _onTab(event: SyntheticKeyboardEvent) {
     let maxDepth = 4;
     this.handleChange(RichUtils.onTab(event, this.state.editorState, maxDepth));
   }
@@ -175,6 +248,7 @@ class BulletComponent extends RichTextComponent {
                   customStyleMap={this.props.customStyleMap}
                   editorState={editorState}
                   handleKeyCommand={this.handleKeyCommand}
+                  keyBindingFn={this.myKeyBindingFn}
                   onChange={this.handleChange}
                   onTab={this.onTab}
                   onBlur={this.handleBlur}
