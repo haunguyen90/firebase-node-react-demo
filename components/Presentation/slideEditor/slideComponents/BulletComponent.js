@@ -4,7 +4,7 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Thumbnail, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
-import {extend, map, isArray, each} from 'underscore';
+import {extend, map, isArray, each, chain, findIndex, filter} from 'underscore';
 import ReactDOM from 'react-dom';
 import {Editor, RichUtils, ContentState, EditorState} from 'draft-js';
 
@@ -20,6 +20,7 @@ class BulletComponent extends RichTextComponent {
     this.toggleBlockType = (type) => this.onBulletToggleBlockType(type);
     this.handleKeyCommand = (command) => this.onBulletHandleKeyCommand(command);
     this.onUpdateComponent = this.onBulletUpdateComponent.bind(this);
+    this.getParentBlock = this.getParentBlock.bind(this);
   }
 
   onBulletUpdateComponent(){
@@ -56,11 +57,37 @@ class BulletComponent extends RichTextComponent {
     this._handleKeyCommand(command);
   }
 
+  getParentBlock(blockArray, currentDepth, index){
+    const blockBefore = blockArray[index - 1];
+
+    if(!blockBefore)
+      return null;
+
+    const depthBefore = blockBefore.depth;
+    if(currentDepth > depthBefore){
+      const parentIndex = index - 1;
+      const parentBlock = blockBefore;
+      return {parentBlock, parentIndex};
+    }else{
+      return this.getParentBlock(blockArray, currentDepth, index - 1);
+    }
+  }
+
   convertEditorToJSON(){
     const {editorState} = this.state;
-    var blockArray = editorState.getCurrentContent().getBlocksAsArray();
+    const contentState = editorState.getCurrentContent();
+    var blockArray = contentState.getBlocksAsArray();
     let points = [];
+
+
+
+
     if(isArray(blockArray)){
+      blockArray = map(blockArray, (block) => {
+        block.id = block.getKey();
+        return block;
+      });
+
       points = map(blockArray, (block) => {
         const newContentState = ContentState.createFromBlockArray([block]);
         const newEditorState = EditorState.createWithContent(newContentState);
@@ -77,9 +104,29 @@ class BulletComponent extends RichTextComponent {
         return {
           text: htmlContent,
           bulletType: bulletType,
-          depth: block.depth
+          depth: block.getDepth(),
+          id: block.getKey()
         };
       });
+
+      let i = 0, j = points.length - 1;
+      for(j; j >= i; j--){
+        const currentBlock = points[j];
+        const parentObject = this.getParentBlock(points, currentBlock.depth, j);
+        if(parentObject){
+          const {parentBlock, parentIndex} = parentObject;
+          if(!parentBlock.points)
+            parentBlock.points = [];
+
+          parentBlock.points.unshift(currentBlock);
+          points[parentIndex] = parentBlock;
+        }
+      }
+
+      points = filter(points, (block) => {
+        return block.depth == 0;
+      });
+
     }
     return points;
   }
