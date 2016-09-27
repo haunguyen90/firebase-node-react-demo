@@ -273,11 +273,8 @@ class BulletComponent extends RichTextComponent {
 
 }
 
-BulletComponent.propTypes = {
-  keyId: React.PropTypes.number,
-  componentData: React.PropTypes.object,
-  deckId: React.PropTypes.string,
-  selectedSlide: React.PropTypes.object
-};
+//BulletComponent.propTypes = {
+//
+//};
 
 export default withRouter(BulletComponent, {withRef: true});

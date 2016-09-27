@@ -70,11 +70,8 @@ class TitleComponent extends SlideComponent {
   }
 }
 
-TitleComponent.propTypes = {
-  keyId: React.PropTypes.number,
-  componentData: React.PropTypes.object,
-  deckId: React.PropTypes.string,
-  selectedSlide: React.PropTypes.object
-};
+//TitleComponent.propTypes = {
+//
+//};
 
 export default withRouter(TitleComponent, {withRef: true});

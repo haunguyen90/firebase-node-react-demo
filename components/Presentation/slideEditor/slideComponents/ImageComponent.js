@@ -184,10 +184,6 @@ class ImageComponent extends SlideComponent {
 }
 
 ImageComponent.propTypes = {
-  keyId: React.PropTypes.number,
-  componentData: React.PropTypes.object,
-  deckId: React.PropTypes.string,
-  selectedSlide: React.PropTypes.object,
   handleAlertShow: React.PropTypes.func
 };
 

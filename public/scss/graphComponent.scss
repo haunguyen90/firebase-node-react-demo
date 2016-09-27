@@ -1,0 +1,26 @@
+/*********************************
+  BAR GRAPH COMPONENT
+*/
+.bar-graph-table-root{
+  &.hidden-header{
+    table{
+      thead{
+        display: none;
+      }
+    }
+  }
+
+  .hidden-cell{
+    display: none;
+  }
+
+  .yAxis-placeholder:after{
+    content: "Label";
+    color: #ccc;
+  }
+
+  .xAxis-placeholder:after{
+    content: "Data";
+    color: #ccc;
+  }
+}

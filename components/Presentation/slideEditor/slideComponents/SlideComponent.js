@@ -73,4 +73,11 @@ class SlideComponent extends React.Component {
   }
 }
 
+SlideComponent.propTypes = {
+  keyId: React.PropTypes.number,
+  componentData: React.PropTypes.object,
+  deckId: React.PropTypes.string,
+  selectedSlide: React.PropTypes.object
+};
+
 export default SlideComponent;

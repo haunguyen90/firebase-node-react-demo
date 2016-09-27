@@ -15,6 +15,7 @@ import TitleComponent from './slideComponents/TitleComponent.js';
 import ImageComponent from './slideComponents/ImageComponent.js';
 import TextAreaComponent from './slideComponents/TextAreaComponent.js';
 import BulletComponent from './slideComponents/BulletComponent.js';
+import BarGraphComponent from './slideComponents/BarGraphComponent.js';
 
 class ContentView extends React.Component {
   constructor(props) {
@@ -118,11 +119,17 @@ class ContentView extends React.Component {
       case ENUMS.SLIDE_COMPONENT.TYPES.BAR_GRAPH:
         componentData = extend(componentData, {
           type: ENUMS.SLIDE_COMPONENT.TYPES.BAR_GRAPH,
-          text: "",
-          image: ""
+          xLabel: "",
+          yLabel: "Revenue $M",
+          xMax: 4,
+          yMax: "240",
+          groups: ["Label 1", "Label 2", "Label 3"],
+          sets: [
+            {values: "", name: "Data 1"},
+            {values: "", name: "Data 2"}
+          ]
         });
         components.push(componentData);
-        return false;
         break;
 
       case ENUMS.SLIDE_COMPONENT.TYPES.PIE_GRAPH:
@@ -291,6 +298,16 @@ class ContentView extends React.Component {
       case ENUMS.SLIDE_COMPONENT.TYPES.BULLETS:
         return (
           <BulletComponent
+            keyId={index} key={index}
+            componentData={component}
+            deckId={this.props.deckObject.id} selectedSlide={selectedSlide}
+          />
+        );
+        break;
+
+      case ENUMS.SLIDE_COMPONENT.TYPES.BAR_GRAPH:
+        return (
+          <BarGraphComponent
             keyId={index} key={index}
             componentData={component}
             deckId={this.props.deckObject.id} selectedSlide={selectedSlide}

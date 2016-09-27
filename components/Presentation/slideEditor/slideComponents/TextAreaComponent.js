@@ -43,7 +43,7 @@ class TextAreaComponent extends RichTextComponent {
   }
 
   render(){
-    const {componentData, keyId} = this.props;
+    const {keyId} = this.props;
     const {editorState} = this.state;
 
     return (
@@ -73,11 +73,8 @@ class TextAreaComponent extends RichTextComponent {
   }
 }
 
-TextAreaComponent.propTypes = {
-  keyId: React.PropTypes.number,
-  componentData: React.PropTypes.object,
-  deckId: React.PropTypes.string,
-  selectedSlide: React.PropTypes.object
-};
+//TextAreaComponent.propTypes = {
+//
+//};
 
 export default withRouter(TextAreaComponent, {withRef: true});
