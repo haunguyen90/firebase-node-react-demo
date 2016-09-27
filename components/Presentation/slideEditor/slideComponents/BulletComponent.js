@@ -109,7 +109,17 @@ class BulletComponent extends RichTextComponent {
     }
 
     const rawContent = this.convertToRaw(editorState);
-    this._updateDatabase(RTFMarkupString, rawContent);
+    // Update single component
+    const {selectedSlide, keyId, deckId} = this.props;
+
+    if(selectedSlide.components && selectedSlide.components[keyId]){
+      let component = selectedSlide.components[keyId];
+      component.points = RTFMarkup;
+      component.rawContent = JSON.stringify(rawContent);
+
+      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/' + keyId);
+      deckDataRef.set(component);
+    }
   }
 
   onBulletToggleBlockType(type){
