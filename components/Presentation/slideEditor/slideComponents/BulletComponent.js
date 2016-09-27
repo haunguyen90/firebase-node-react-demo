@@ -50,7 +50,7 @@ class BulletComponent extends RichTextComponent {
       // the block above is a list item as well.
       const blockAbove = content.getBlockBefore(key);
       if (!blockAbove) {
-        return "not-handle";
+        return getDefaultKeyBinding(e);
       }
 
       const typeAbove = blockAbove.getType();
@@ -62,11 +62,19 @@ class BulletComponent extends RichTextComponent {
       }
 
       const depth = block.getDepth();
+      const depthAbove = blockAbove.getDepth();
       //if (!event.shiftKey && depth === maxDepth) {
       //  return editorState;
       //}
+
       const textAbove = blockAbove.getText();
+
       const currentText = block.getText();
+
+      // commented out because we don't allow the user add a null string bullet
+      //if(depth == 0 && depthAbove == 0)
+      //  return getDefaultKeyBinding(e);
+
 
       if(textAbove == "" || currentText == ""){
         maxDepth = Math.min(blockAbove.getDepth() + 1, maxDepth);
