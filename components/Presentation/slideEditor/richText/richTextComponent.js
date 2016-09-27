@@ -108,20 +108,20 @@ class RichTextComponent extends SlideComponent {
           //style: {fontSize: 12}
         },
         // Use a custom inline style. Default element is `span`.
-        font1: {style: {"font-size": '1em'}},
-        font2: {style: {"font-size": '2em'}},
-        font3: {style: {"font-size": '3em'}},
-        font4: {style: {"font-size": '4em'}},
-        font5: {style: {"font-size": '5em'}},
-        font6: {style: {"font-size": '6em'}},
-        font7: {style: {"font-size": '7em'}},
-        font8: {style: {"font-size": '8em'}},
-        font9: {style: {"font-size": '9pem'}},
-        font10: {style: {"font-size": '10em'}},
-        font11: {style: {"font-size": '11em'}},
-        font12: {style: {"font-size": '12em'}},
-        font13: {style: {"font-size": '13em'}},
-        font14: {style: {"font-size": '14em'}}
+        font1: {style: {"fontSize": '1em'}},
+        font2: {style: {"fontSize": '1.2em'}},
+        font3: {style: {"fontSize": '1.4em'}},
+        font4: {style: {"fontSize": '1.6em'}},
+        font5: {style: {"fontSize": '1.8em'}},
+        font6: {style: {"fontSize": '2em'}},
+        font7: {style: {"fontSize": '2.2em'}},
+        font8: {style: {"fontSize": '2.4em'}},
+        font9: {style: {"fontSize": '2.6pem'}},
+        font10: {style: {"fontSize": '2.8em'}},
+        font11: {style: {"fontSize": '3em'}},
+        font12: {style: {"fontSize": '3.2em'}},
+        font13: {style: {"fontSize": '3.4em'}},
+        font14: {style: {"fontSize": '3.6em'}}
       }
     };
 
@@ -252,43 +252,43 @@ RichTextComponent.defaultProps = {
       "fontSize": "1em"
     },
     font2: {
-      "fontSize": "2em"
+      "fontSize": "1.2em"
     },
     font3: {
-      "fontSize": "3em"
+      "fontSize": "1.4em"
     },
     font4: {
-      "fontSize": "4em"
+      "fontSize": "1.6em"
     },
     font5: {
-      "fontSize": "5em"
+      "fontSize": "1.8em"
     },
     font6: {
-      "fontSize": "6em"
+      "fontSize": "2em"
     },
     font7: {
-      "fontSize": "7em"
+      "fontSize": "2.2em"
     },
     font8: {
-      "fontSize": "8em"
+      "fontSize": "2.4em"
     },
     font9: {
-      "fontSize": "9em"
+      "fontSize": "2.6em"
     },
     font10: {
-      "fontSize": "10em"
+      "fontSize": "2.8em"
     },
     font11: {
-      "fontSize": "11em"
+      "fontSize": "3em"
     },
     font12: {
-      "fontSize": "12em"
+      "fontSize": "3.2em"
     },
     font13: {
-      "fontSize": "13em"
+      "fontSize": "3.4em"
     },
     font14: {
-      "fontSize": "14em"
+      "fontSize": "3.6em"
     }
   },
   defaultStyles: {

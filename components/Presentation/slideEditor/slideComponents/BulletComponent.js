@@ -129,12 +129,6 @@ class BulletComponent extends RichTextComponent {
         }
       }
     }
-    if(command == "split-block"){
-      if(newState){
-        const contentState = newState.getCurrentContent();
-        const currentBlock = contentState.getFirstBlock();
-      }
-    }
     this._handleKeyCommand(command);
   }
 
@@ -159,9 +153,7 @@ class BulletComponent extends RichTextComponent {
     const contentState = editorState.getCurrentContent();
     var blockArray = contentState.getBlocksAsArray();
     let points = [];
-
-
-
+    let numbered = [0, 0, 0, 0];
 
     if(isArray(blockArray)){
       points = map(blockArray, (block) => {
@@ -173,18 +165,27 @@ class BulletComponent extends RichTextComponent {
         if(DOM[0] && DOM[0].firstElementChild){
           htmlContent = DOM[0].firstElementChild.innerHTML;
         }
-        let bulletType = "numeric";
-        if(block.type == "unordered-list-item")
-          bulletType = "bulletPoint";
+        let bulletType = "bulletPoint";
+        const depth = block.getDepth();
 
-        return {
+        let blockData = {
           text: htmlContent,
-          bulletType: bulletType,
-          depth: block.getDepth()
+          depth: depth
         };
+
+        if(block.type == "ordered-list-item"){
+          bulletType = "numeric";
+          numbered[depth]= numbered[depth] + 1;
+          blockData.value = numbered[depth];
+        }
+
+        blockData.type = bulletType;
+
+        return blockData;
       });
 
       let i = 0, j = points.length - 1;
+
       for(j; j >= i; j--){
         const currentBlock = points[j];
         const parentObject = this.getParentBlock(points, currentBlock.depth, j);
