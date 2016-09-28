@@ -129,6 +129,7 @@ class RichTextComponent extends SlideComponent {
       editorState = this.state.editorState;
 
     let html = stateToHTML(editorState.getCurrentContent(), options);
+    html = html.replace(/<\/?p[^>]*>/g, "");
     return html;
   }
 

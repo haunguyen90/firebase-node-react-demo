@@ -121,13 +121,14 @@ class ContentView extends React.Component {
           type: ENUMS.SLIDE_COMPONENT.TYPES.BAR_GRAPH,
           xLabel: "",
           yLabel: "Revenue $M",
-          xMax: 4,
+          xMax: 2,
           yMax: "240",
-          groups: ["Label 1", "Label 2", "Label 3"],
-          sets: [
-            {values: "", name: "Data 1"},
-            {values: "", name: "Data 2"}
-          ]
+          groups: [
+            {values: "", name: ""},
+            {values: "", name: ""}
+          ],
+          sets: ["", "", ""],
+          init: true
         });
         components.push(componentData);
         break;

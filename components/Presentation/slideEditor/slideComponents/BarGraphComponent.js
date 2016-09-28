@@ -42,7 +42,7 @@ class BarGraphComponent extends SlideComponent {
       let component = selectedSlide.components[keyId];
       const JSONData = this.convertRowsToJSONData();
       component = extend(component, JSONData);
-
+      delete component.init;
       let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/' + keyId);
       deckDataRef.set(component);
     }
@@ -51,13 +51,13 @@ class BarGraphComponent extends SlideComponent {
   convertJSONDataToRows(){
     const {componentData} = this.props;
     if(componentData){
-      let rows = map(componentData.groups, (row, rowIdx) => {
+      let rows = map(componentData.sets, (row, rowIdx) => {
         let rowData = {
           id: rowIdx + 1,
           yAxis: row
         };
 
-        each(componentData.sets, (col, colIdx) => {
+        each(componentData.groups, (col, colIdx) => {
           const fieldName = `xAxis${colIdx + 1}`;
           const arrayValue = col.values.split(",");
           let colVal = "";
@@ -71,8 +71,8 @@ class BarGraphComponent extends SlideComponent {
       const firstRow = {
         id: 0,
         yAxis: "",
-        xAxis1: componentData.sets[0].name,
-        xAxis2: componentData.sets[1].name
+        xAxis1: componentData.groups[0].name,
+        xAxis2: componentData.groups[1].name
       };
       rows.unshift(firstRow);
 
@@ -96,11 +96,11 @@ class BarGraphComponent extends SlideComponent {
     let JSONData = {
       xMax: rows.length - 1,
       yMax: "240",
-      groups: [],
-      sets: [
+      groups: [
         {values: [], name: "Data 1"},
         {values: [], name: "Data 2"}
-      ]
+      ],
+      sets: []
     };
 
     each(rows, (row, rowIdx) => {
@@ -111,16 +111,16 @@ class BarGraphComponent extends SlideComponent {
       }
 
       if(rowIdx > 0){
-        JSONData.groups.push(row.yAxis);
-        JSONData.sets[0].values.push(row.xAxis1);
-        JSONData.sets[1].values.push(row.xAxis2);
+        JSONData.sets.push(row.yAxis);
+        JSONData.groups[0].values.push(row.xAxis1);
+        JSONData.groups[1].values.push(row.xAxis2);
       }else if(rowIdx == 0){
-        JSONData.sets[0].name = row.xAxis1;
-        JSONData.sets[1].name = row.xAxis2;
+        JSONData.groups[0].name = row.xAxis1;
+        JSONData.groups[1].name = row.xAxis2;
       }
     });
-    JSONData.sets[0].values = JSONData.sets[0].values.join();
-    JSONData.sets[1].values = JSONData.sets[1].values.join();
+    JSONData.groups[0].values = JSONData.groups[0].values.join();
+    JSONData.groups[1].values = JSONData.groups[1].values.join();
     return JSONData;
   }
 
@@ -167,6 +167,7 @@ class BarGraphComponent extends SlideComponent {
 
   onAfterSaveCell(row, cellName, cellValue){
     const {rows} = this.state;
+    const {componentData} = this.props;
     let arrayCellValue = [];
     each(Object.keys(row), (cell) => {
       if(cell != "id" && row[cell] != ""){
@@ -177,10 +178,11 @@ class BarGraphComponent extends SlideComponent {
     if(arrayCellValue.length == 0 && rows.length == 2)
       return false;
 
-    if(arrayCellValue.length > 0 || (arrayCellValue.length == 0 && row.id == 0))
+    if(arrayCellValue.length > 0 || (arrayCellValue.length == 0 && row.id == 0)){
       this.onUpdateComponent();
-    else if(arrayCellValue.length == 0 && row.id < rows.length){
-      this.removeEmptyRow(row.id);
+    }else if(arrayCellValue.length == 0 && row.id < rows.length){
+      if(!componentData.init)
+        this.removeEmptyRow(row.id);
     }
   }
 
@@ -193,6 +195,7 @@ class BarGraphComponent extends SlideComponent {
     });
 
     this.setState({rows: rows});
+    this.onUpdateComponent();
   }
 
   columnClassNameFormat(fieldValue, row, rowIdx, colIdx){
@@ -221,6 +224,10 @@ class BarGraphComponent extends SlideComponent {
     if(JSON.stringify(prevProps.componentData) != JSON.stringify(this.props.componentData)){
       const rows = this.convertJSONDataToRows();
       this.setState({rows: rows});
+    }
+
+    if(JSON.stringify(prevState.rows) != JSON.stringify(this.state.rows)){
+      this.onUpdateComponent();
     }
   }
 
