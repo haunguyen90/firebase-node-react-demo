@@ -61,7 +61,7 @@ class TitleComponent extends SlideComponent {
               placeholder="Enter slide title"
               onChange={this.handleChange}
               onBlur={this.handleBlur}
-              />
+            />
             <FormControl.Feedback />
           </FormGroup>
         </Col>

@@ -84,3 +84,38 @@
     color: #ccc;
   }
 }
+
+/*********************************
+  PIE GRAPH COMPONENT
+*/
+.pie-graph-component{
+
+  .bar-graph-table-root{
+
+    .bar-graph-table-bootstrap{
+      tr{
+        &:last-child{
+          td.xData-placeholder, td.yData-placeholder{
+            min-height: 37px;
+            height: 37px;
+
+            &:after{
+              content: "" !important;
+            }
+          }
+        }
+      }
+    }
+
+    .xData-placeholder:after{
+      content: "Label";
+      color: #ccc;
+    }
+
+    .yData-placeholder:after{
+      content: "value";
+      color: #ccc;
+    }
+  }
+
+}

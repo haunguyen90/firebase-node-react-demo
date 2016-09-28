@@ -16,6 +16,7 @@ import ImageComponent from './slideComponents/ImageComponent.js';
 import TextAreaComponent from './slideComponents/TextAreaComponent.js';
 import BulletComponent from './slideComponents/BulletComponent.js';
 import BarGraphComponent from './slideComponents/BarGraphComponent.js';
+import PieGraphComponent from './slideComponents/PieGraphComponent.js';
 
 class ContentView extends React.Component {
   constructor(props) {
@@ -136,11 +137,11 @@ class ContentView extends React.Component {
       case ENUMS.SLIDE_COMPONENT.TYPES.PIE_GRAPH:
         componentData = extend(componentData, {
           type: ENUMS.SLIDE_COMPONENT.TYPES.PIE_GRAPH,
-          text: "",
-          image: ""
+          xData: ",,",
+          yData: ",,",
+          init: true
         });
         components.push(componentData);
-        return false;
         break;
 
       default :
@@ -309,6 +310,16 @@ class ContentView extends React.Component {
       case ENUMS.SLIDE_COMPONENT.TYPES.BAR_GRAPH:
         return (
           <BarGraphComponent
+            keyId={index} key={index}
+            componentData={component}
+            deckId={this.props.deckObject.id} selectedSlide={selectedSlide}
+          />
+        );
+        break;
+
+      case ENUMS.SLIDE_COMPONENT.TYPES.PIE_GRAPH:
+        return (
+          <PieGraphComponent
             keyId={index} key={index}
             componentData={component}
             deckId={this.props.deckObject.id} selectedSlide={selectedSlide}

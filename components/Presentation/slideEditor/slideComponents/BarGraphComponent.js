@@ -8,14 +8,12 @@ import {extend, map, each, isArray} from 'underscore';
 import ReactDOM from 'react-dom';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
-import SlideComponent from './SlideComponent.js';
+import GraphComponent from '../graphComponent/GraphComponent.js';
 
-class BarGraphComponent extends SlideComponent {
+class BarGraphComponent extends GraphComponent {
   constructor(props) {
     super(props);
 
-    this.rowGetter = this.rowGetter.bind(this);
-    this.handleRowUpdated = this.handleRowUpdated.bind(this);
     this.onAfterSaveCell = this.onAfterSaveCell.bind(this);
     this.beforeSaveCell = this.beforeSaveCell.bind(this);
     this.convertJSONDataToRows = this.convertJSONDataToRows.bind(this);
@@ -24,6 +22,8 @@ class BarGraphComponent extends SlideComponent {
     this.removeEmptyRow = this.removeEmptyRow.bind(this);
 
     this.state = extend({
+      xLabel: props.componentData.xLabel,
+      yLabel: props.componentData.yLabel,
       rows: this.convertJSONDataToRows(),
       cellEditProp: {
         mode: "click",
@@ -106,7 +106,7 @@ class BarGraphComponent extends SlideComponent {
     each(rows, (row, rowIdx) => {
       if(rowIdx == (rows.length - 1)){
         if(!row.yAxis && !row.xAxis1 && !row.xAxis2){
-          return
+          return;
         }
       }
 
@@ -122,17 +122,6 @@ class BarGraphComponent extends SlideComponent {
     JSONData.groups[0].values = JSONData.groups[0].values.join();
     JSONData.groups[1].values = JSONData.groups[1].values.join();
     return JSONData;
-  }
-
-  rowGetter (rowIdx){
-    return this.state.rows[rowIdx];
-  }
-
-  handleRowUpdated(e){
-    //merge updated row with current row and rerender by setting state
-    const rows = this.state.rows;
-    Object.assign(rows[e.rowIdx], e.updated);
-    this.setState({rows:rows});
   }
 
   beforeSaveCell(row, cellName, cellValue){
@@ -214,6 +203,34 @@ class BarGraphComponent extends SlideComponent {
     return "";
   }
 
+  onXLabelChange(event){
+    event.preventDefault();
+    this.setState({xLabel: event.target.value});
+  }
+
+  onYLabelChange(event){
+    event.preventDefault();
+    this.setState({yLabel: event.target.value});
+  }
+
+  onLabelUpdate(event){
+    event.preventDefault();
+    const value = event.target.value;
+    const label = event.target.name;
+
+    // Update single component
+    const {selectedSlide, keyId, deckId} = this.props;
+
+    if(selectedSlide.components && selectedSlide.components[keyId]){
+      let component = selectedSlide.components[keyId];
+      component[label] = value;
+
+      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/' + keyId);
+      deckDataRef.set(component);
+    }
+
+  }
+
   componentDidMount(){
     $(this.refs.bootstrapTableRoot).find(".first-cell").click((e) => {
       e.stopPropagation();
@@ -233,7 +250,7 @@ class BarGraphComponent extends SlideComponent {
 
   render(){
     const {keyId} = this.props;
-    const {rows, cellEditProp} = this.state;
+    const {rows, cellEditProp, xLabel, yLabel} = this.state;
     return (
       <div className="slide-component bar-graph-component row">
         <Col sm={12}>
@@ -243,12 +260,41 @@ class BarGraphComponent extends SlideComponent {
 
             <div className="bar-graph-table-root hidden-header" ref="bootstrapTableRoot">
               <BootstrapTable tableBodyClass="bar-graph-table-bootstrap" ref="bootstrapTable" data={rows} striped={true} hover={true} cellEdit={cellEditProp}>
-                <TableHeaderColumn dataField="id" editable={true} hidden={true} isKey={true} columnClassName="hidden-cell"></TableHeaderColumn>
-                <TableHeaderColumn columnClassName={this.columnClassNameFormat} dataField="yAxis" hiddenOnInsert={true}></TableHeaderColumn>
+                <TableHeaderColumn dataField="id" hidden={true} isKey={true}></TableHeaderColumn>
+                <TableHeaderColumn columnClassName={this.columnClassNameFormat} dataField="yAxis" ></TableHeaderColumn>
                 <TableHeaderColumn columnClassName={this.columnClassNameFormat} dataField="xAxis1">Data 1</TableHeaderColumn>
                 <TableHeaderColumn columnClassName={this.columnClassNameFormat} dataField="xAxis2">Data 2</TableHeaderColumn>
               </BootstrapTable>
             </div>
+
+            <FormControl.Feedback />
+          </FormGroup>
+        </Col>
+
+        <Col sm={6}>
+          <FormGroup controlId={"xAxis-title-" + keyId}>
+            <ControlLabel>X AXIS TITLE</ControlLabel>
+            <FormControl
+              type="text"
+              value={xLabel}
+              name="xLabel"
+              onChange={this.onXLabelChange.bind(this)}
+              onBlur={this.onLabelUpdate.bind(this)}
+            />
+
+            <FormControl.Feedback />
+          </FormGroup>
+        </Col>
+        <Col sm={6}>
+          <FormGroup controlId={"yAxis-title-" + keyId}>
+            <ControlLabel>Y AXIS TITLE</ControlLabel>
+            <FormControl
+              type="text"
+              value={yLabel}
+              name="yLabel"
+              onChange={this.onYLabelChange.bind(this)}
+              onBlur={this.onLabelUpdate.bind(this)}
+            />
 
             <FormControl.Feedback />
           </FormGroup>
