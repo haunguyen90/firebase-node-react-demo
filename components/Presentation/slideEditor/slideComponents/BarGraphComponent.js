@@ -21,6 +21,7 @@ class BarGraphComponent extends SlideComponent {
     this.convertJSONDataToRows = this.convertJSONDataToRows.bind(this);
     this.convertRowsToJSONData = this.convertRowsToJSONData.bind(this);
     this.onUpdateComponent = this.onBarGraphUpdate.bind(this);
+    this.removeEmptyRow = this.removeEmptyRow.bind(this);
 
     this.state = extend({
       rows: this.convertJSONDataToRows(),
@@ -74,6 +75,15 @@ class BarGraphComponent extends SlideComponent {
         xAxis2: componentData.sets[1].name
       };
       rows.unshift(firstRow);
+
+      const lastRow = {
+        id: rows.length,
+        yAxis: "",
+        xAxis1: "",
+        xAxis2: ""
+      };
+      rows.push(lastRow);
+
       return rows;
     }else{
       return this.props.defaultRows;
@@ -94,11 +104,17 @@ class BarGraphComponent extends SlideComponent {
     };
 
     each(rows, (row, rowIdx) => {
+      if(rowIdx == (rows.length - 1)){
+        if(!row.yAxis && !row.xAxis1 && !row.xAxis2){
+          return
+        }
+      }
+
       if(rowIdx > 0){
         JSONData.groups.push(row.yAxis);
         JSONData.sets[0].values.push(row.xAxis1);
         JSONData.sets[1].values.push(row.xAxis2);
-      }else{
+      }else if(rowIdx == 0){
         JSONData.sets[0].name = row.xAxis1;
         JSONData.sets[1].name = row.xAxis2;
       }
@@ -120,14 +136,63 @@ class BarGraphComponent extends SlideComponent {
   }
 
   beforeSaveCell(row, cellName, cellValue){
-    console.log("Save cell '"+cellName+"' with value '"+cellValue+"'");
-    console.log("Thw whole row :");
-    console.log(row);
+    const {rows} = this.state;
+
+    let arrayCellValue = [];
+    each(Object.keys(row), (cell) => {
+      if(cell != "id" && row[cell] != ""){
+        arrayCellValue.push(row[cell]);
+      }
+    });
+
+    //if(arrayCellValue.length == 0 && row.id == 0)
+    //  return false;
+    //if(arrayCellValue.length == 0 && rows.length == 2)
+    //  return false;
+
     return true;
+    //let allowSave = false;
+    //let arrayCellValue = [];
+    //each(Object.keys(row), (cell) => {
+    //  if(cell != "id" && row[cell] != ""){
+    //    arrayCellValue.push(row[cell]);
+    //  }
+    //});
+    //
+    //if(arrayCellValue.length > 0)
+    //  allowSave = true;
+    //
+    //return allowSave;
   }
 
   onAfterSaveCell(row, cellName, cellValue){
-    this.onUpdateComponent();
+    const {rows} = this.state;
+    let arrayCellValue = [];
+    each(Object.keys(row), (cell) => {
+      if(cell != "id" && row[cell] != ""){
+        arrayCellValue.push(row[cell]);
+      }
+    });
+
+    if(arrayCellValue.length == 0 && rows.length == 2)
+      return false;
+
+    if(arrayCellValue.length > 0 || (arrayCellValue.length == 0 && row.id == 0))
+      this.onUpdateComponent();
+    else if(arrayCellValue.length == 0 && row.id < rows.length){
+      this.removeEmptyRow(row.id);
+    }
+  }
+
+  removeEmptyRow(index){
+    let {rows} = this.state;
+    rows.splice(index, 1);
+    rows = map(rows, (row, index) => {
+      row.id = index;
+      return row;
+    });
+
+    this.setState({rows: rows});
   }
 
   columnClassNameFormat(fieldValue, row, rowIdx, colIdx){
@@ -152,6 +217,13 @@ class BarGraphComponent extends SlideComponent {
     })
   }
 
+  componentDidUpdate(prevProps, prevState){
+    if(JSON.stringify(prevProps.componentData) != JSON.stringify(this.props.componentData)){
+      const rows = this.convertJSONDataToRows();
+      this.setState({rows: rows});
+    }
+  }
+
   render(){
     const {keyId} = this.props;
     const {rows, cellEditProp} = this.state;
@@ -163,7 +235,7 @@ class BarGraphComponent extends SlideComponent {
             {this.renderConfirmDeleteComponent()}
 
             <div className="bar-graph-table-root hidden-header" ref="bootstrapTableRoot">
-              <BootstrapTable ref="bootstrapTable" data={rows} striped={true} hover={true} cellEdit={cellEditProp}>
+              <BootstrapTable tableBodyClass="bar-graph-table-bootstrap" ref="bootstrapTable" data={rows} striped={true} hover={true} cellEdit={cellEditProp}>
                 <TableHeaderColumn dataField="id" editable={true} hidden={true} isKey={true} columnClassName="hidden-cell"></TableHeaderColumn>
                 <TableHeaderColumn columnClassName={this.columnClassNameFormat} dataField="yAxis" hiddenOnInsert={true}></TableHeaderColumn>
                 <TableHeaderColumn columnClassName={this.columnClassNameFormat} dataField="xAxis1">Data 1</TableHeaderColumn>

@@ -114,7 +114,7 @@ class BulletComponent extends RichTextComponent {
 
     if(selectedSlide.components && selectedSlide.components[keyId]){
       let component = selectedSlide.components[keyId];
-      component.points = RTFMarkup;
+      component.points = RTFMarkupString;
       component.rawContent = JSON.stringify(rawContent);
 
       let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/' + keyId);
