@@ -34,18 +34,18 @@ class PieGraphComponent extends GraphComponent {
   }
 
   beforeSaveCell(row, cellName, cellValue){
-
+    console.log(cellValue);
+    const pattern = /^\d+$/;
+    if(cellName == "yData" && !pattern.test(cellValue)){
+      //const rowsRollback = this.convertJSONDataToRows();
+      //this.setState({rows: rowsRollback});
+      return false;
+    }
   }
 
   onAfterSaveCell(row, cellName, cellValue){
     const {rows} = this.state;
     const {componentData} = this.props;
-
-    if(cellName == "yData" && isNaN(parseInt(cellValue))){
-      const rowsRollback = this.convertJSONDataToRows();
-      this.setState({rows: rowsRollback});
-      return;
-    }
 
     if(!row.xData && !row.yData && row.id < rows.length - 1){
       if(!componentData.init)
