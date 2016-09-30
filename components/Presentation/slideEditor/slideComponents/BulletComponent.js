@@ -248,6 +248,18 @@ class BulletComponent extends RichTextComponent {
       this.toggleBlockType("unordered-list-item");
   }
 
+  componentDidUpdate(prevProps, prevState){
+    if(JSON.stringify(prevProps.componentData) != JSON.stringify(this.props.componentData)){
+      let editorState = this.getEditorState();
+      this.setState({editorState: editorState});
+    }
+
+    if(prevState.editorState != this.state.editorState){
+      if(!this.hasBlockType())
+        this.toggleBlockType("unordered-list-item");
+    }
+  }
+
   render(){
     const {keyId} = this.props;
     const {editorState} = this.state;

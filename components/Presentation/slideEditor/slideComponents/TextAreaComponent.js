@@ -18,10 +18,10 @@ class TextAreaComponent extends RichTextComponent {
   }
 
   componentDidUpdate(prevProps, prevState){
-    //if(JSON.stringify(prevProps.componentData) && JSON.stringify(this.props.componentData)){
-    //  if(this.props.componentData.text != prevProps.componentData.text)
-    //    this.setState({text: this.props.componentData.text});
-    //}
+    if(JSON.stringify(prevProps.componentData) != JSON.stringify(this.props.componentData)){
+      let editorState = this.getEditorState();
+      this.setState({editorState: editorState});
+    }
   }
 
   componentDidMount(){

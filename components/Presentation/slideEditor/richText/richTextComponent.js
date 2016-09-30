@@ -27,20 +27,9 @@ class RichTextComponent extends SlideComponent {
     this.convertFromRaw = (rawContent) => this._convertFromRaw(rawContent);
     this.onUpdateComponent = (editorState) => this.__onUpdateComponent(editorState);
     this._updateDatabase = this._updateDatabase.bind(this);
+    this.getEditorState = this.getEditorState.bind(this);
 
-    let editorState = EditorState.createEmpty();
-    if(props.componentData && props.componentData.rawContent){
-      let rawContent;
-      try{
-        rawContent = JSON.parse(props.componentData.rawContent)
-      }catch(e){
-        console.warn("rawContent JSON is not valid");
-      }
-      if(rawContent){
-        const contentState = this.convertFromRaw(rawContent);
-        editorState = this.getEditorStateFromRaw(contentState);
-      }
-    }
+    let editorState = this.getEditorState();
 
     this.state = extend({
       editorState: editorState
@@ -93,6 +82,23 @@ class RichTextComponent extends SlideComponent {
 
   getEditorStateFromRaw(contentState){
     const editorState = EditorState.createWithContent(contentState);
+    return editorState;
+  }
+
+  getEditorState(){
+    let editorState = EditorState.createEmpty();
+    if(this.props.componentData && this.props.componentData.rawContent){
+      let rawContent;
+      try{
+        rawContent = JSON.parse(this.props.componentData.rawContent)
+      }catch(e){
+        console.warn("rawContent JSON is not valid");
+      }
+      if(rawContent){
+        const contentState = this.convertFromRaw(rawContent);
+        editorState = this.getEditorStateFromRaw(contentState);
+      }
+    }
     return editorState;
   }
 
