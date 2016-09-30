@@ -110,15 +110,22 @@ class BulletComponent extends RichTextComponent {
 
     const rawContent = this.convertToRaw(editorState);
     // Update single component
-    const {selectedSlide, keyId, deckId} = this.props;
+    const {selectedSlide, keyId, deckId, getSlides} = this.props;
 
     if(selectedSlide.components && selectedSlide.components[keyId]){
-      let component = selectedSlide.components[keyId];
-      component.points = RTFMarkupString;
-      component.rawContent = JSON.stringify(rawContent);
+      const slides = getSlides();
+      const currentSlideIndex = findIndex(slides, (slide) => {
+        return slide.slideId == selectedSlide.slideId
+      });
 
-      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/' + keyId);
-      deckDataRef.set(component);
+      if(currentSlideIndex >= 0){
+        let component = selectedSlide.components[keyId];
+        component.points = RTFMarkupString;
+        component.rawContent = JSON.stringify(rawContent);
+
+        let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
+        deckDataRef.set(component);
+      }
     }
   }
 

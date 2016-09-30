@@ -4,7 +4,7 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Thumbnail, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
-import {extend, map, each, isArray} from 'underscore';
+import {extend, map, each, isArray, findIndex} from 'underscore';
 import ReactDOM from 'react-dom';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
@@ -26,7 +26,7 @@ class PieGraphComponent extends GraphComponent {
       rows: this.convertJSONDataToRows(),
       cellEditProp: {
         mode: "click",
-        blurToSave: false,
+        blurToSave: true,
         beforeSaveCell: this.beforeSaveCell,
         afterSaveCell: this.onAfterSaveCell
       }
@@ -70,15 +70,22 @@ class PieGraphComponent extends GraphComponent {
 
   onPieGraphUpdate(){
     // Update single component
-    const {selectedSlide, keyId, deckId} = this.props;
+    const {selectedSlide, keyId, deckId, getSlides} = this.props;
 
     if(selectedSlide.components && selectedSlide.components[keyId]){
-      let component = selectedSlide.components[keyId];
-      const JSONData = this.convertRowsToJSONData();
-      component = extend(component, JSONData);
-      delete component.init;
-      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/' + keyId);
-      deckDataRef.set(component);
+      const slides = getSlides();
+      const currentSlideIndex = findIndex(slides, (slide) => {
+        return slide.slideId == selectedSlide.slideId
+      });
+
+      if(currentSlideIndex >= 0){
+        let component = selectedSlide.components[keyId];
+        const JSONData = this.convertRowsToJSONData();
+        component = extend(component, JSONData);
+        delete component.init;
+        let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
+        deckDataRef.set(component);
+      }
     }
   }
 

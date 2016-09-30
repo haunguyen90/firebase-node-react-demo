@@ -5,6 +5,7 @@ import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
 import Confirm from 'react-confirm-bootstrap';
+import {findIndex} from 'underscore';
 
 class SlideComponent extends React.Component {
   constructor(props) {
@@ -16,14 +17,21 @@ class SlideComponent extends React.Component {
 
   _onUpdateComponent(text) {
     // Update single component
-    const {selectedSlide, keyId, deckId} = this.props;
+    const {selectedSlide, keyId, deckId, getSlides} = this.props;
 
     if(selectedSlide.components && selectedSlide.components[keyId]){
-      let component = selectedSlide.components[keyId];
-      component.text = text;
+      const slides = getSlides();
+      const currentSlideIndex = findIndex(slides, (slide) => {
+        return slide.slideId == selectedSlide.slideId
+      });
 
-      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/' + keyId);
-      deckDataRef.set(component);
+      if(currentSlideIndex >= 0){
+        let component = selectedSlide.components[keyId];
+        component.text = text;
+
+        let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
+        deckDataRef.set(component);
+      }
     }
   }
 
@@ -31,24 +39,38 @@ class SlideComponent extends React.Component {
     event.preventDefault();
 
     // Update single component
-    const {selectedSlide, keyId, deckId} = this.props;
+    const {selectedSlide, keyId, deckId, getSlides} = this.props;
 
     if(selectedSlide.components && selectedSlide.components[keyId]){
-      let component = selectedSlide.components[keyId];
-      component.text = this.state.text;
+      const slides = getSlides();
+      const currentSlideIndex = findIndex(slides, (slide) => {
+        return slide.slideId == selectedSlide.slideId
+      });
 
-      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/' + keyId);
-      deckDataRef.set(component);
+      if(currentSlideIndex >= 0){
+        let component = selectedSlide.components[keyId];
+        component.text = this.state.text;
+
+        let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
+        deckDataRef.set(component);
+      }
     }
   }
 
   _onRemoveComponent(){
     // Remove single component
-    const {selectedSlide, keyId, deckId} = this.props;
+    const {selectedSlide, keyId, deckId, getSlides} = this.props;
     if(selectedSlide.components && selectedSlide.components[keyId]){
-      selectedSlide.components.splice(keyId,1);
-      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/');
-      deckDataRef.set(selectedSlide.components);
+      const slides = getSlides();
+      const currentSlideIndex = findIndex(slides, (slide) => {
+        return slide.slideId == selectedSlide.slideId
+      });
+
+      if(currentSlideIndex >= 0){
+        selectedSlide.components.splice(keyId,1);
+        let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/');
+        deckDataRef.set(selectedSlide.components);
+      }
     }
 
   }

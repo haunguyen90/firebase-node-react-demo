@@ -111,8 +111,7 @@ class ContentView extends React.Component {
 
       case ENUMS.SLIDE_COMPONENT.TYPES.BULLETS:
         componentData = extend(componentData, {
-          type: ENUMS.SLIDE_COMPONENT.TYPES.BULLETS,
-          text: ""
+          type: ENUMS.SLIDE_COMPONENT.TYPES.BULLETS
         });
         components.push(componentData);
         break;
@@ -122,13 +121,13 @@ class ContentView extends React.Component {
           type: ENUMS.SLIDE_COMPONENT.TYPES.BAR_GRAPH,
           xLabel: "",
           yLabel: "Revenue $M",
-          xMax: 2,
+          xMax: 3,
           yMax: "240",
-          groups: [
+          groups:  ",,",
+          sets: [
             {values: "", name: ""},
             {values: "", name: ""}
           ],
-          sets: ",,",
           init: true
         });
         components.push(componentData);
@@ -270,7 +269,9 @@ class ContentView extends React.Component {
           <TitleComponent
             keyId={index} key={index}
             componentData={component}
-            deckId={this.props.deckObject.id} selectedSlide={selectedSlide}
+            deckId={this.props.deckObject.id}
+            getSlides={this.props.getSlides}
+            selectedSlide={selectedSlide}
           />
         );
         break;
@@ -282,6 +283,7 @@ class ContentView extends React.Component {
             componentData={component}
             deckId={this.props.deckObject.id}
             selectedSlide={selectedSlide}
+            getSlides={this.props.getSlides}
             handleAlertShow={this.handleAlertShow}
           />
         );
@@ -292,6 +294,7 @@ class ContentView extends React.Component {
           <TextAreaComponent
             keyId={index} key={index}
             componentData={component}
+            getSlides={this.props.getSlides}
             deckId={this.props.deckObject.id} selectedSlide={selectedSlide}
           />
         );
@@ -302,6 +305,7 @@ class ContentView extends React.Component {
           <BulletComponent
             keyId={index} key={index}
             componentData={component}
+            getSlides={this.props.getSlides}
             deckId={this.props.deckObject.id} selectedSlide={selectedSlide}
           />
         );
@@ -312,6 +316,7 @@ class ContentView extends React.Component {
           <BarGraphComponent
             keyId={index} key={index}
             componentData={component}
+            getSlides={this.props.getSlides}
             deckId={this.props.deckObject.id} selectedSlide={selectedSlide}
           />
         );
@@ -322,6 +327,7 @@ class ContentView extends React.Component {
           <PieGraphComponent
             keyId={index} key={index}
             componentData={component}
+            getSlides={this.props.getSlides}
             deckId={this.props.deckObject.id} selectedSlide={selectedSlide}
           />
         );

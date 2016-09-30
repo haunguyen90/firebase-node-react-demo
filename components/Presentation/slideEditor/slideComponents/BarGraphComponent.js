@@ -4,7 +4,7 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Thumbnail, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
-import {extend, map, each, isArray} from 'underscore';
+import {extend, map, each, isArray, findIndex} from 'underscore';
 import ReactDOM from 'react-dom';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
@@ -36,31 +36,40 @@ class BarGraphComponent extends GraphComponent {
 
   onBarGraphUpdate(){
     // Update single component
-    const {selectedSlide, keyId, deckId} = this.props;
+    const {selectedSlide, keyId, deckId, getSlides} = this.props;
 
     if(selectedSlide.components && selectedSlide.components[keyId]){
-      let component = selectedSlide.components[keyId];
-      const JSONData = this.convertRowsToJSONData();
-      component = extend(component, JSONData);
-      delete component.init;
-      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/' + keyId);
-      deckDataRef.set(component);
+      const slides = getSlides();
+      const currentSlideIndex = findIndex(slides, (slide) => {
+        return slide.slideId == selectedSlide.slideId
+      });
+
+      if(currentSlideIndex >= 0){
+        let component = selectedSlide.components[keyId];
+        const JSONData = this.convertRowsToJSONData();
+        component = extend(component, JSONData);
+        delete component.init;
+        let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
+        deckDataRef.set(component);
+      }
     }
   }
 
   convertJSONDataToRows(){
     const {componentData} = this.props;
-    if(componentData && componentData.sets && typeof componentData.sets == "string"){
-      const setsRows = componentData.sets.split(",");
-      let rows = map(setsRows, (row, rowIdx) => {
+    if(componentData && componentData.groups && typeof componentData.groups == "string"){
+      const groupsRows = componentData.groups.split(",");
+      let rows = map(groupsRows, (row, rowIdx) => {
         let rowData = {
           id: rowIdx + 1,
-          yAxis: row
+          xAxis: row
         };
 
-        each(componentData.groups, (col, colIdx) => {
-          const fieldName = `xAxis${colIdx + 1}`;
-          const arrayValue = col.values.split(",");
+        each(componentData.sets, (col, colIdx) => {
+          const fieldName = `yAxis${colIdx + 1}`;
+          let arrayValue = [];
+          if(col.values && typeof col.values == "string")
+            arrayValue = col.values.split(",");
           let colVal = "";
           if(arrayValue && arrayValue[rowIdx])
             colVal = arrayValue[rowIdx];
@@ -71,17 +80,17 @@ class BarGraphComponent extends GraphComponent {
       });
       const firstRow = {
         id: 0,
-        yAxis: "",
-        xAxis1: componentData.groups[0].name,
-        xAxis2: componentData.groups[1].name
+        xAxis: "",
+        yAxis1: componentData.sets[0].name,
+        yAxis2: componentData.sets[1].name
       };
       rows.unshift(firstRow);
 
       const lastRow = {
         id: rows.length,
-        yAxis: "",
-        xAxis1: "",
-        xAxis2: ""
+        xAxis: "",
+        yAxis1: "",
+        yAxis2: ""
       };
       rows.push(lastRow);
 
@@ -95,65 +104,41 @@ class BarGraphComponent extends GraphComponent {
   convertRowsToJSONData(){
     const {rows} = this.state;
     let JSONData = {
-      xMax: rows.length - 1,
+      xMax: rows.length - 2,
       yMax: "240",
-      groups: [
+      groups: [],
+      sets: [
         {values: [], name: "Data 1"},
         {values: [], name: "Data 2"}
-      ],
-      sets: []
+      ]
     };
 
     each(rows, (row, rowIdx) => {
       if(rowIdx == (rows.length - 1)){
-        if(!row.yAxis && !row.xAxis1 && !row.xAxis2){
+        if(!row.xAxis && !row.yAxis1 && !row.yAxis2){
           return;
         }
       }
 
       if(rowIdx > 0){
-        JSONData.sets.push(row.yAxis);
-        JSONData.groups[0].values.push(row.xAxis1);
-        JSONData.groups[1].values.push(row.xAxis2);
+        JSONData.groups.push(row.xAxis);
+        JSONData.sets[0].values.push(row.yAxis1);
+        JSONData.sets[1].values.push(row.yAxis2);
       }else if(rowIdx == 0){
-        JSONData.groups[0].name = row.xAxis1;
-        JSONData.groups[1].name = row.xAxis2;
+        JSONData.sets[0].name = row.yAxis1;
+        JSONData.sets[1].name = row.yAxis2;
       }
     });
-    JSONData.groups[0].values = JSONData.groups[0].values.join();
-    JSONData.groups[1].values = JSONData.groups[1].values.join();
-    JSONData.sets = JSONData.sets.join();
+    JSONData.sets[0].values = JSONData.sets[0].values.join();
+    JSONData.sets[1].values = JSONData.sets[1].values.join();
+    JSONData.xMax = JSONData.groups.length;
+    JSONData.groups = JSONData.groups.join();
+
     return JSONData;
   }
 
   beforeSaveCell(row, cellName, cellValue){
-    const {rows} = this.state;
-
-    let arrayCellValue = [];
-    each(Object.keys(row), (cell) => {
-      if(cell != "id" && row[cell] != ""){
-        arrayCellValue.push(row[cell]);
-      }
-    });
-
-    //if(arrayCellValue.length == 0 && row.id == 0)
-    //  return false;
-    //if(arrayCellValue.length == 0 && rows.length == 2)
-    //  return false;
-
     return true;
-    //let allowSave = false;
-    //let arrayCellValue = [];
-    //each(Object.keys(row), (cell) => {
-    //  if(cell != "id" && row[cell] != ""){
-    //    arrayCellValue.push(row[cell]);
-    //  }
-    //});
-    //
-    //if(arrayCellValue.length > 0)
-    //  allowSave = true;
-    //
-    //return allowSave;
   }
 
   onAfterSaveCell(row, cellName, cellValue){
@@ -195,11 +180,11 @@ class BarGraphComponent extends GraphComponent {
     }
 
     if(colIdx == 1 && fieldValue == ""){
-      return "yAxis-placeholder";
+      return "xAxis-placeholder";
     }
 
     if(rowIdx == 0 && fieldValue == ""){
-      return "xAxis-placeholder";
+      return "yAxis-placeholder";
     }
 
     return "";
@@ -221,14 +206,21 @@ class BarGraphComponent extends GraphComponent {
     const label = event.target.name;
 
     // Update single component
-    const {selectedSlide, keyId, deckId} = this.props;
+    const {selectedSlide, keyId, deckId, getSlides} = this.props;
 
     if(selectedSlide.components && selectedSlide.components[keyId]){
-      let component = selectedSlide.components[keyId];
-      component[label] = value;
+      const slides = getSlides();
+      const currentSlideIndex = findIndex(slides, (slide) => {
+        return slide.slideId == selectedSlide.slideId
+      });
 
-      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/' + keyId);
-      deckDataRef.set(component);
+      if(currentSlideIndex >= 0){
+        let component = selectedSlide.components[keyId];
+        component[label] = value;
+
+        let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
+        deckDataRef.set(component);
+      }
     }
 
   }
@@ -263,9 +255,9 @@ class BarGraphComponent extends GraphComponent {
             <div className="bar-graph-table-root hidden-header" ref="bootstrapTableRoot">
               <BootstrapTable tableBodyClass="bar-graph-table-bootstrap" ref="bootstrapTable" data={rows} striped={true} hover={true} cellEdit={cellEditProp}>
                 <TableHeaderColumn dataField="id" hidden={true} isKey={true}></TableHeaderColumn>
-                <TableHeaderColumn columnClassName={this.columnClassNameFormat} dataField="yAxis" ></TableHeaderColumn>
-                <TableHeaderColumn columnClassName={this.columnClassNameFormat} dataField="xAxis1">Data 1</TableHeaderColumn>
-                <TableHeaderColumn columnClassName={this.columnClassNameFormat} dataField="xAxis2">Data 2</TableHeaderColumn>
+                <TableHeaderColumn columnClassName={this.columnClassNameFormat} dataField="xAxis" ></TableHeaderColumn>
+                <TableHeaderColumn columnClassName={this.columnClassNameFormat} dataField="yAxis1">Data 1</TableHeaderColumn>
+                <TableHeaderColumn columnClassName={this.columnClassNameFormat} dataField="yAxis2">Data 2</TableHeaderColumn>
               </BootstrapTable>
             </div>
 
@@ -314,21 +306,21 @@ BarGraphComponent.defaultProps = {
   defaultRows: [
     {
       id: 1,
-      yAxis: '',
-      xAxis1: "Data 1",
-      xAxis2: "Data 2"
+      xAxis: '',
+      yAxis1: "Data 1",
+      yAxis2: "Data 2"
     },
     {
       id: 2,
-      yAxis: 'Label 1',
-      xAxis1: "Data Label 1",
-      xAxis2: "Data Label 2"
+      xAxis: 'Label 1',
+      yAxis1: "Data Label 1",
+      yAxis2: "Data Label 2"
     },
     {
       id: 3,
-      yAxis: 'Label 2',
-      xAxis1: "Data Label 1",
-      xAxis2: "Data Label 2"
+      xAxis: 'Label 2',
+      yAxis1: "Data Label 1",
+      yAxis2: "Data Label 2"
     }
   ]
 };

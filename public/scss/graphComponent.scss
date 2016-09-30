@@ -25,7 +25,7 @@
       height: 37px;
 
       &:last-child{
-        td.yAxis-placeholder{
+        td.xAxis-placeholder{
           min-height: 37px;
           height: 37px;
 
@@ -74,12 +74,12 @@
 
   }
 
-  .yAxis-placeholder:after{
+  .xAxis-placeholder:after{
     content: "Label";
     color: #ccc;
   }
 
-  .xAxis-placeholder:after{
+  .yAxis-placeholder:after{
     content: "Data";
     color: #ccc;
   }

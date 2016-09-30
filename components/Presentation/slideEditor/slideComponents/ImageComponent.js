@@ -4,7 +4,7 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Thumbnail, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
-import {extend} from 'underscore';
+import {extend, findIndex} from 'underscore';
 import {isMounted} from '~/lib/react/reactLib.js';
 import { Circle } from 'rc-progress';
 import {ENUMS} from '~/lib/_required/enums.js';
@@ -43,14 +43,21 @@ class ImageComponent extends SlideComponent {
   }
 
   updatePhotoURLToDB(downloadURL){
-    const {selectedSlide, keyId, deckId} = this.props;
+    const {selectedSlide, keyId, deckId, getSlides} = this.props;
 
     if(selectedSlide.components && selectedSlide.components[keyId]){
-      let component = selectedSlide.components[keyId];
-      component.image = downloadURL;
+      const slides = getSlides();
+      const currentSlideIndex = findIndex(slides, (slide) => {
+        return slide.slideId == selectedSlide.slideId
+      });
 
-      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + selectedSlide.keyId + '/components/' + keyId);
-      deckDataRef.set(component);
+      if(currentSlideIndex >= 0){
+        let component = selectedSlide.components[keyId];
+        component.image = downloadURL;
+
+        let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
+        deckDataRef.set(component);
+      }
     }
   }
 
