@@ -128,7 +128,7 @@ class ContentView extends React.Component {
             {values: "", name: ""},
             {values: "", name: ""}
           ],
-          sets: ["", "", ""],
+          sets: ",,",
           init: true
         });
         components.push(componentData);
@@ -167,7 +167,7 @@ class ContentView extends React.Component {
 
   onDeleteSlide(){
     const {selectedSlide, getSlides} = this.props;
-    const slides = getSlides();
+    let slides = getSlides();
     if(slides && isArray(slides) && slides.length > 0){
       const currentSlideIndex = findIndex(slides, (slide) => {
         return slide.slideId == selectedSlide.slideId

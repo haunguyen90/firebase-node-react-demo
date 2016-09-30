@@ -82,19 +82,22 @@ class DeckSlides extends React.Component {
 
     }else{
       let deckDataRef = firebase.database().ref('deckData/' + deckObject.id + '/slides/');
+      delete newSlides.keyId;
       deckDataRef.set(newSlides);
       //this.onSelectSlide(newSlides[newIndex]);
     }
   };
 
-  getSlides(){
+  getSlides(hasKeyId = false){
     const {deckData} = this.props;
     if(deckData && deckData.slides && deckData.slides.length > 0){
-      return map(deckData.slides, (slide, index) => {
-        slide.keyId = index;
-        return slide;
-      });
-      //return deckData.slides;
+      if(hasKeyId){
+        return map(deckData.slides, (slide, index) => {
+          slide.keyId = index;
+          return slide;
+        });
+      }
+      return deckData.slides;
     }
     return [];
   }
@@ -164,7 +167,7 @@ class DeckSlides extends React.Component {
 
   componentDidUpdate(prevProps, prevState){
     if(JSON.stringify(prevProps.deckData) != JSON.stringify(this.props.deckData)){
-      const slides = this.getSlides();
+      const slides = this.getSlides(true);
       if(slides.length > 0){
         const {selectedSlide} = this.state;
         if(selectedSlide && selectedSlide.slideId){

@@ -50,8 +50,9 @@ class BarGraphComponent extends GraphComponent {
 
   convertJSONDataToRows(){
     const {componentData} = this.props;
-    if(componentData){
-      let rows = map(componentData.sets, (row, rowIdx) => {
+    if(componentData && componentData.sets && typeof componentData.sets == "string"){
+      const setsRows = componentData.sets.split(",");
+      let rows = map(setsRows, (row, rowIdx) => {
         let rowData = {
           id: rowIdx + 1,
           yAxis: row
@@ -121,6 +122,7 @@ class BarGraphComponent extends GraphComponent {
     });
     JSONData.groups[0].values = JSONData.groups[0].values.join();
     JSONData.groups[1].values = JSONData.groups[1].values.join();
+    JSONData.sets = JSONData.sets.join();
     return JSONData;
   }
 
