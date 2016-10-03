@@ -29,6 +29,17 @@
 <div id="prezent-app">
   {{html|safe}}
 </div>
+<script type='text/javascript'>
+  var Module = {
+    TOTAL_MEMORY: 536870912,
+    errorhandler: null,			// arguments: err, url, line. This function must return 'true' if the error is handled, otherwise 'false'
+    compatibilitycheck: null,
+    dataUrl: "Development/prezentvrweb.data",
+    codeUrl: "Development/prezentvrweb.js",
+    memUrl: "Development/prezentvrweb.mem",
+
+  };
+</script>
 <script src="/Development/UnityLoader.js" type="text/javascript"></script>
 <script src="/bundle.js" type="text/javascript"></script>
 <!--Import jQuery before materialize.js-->
