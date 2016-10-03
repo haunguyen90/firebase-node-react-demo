@@ -9,6 +9,7 @@ import {ENUMS} from '~/lib/_required/enums.js';
 
 import DeckSettings from './deckSettings.js';
 import DeckSlides from './deckSlides.js';
+import SharingDeckModal from '../Dashboard/SharingDeckModal.js';
 
 class Presentation extends React.Component {
   constructor(props) {
@@ -17,7 +18,8 @@ class Presentation extends React.Component {
       observerAuth: null,
       presentationTabActive: 1,
       deckObject: {},
-      deckData: {}
+      deckData: {},
+      showModal: false
     };
 
     this.handlePresentationTabSelect = this.handlePresentationTabSelect.bind(this);
@@ -25,7 +27,11 @@ class Presentation extends React.Component {
   }
 
   handlePresentationTabSelect(key){
-    this.setState({presentationTabActive: key});
+    if (key === 3) {
+      this.showShareModal();
+    } else {
+      this.setState({presentationTabActive: key});
+    }
   }
 
   getPresentationName(){
@@ -80,6 +86,20 @@ class Presentation extends React.Component {
     deckDataRef.off();
   }
 
+  showShareModal() {
+      this.setState({showModal: true});
+  }
+
+  getDeckUrl(){
+    const getUrl = window.location;
+    const baseUrl = getUrl.protocol + "//" + getUrl.host + "/presentation/" + this.state.deckObject.id;
+    return baseUrl;
+  }
+
+  closeShareModal(){
+    this.setState({showModal: false});
+  }
+
   render(){
     return (
       <div className="presentation-component">
@@ -106,6 +126,12 @@ class Presentation extends React.Component {
             </Tabs>
           </div>
         </Row>
+        <SharingDeckModal
+          showModal={this.state.showModal}
+          closeShareWindow={this.closeShareModal.bind(this)}
+          deckUrl={this.getDeckUrl()}
+          name={this.state.deckObject.name}
+        />
       </div>
     )
   }
