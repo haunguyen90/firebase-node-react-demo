@@ -120,7 +120,7 @@ class ContentView extends React.Component {
         componentData = extend(componentData, {
           type: ENUMS.SLIDE_COMPONENT.TYPES.BAR_GRAPH,
           xLabel: "",
-          yLabel: "Revenue $M",
+          yLabel: "",
           xMax: 3,
           yMax: "240",
           groups:  ",,",
