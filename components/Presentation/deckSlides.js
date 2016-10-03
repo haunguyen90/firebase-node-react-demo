@@ -136,7 +136,6 @@ class DeckSlides extends React.Component {
 
     const newSlide = {
       slideId: slideId,
-      title: `Slide ${slides.length + 1}`,
       type: "COMPONENT",
       components: [
         {
@@ -239,4 +238,3 @@ class DeckSlides extends React.Component {
 }
 
 export default withRouter(DeckSlides, {withRef: true});
-
