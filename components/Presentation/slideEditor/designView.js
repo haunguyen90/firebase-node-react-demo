@@ -4,6 +4,7 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
+import scriptLoader from 'react-async-script-loader'
 
 class DesignView extends React.Component {
   constructor(props) {
@@ -51,8 +52,35 @@ class DesignView extends React.Component {
     SendMessage("Manager", "WebShowSlide", slideIndex);
   }
 
+  componentWillMount(){
+    let Module = {
+      TOTAL_MEMORY: 536870912,
+      errorhandler: null,			// arguments: err, url, line. This function must return 'true' if the error is handled, otherwise 'false'
+      compatibilitycheck: null,
+      dataUrl: "Development/prezentvrweb.data",
+      codeUrl: "Development/prezentvrweb.js",
+      memUrl: "Development/prezentvrweb.mem",
+
+    };
+    window.Module = Module;
+  }
+
+  componentWillReceiveProps ({ isScriptLoaded, isScriptLoadSucceed }) {
+    if (isScriptLoaded && !this.props.isScriptLoaded) { // load finished
+      if (isScriptLoadSucceed) {
+        console.log("loaded script");
+      }
+      else this.props.onError()
+    }
+  }
+
   componentDidMount(){
-    this.PlayerShow();
+    const { isScriptLoaded, isScriptLoadSucceed } = this.props;
+    if (isScriptLoaded && isScriptLoadSucceed) {
+      console.log("Play show here");
+      //this.PlayerShow();
+    }
+
   }
 
   render(){
@@ -64,4 +92,6 @@ class DesignView extends React.Component {
   }
 }
 
-export default withRouter(DesignView, {withRef: true});
+export default scriptLoader(
+  '/Development/UnityLoader.js'
+)(DesignView);
