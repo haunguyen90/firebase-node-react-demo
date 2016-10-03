@@ -39,7 +39,7 @@ class DeckItem extends React.Component {
     return (
       <div className="deck-item-component">
         <Thumbnail src={deckData.cover} alt="242x200">
-          <h3>{deckData.name}</h3>
+          <h3 className="deck-item-title">{deckData.name}</h3>
           <p>{deckData.description}</p>
           <p>
             <Button bsStyle="primary" onClick={this.onEditDeck.bind(this)}>Edit</Button>&nbsp;
