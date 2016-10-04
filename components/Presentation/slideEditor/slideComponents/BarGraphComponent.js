@@ -298,7 +298,7 @@ class BarGraphComponent extends GraphComponent {
   }
 }
 
-BarGraphComponent.proppTypes = {
+BarGraphComponent.propTypes = {
   defaultRows: React.PropTypes.array
 };
 

@@ -62,6 +62,7 @@ class DeckSlides extends React.Component {
     super(props);
     this.state = {
       viewState: 1,
+      mountDesignView: false,
       selectedSlide: {},
       currentSlideIndex: -1
     };
@@ -106,6 +107,9 @@ class DeckSlides extends React.Component {
 
   onSwitchView(view){
     this.setState({viewState: view});
+    if(view == 2 && !this.state.mountDesignView){
+      this.setState({mountDesignView: true});
+    }
   }
 
   getViewActive(view){
@@ -228,8 +232,18 @@ class DeckSlides extends React.Component {
                 selectedSlide={this.state.selectedSlide}
                 getSlides={this.getSlides}
               />
-              : <DesignView/>
+              : null
             }
+
+            {this.state.mountDesignView?
+              <DesignView
+                viewState={this.state.viewState}
+                currentSlideIndex={this.state.currentSlideIndex}
+                deckObject={this.props.deckObject}
+                deckData={this.props.deckData}
+              /> : null
+            }
+
           </div>
         </div>
       </div>

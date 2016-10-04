@@ -2,6 +2,7 @@
 @import "../stylesheets/Draft.css";
 @import "graphComponent";
 @import "deckItem";
+@import "deckSlides";
 /**********************************
 Global style
 */
@@ -230,95 +231,6 @@ presentation-component
       }
     }
   }
-}
-
-/**********************************
-deck-slides-component
-*/
-.deck-slides-component{
-  .slides-navigation{
-    width: 150px;
-    float: left;
-
-    .slides-header{
-      padding: 10px;
-      background-color: #101010;
-      color: white;
-
-      .title{
-        display: inline-block;
-      }
-
-      .add-slide{
-        display: inline-block;
-        float: right;
-        cursor: pointer;
-      }
-    }
-
-    .slide-animation-enter {
-      opacity: 0.01;
-    }
-
-    .slide-animation-enter {
-      &.slide-animation-enter-active{
-        opacity: 1;
-        transition: opacity 500ms ease-in;
-      }
-
-    }
-
-    .slide-animation-leave {
-      opacity: 1;
-    }
-
-    .slide-animation-leave {
-      &.slide-animation-leave-active{
-        opacity: 0.01;
-        transition: opacity 300ms ease-in;
-      }
-
-    }
-
-    .slides-list.orderable{
-      background-color: #888888;
-      border-right: 1px solid black;
-      overflow-y: scroll;
-      height: calc(100vh - 200px);
-      padding-left: 0;
-
-      .slide-item-thumb{
-        padding: 5px;
-        height: 145px;
-        cursor: pointer;
-
-        .slide-active{
-          border: 3px solid #6c069e;
-          border-radius: 5px;
-        }
-      }
-
-    }
-
-  }
-
-  .main-slide-editor{
-    width: calc(100% - 150px);
-    float: left;
-    padding: 10px 20px;
-    height: calc(100vh - 170px);
-    overflow-y: scroll;
-
-    .button-group-switch-view{
-      text-align: center;
-      padding-bottom: 20px;
-    }
-
-    .editor-view{
-
-    }
-  }
-
 }
 
 /**********************************
