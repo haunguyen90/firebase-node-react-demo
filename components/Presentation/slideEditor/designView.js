@@ -57,9 +57,9 @@ class DesignView extends React.Component {
       TOTAL_MEMORY: 536870912,
       errorhandler: null,			// arguments: err, url, line. This function must return 'true' if the error is handled, otherwise 'false'
       compatibilitycheck: null,
-      dataUrl: "Development/prezentvrweb.data",
-      codeUrl: "Development/prezentvrweb.js",
-      memUrl: "Development/prezentvrweb.mem",
+      dataUrl: "/Development/prezentvrweb.data",
+      codeUrl: "/Development/prezentvrweb.js",
+      memUrl: "/Development/prezentvrweb.mem"
 
     };
     window.Module = Module;
@@ -80,18 +80,23 @@ class DesignView extends React.Component {
       console.log("Play show here");
       //this.PlayerShow();
     }
-
   }
 
   render(){
     return (
       <div className="design-view-component">
-        design view
+        <div className="template-wrap clear">
+          <canvas className="emscripten" id="canvas" oncontextmenu="event.preventDefault()" height="600px" width="960px"></canvas>
+          <br/>
+          <div className="logo"></div>
+        </div>
       </div>
     )
   }
 }
 
 export default scriptLoader(
-  '/Development/UnityLoader.js'
+  '/Development/UnityLoader.js',
+  '/TemplateData/UnityProgress.js',
+  '/Development/WebPlayer.js'
 )(DesignView);
