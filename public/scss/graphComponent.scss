@@ -1,0 +1,117 @@
+@import "react-bootstrap-table.min.css";
+/*********************************
+  BAR GRAPH COMPONENT
+*/
+.bar-graph-table-root{
+  .react-bs-container-body{
+    overflow: visible;
+  }
+
+  &.hidden-header{
+    table{
+      thead{
+        display: none;
+      }
+    }
+  }
+
+  .hidden-cell{
+    display: none;
+  }
+
+  .bar-graph-table-bootstrap{
+    tr{
+      min-height: 37px;
+      height: 37px;
+
+      &:last-child{
+        td.xAxis-placeholder{
+          min-height: 37px;
+          height: 37px;
+        }
+      }
+
+      td{
+        overflow: visible;
+
+        input{
+          &.editor{
+            &.edit-text{
+              border: none;
+              height: auto;
+              padding: 0;
+              background-color: transparent;
+              box-shadow: none;
+              position: absolute;
+              z-index: 2;
+            }
+          }
+        }
+
+        #toast-container{
+          &:after{
+            width: 100%;
+            height: 100%;
+            display: block;
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            border-color: #66afe9;
+            border-radius: 5px;
+            -webkit-box-shadow: 0px 0px 5px 3px rgba(102,175,233,1);
+            -moz-box-shadow: 0px 0px 5px 3px rgba(102,175,233,1);
+            box-shadow: 0px 0px 5px 3px rgba(102,175,233,1);
+          }
+        }
+      }
+    }
+
+  }
+
+  .xAxis-placeholder:after{
+    content: "Label";
+    color: #ccc;
+  }
+
+  .yAxis-placeholder:after{
+    content: "Data";
+    color: #ccc;
+  }
+}
+
+/*********************************
+  PIE GRAPH COMPONENT
+*/
+.pie-graph-component{
+
+  .bar-graph-table-root{
+
+    .bar-graph-table-bootstrap{
+      tr{
+        &:last-child{
+          td.xData-placeholder, td.yData-placeholder{
+            min-height: 37px;
+            height: 37px;
+
+            &:after{
+              content: "" !important;
+            }
+          }
+        }
+      }
+    }
+
+    .xData-placeholder:after{
+      content: "Label";
+      color: #ccc;
+    }
+
+    .yData-placeholder:after{
+      content: "value";
+      color: #ccc;
+    }
+  }
+
+}

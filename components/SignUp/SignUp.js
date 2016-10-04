@@ -80,7 +80,6 @@ class SignUp extends React.Component {
     // Sign in with email and pass.
     // [START createwithemail]
     Auth.createUserWithEmailAndPassword(email, password).then((user) => {
-      console.log(user);
       user.updateProfile({
         displayName: fullName,
         photoURL: "https://firebasestorage.googleapis.com/v0/b/newauth-e3860.appspot.com/o/avatar_default.jpg?alt=media&token=684f1704-5d7b-4df9-8aab-e717bc4baeac"

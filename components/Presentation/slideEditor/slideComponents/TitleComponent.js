@@ -20,7 +20,6 @@ class TitleComponent extends SlideComponent {
     }, this.state);
     this.handleChange = this.handleChange.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
-    this.onRemoveComponent = this.onRemoveComponent.bind(this);
   }
 
   handleChange(event){
@@ -62,7 +61,7 @@ class TitleComponent extends SlideComponent {
               placeholder="Enter slide title"
               onChange={this.handleChange}
               onBlur={this.handleBlur}
-              />
+            />
             <FormControl.Feedback />
           </FormGroup>
         </Col>
@@ -71,11 +70,8 @@ class TitleComponent extends SlideComponent {
   }
 }
 
-TitleComponent.propTypes = {
-  keyId: React.PropTypes.number,
-  componentData: React.PropTypes.object,
-  deckId: React.PropTypes.string,
-  selectedSlide: React.PropTypes.object
-};
+//TitleComponent.propTypes = {
+//
+//};
 
 export default withRouter(TitleComponent, {withRef: true});

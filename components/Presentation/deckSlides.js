@@ -5,7 +5,7 @@ import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
 import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
-import {map, findWhere} from 'underscore';
+import {map, findWhere, findIndex} from 'underscore';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 import ContentView from './slideEditor/contentView.js';
@@ -62,7 +62,8 @@ class DeckSlides extends React.Component {
     super(props);
     this.state = {
       viewState: 1,
-      selectedSlide: {}
+      selectedSlide: {},
+      currentSlideIndex: -1
     };
     this.onSortEnd = this.onSortEnd.bind(this);
     this.getViewActive = this.getViewActive.bind(this);
@@ -82,19 +83,23 @@ class DeckSlides extends React.Component {
 
     }else{
       let deckDataRef = firebase.database().ref('deckData/' + deckObject.id + '/slides/');
+      delete newSlides.keyId;
       deckDataRef.set(newSlides);
       //this.onSelectSlide(newSlides[newIndex]);
     }
   };
 
-  getSlides(){
+  getSlides(hasKeyId = false){
     const {deckData} = this.props;
     if(deckData && deckData.slides && deckData.slides.length > 0){
       return map(deckData.slides, (slide, index) => {
-        slide.keyId = index;
+        if(hasKeyId){
+          slide.keyId = index;
+        }else{
+          delete slide.keyId;
+        }
         return slide;
       });
-      //return deckData.slides;
     }
     return [];
   }
@@ -109,12 +114,16 @@ class DeckSlides extends React.Component {
     return "";
   }
 
-  onSelectSlide(slide){
+  onSelectSlide(selectedSlide){
     const slides = this.getSlides();
-    const currentSelectedSlide = findWhere(slides, {slideId: slide.slideId});
-    if(currentSelectedSlide)
-      this.setState({selectedSlide: slide});
-    else
+    const currentSlideIndex = findIndex(slides, (slide) => {
+      return slide.slideId == selectedSlide.slideId
+    });
+
+    if(currentSlideIndex >= 0){
+      this.setState({selectedSlide: selectedSlide});
+      this.setState({currentSlideIndex: currentSlideIndex});
+    }else
       console.error("Could not find the current slide");
   }
 
@@ -127,7 +136,6 @@ class DeckSlides extends React.Component {
 
     const newSlide = {
       slideId: slideId,
-      title: `Slide ${slides.length + 1}`,
       type: "COMPONENT",
       components: [
         {
@@ -151,6 +159,8 @@ class DeckSlides extends React.Component {
 
   findExistedSlide(keyId){
     const slides = this.getSlides();
+    keyId = parseInt(keyId);
+    if(isNaN(keyId) || keyId < 0) return false;
     if(slides.length > 0){
       if(slides[keyId]){
         return keyId;
@@ -166,13 +176,13 @@ class DeckSlides extends React.Component {
     if(JSON.stringify(prevProps.deckData) != JSON.stringify(this.props.deckData)){
       const slides = this.getSlides();
       if(slides.length > 0){
-        const {selectedSlide} = this.state;
+        const {selectedSlide, currentSlideIndex} = this.state;
         if(selectedSlide && selectedSlide.slideId){
           const currentSelectedSlide = findWhere(slides, {slideId: selectedSlide.slideId});
           if(currentSelectedSlide){
             this.onSelectSlide(currentSelectedSlide);
-          }else if(selectedSlide && selectedSlide.keyId){
-            const selectedKeyId = this.findExistedSlide(selectedSlide.keyId);
+          }else{
+            const selectedKeyId = this.findExistedSlide(currentSlideIndex);
             if(selectedKeyId)
               this.onSelectSlide(slides[selectedKeyId]);
             else
@@ -228,4 +238,3 @@ class DeckSlides extends React.Component {
 }
 
 export default withRouter(DeckSlides, {withRef: true});
-

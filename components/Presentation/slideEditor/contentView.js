@@ -11,9 +11,12 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import Confirm from 'react-confirm-bootstrap';
 import {isMounted} from '~/lib/react/reactLib.js';
 
-import TitleComponent from './TitleComponent.js';
-import ImageComponent from './ImageComponent.js';
-import TextAreaComponent from './TextAreaComponent.js'
+import TitleComponent from './slideComponents/TitleComponent.js';
+import ImageComponent from './slideComponents/ImageComponent.js';
+import TextAreaComponent from './slideComponents/TextAreaComponent.js';
+import BulletComponent from './slideComponents/BulletComponent.js';
+import BarGraphComponent from './slideComponents/BarGraphComponent.js';
+import PieGraphComponent from './slideComponents/PieGraphComponent.js';
 
 class ContentView extends React.Component {
   constructor(props) {
@@ -50,14 +53,14 @@ class ContentView extends React.Component {
       components = selectedSlide.components;
 
     const titleComponent = findWhere(components, (component) => {
-      return component.type == "TITLE";
+      return component.type == ENUMS.SLIDE_COMPONENT.TYPES.TITLE;
     });
 
     let maxComponents = 3;
 
     if(titleComponent){
       maxComponents = 4;
-      if(componentType == "title"){
+      if(componentType == ENUMS.SLIDE_COMPONENT.TYPES.TITLE){
         this.handleAlertShow("Each slide can only have one title.");
         return;
       }
@@ -74,13 +77,13 @@ class ContentView extends React.Component {
     };
 
     switch (componentType) {
-      case "title":
+      case ENUMS.SLIDE_COMPONENT.TYPES.TITLE:
         componentData = extend(componentData, {
-          type: "TITLE",
+          type: ENUMS.SLIDE_COMPONENT.TYPES.TITLE,
           text: ""
         });
 
-        const existedComponent = findWhere(components, {type: "TITLE"});
+        const existedComponent = findWhere(components, {type: ENUMS.SLIDE_COMPONENT.TYPES.TITLE});
         if(existedComponent){
           this.handleAlertShow("Title has been added already");
           return;
@@ -89,41 +92,55 @@ class ContentView extends React.Component {
         components.unshift(componentData);
         break;
 
-      case "text":
+      case ENUMS.SLIDE_COMPONENT.TYPES.TEXT:
         componentData = extend(componentData, {
-          type: "TEXT",
+          type: ENUMS.SLIDE_COMPONENT.TYPES.TEXT,
           text: ""
         });
         components.push(componentData);
         break;
 
-      case "image":
+      case ENUMS.SLIDE_COMPONENT.TYPES.IMAGE:
         componentData = extend(componentData, {
-          type: "IMAGE",
+          type: ENUMS.SLIDE_COMPONENT.TYPES.IMAGE,
           text: "",
           image: ENUMS.MISC.NO_IMAGE_AVAILABLE
         });
         components.push(componentData);
         break;
 
-      case "barGraph":
+      case ENUMS.SLIDE_COMPONENT.TYPES.BULLETS:
         componentData = extend(componentData, {
-          type: "BARGRAPH",
-          text: "",
-          image: ""
+          type: ENUMS.SLIDE_COMPONENT.TYPES.BULLETS
         });
         components.push(componentData);
-        return false;
         break;
 
-      case "pieGraph":
+      case ENUMS.SLIDE_COMPONENT.TYPES.BAR_GRAPH:
         componentData = extend(componentData, {
-          type: "PIEGRAPH",
-          text: "",
-          image: ""
+          type: ENUMS.SLIDE_COMPONENT.TYPES.BAR_GRAPH,
+          xLabel: "",
+          yLabel: "",
+          xMax: 3,
+          yMax: "240",
+          groups:  ",,",
+          sets: [
+            {values: "", name: ""},
+            {values: "", name: ""}
+          ],
+          init: true
         });
         components.push(componentData);
-        return false;
+        break;
+
+      case ENUMS.SLIDE_COMPONENT.TYPES.PIE_GRAPH:
+        componentData = extend(componentData, {
+          type: ENUMS.SLIDE_COMPONENT.TYPES.PIE_GRAPH,
+          xData: ",,",
+          yData: ",,",
+          init: true
+        });
+        components.push(componentData);
         break;
 
       default :
@@ -149,7 +166,7 @@ class ContentView extends React.Component {
 
   onDeleteSlide(){
     const {selectedSlide, getSlides} = this.props;
-    const slides = getSlides();
+    let slides = getSlides();
     if(slides && isArray(slides) && slides.length > 0){
       const currentSlideIndex = findIndex(slides, (slide) => {
         return slide.slideId == selectedSlide.slideId
@@ -172,19 +189,22 @@ class ContentView extends React.Component {
       <Popover id="popoverAddComponent" className="add-component-popover-container">
         <Row>
           <Col xs={4}>
-            <a href="#" onClick={this.onAddComponent.bind(this, "title")} className="add-component-action add-title">Title</a>
+            <a href="#" onClick={this.onAddComponent.bind(this, ENUMS.SLIDE_COMPONENT.TYPES.TITLE)} className="add-component-action add-title">Title</a>
           </Col>
           <Col xs={4}>
-            <a href="#" onClick={this.onAddComponent.bind(this, "text")} className="add-component-action add-text">Text</a>
+            <a href="#" onClick={this.onAddComponent.bind(this, ENUMS.SLIDE_COMPONENT.TYPES.TEXT)} className="add-component-action add-text">Text</a>
           </Col>
           <Col xs={4}>
-            <a href="#" onClick={this.onAddComponent.bind(this, "image")} className="add-component-action add-image">Image</a>
+            <a href="#" onClick={this.onAddComponent.bind(this, ENUMS.SLIDE_COMPONENT.TYPES.IMAGE)} className="add-component-action add-image">Image</a>
           </Col>
           <Col xs={4}>
-            <a href="#" onClick={this.onAddComponent.bind(this, "barGraph")} className="add-component-action add-bar-graph">Bar Graph</a>
+            <a href="#" onClick={this.onAddComponent.bind(this, ENUMS.SLIDE_COMPONENT.TYPES.BULLETS)} className="add-component-action add-bullets">Bullets</a>
           </Col>
           <Col xs={4}>
-            <a href="#" onClick={this.onAddComponent.bind(this, "pieGraph")} className="add-component-action add-pie-graph">Pie Graph</a>
+            <a href="#" onClick={this.onAddComponent.bind(this, ENUMS.SLIDE_COMPONENT.TYPES.BAR_GRAPH)} className="add-component-action add-bar-graph">Bar Graph</a>
+          </Col>
+          <Col xs={4}>
+            <a href="#" onClick={this.onAddComponent.bind(this, ENUMS.SLIDE_COMPONENT.TYPES.PIE_GRAPH)} className="add-component-action add-pie-graph">Pie Graph</a>
           </Col>
         </Row>
       </Popover>
@@ -243,22 +263,80 @@ class ContentView extends React.Component {
   renderSlideComponent(component, index){
     const {selectedSlide} = this.props;
 
-    if(component.type == "TITLE")
-      return (<TitleComponent keyId={index} key={index} componentData={component} deckId={this.props.deckObject.id} selectedSlide={selectedSlide}/>);
-    else if(component.type == "IMAGE")
-      return (
-        <ImageComponent
-          keyId={index} key={index}
-          componentData={component}
-          deckId={this.props.deckObject.id}
-          selectedSlide={selectedSlide}
-          handleAlertShow={this.handleAlertShow}
-        />
-      );
-    else if(component.type == "TEXT")
-      return (<TextAreaComponent keyId={index} key={index} componentData={component} deckId={this.props.deckObject.id} selectedSlide={selectedSlide}/>);
-    else
-      return null;
+    switch (component.type) {
+      case ENUMS.SLIDE_COMPONENT.TYPES.TITLE:
+        return (
+          <TitleComponent
+            keyId={index} key={index}
+            componentData={component}
+            deckId={this.props.deckObject.id}
+            getSlides={this.props.getSlides}
+            selectedSlide={selectedSlide}
+          />
+        );
+        break;
+
+      case ENUMS.SLIDE_COMPONENT.TYPES.IMAGE:
+        return (
+          <ImageComponent
+            keyId={index} key={index}
+            componentData={component}
+            deckId={this.props.deckObject.id}
+            selectedSlide={selectedSlide}
+            getSlides={this.props.getSlides}
+            handleAlertShow={this.handleAlertShow}
+          />
+        );
+        break;
+
+      case ENUMS.SLIDE_COMPONENT.TYPES.TEXT:
+        return (
+          <TextAreaComponent
+            keyId={index} key={index}
+            componentData={component}
+            getSlides={this.props.getSlides}
+            deckId={this.props.deckObject.id} selectedSlide={selectedSlide}
+          />
+        );
+        break;
+
+      case ENUMS.SLIDE_COMPONENT.TYPES.BULLETS:
+        return (
+          <BulletComponent
+            keyId={index} key={index}
+            componentData={component}
+            getSlides={this.props.getSlides}
+            deckId={this.props.deckObject.id} selectedSlide={selectedSlide}
+          />
+        );
+        break;
+
+      case ENUMS.SLIDE_COMPONENT.TYPES.BAR_GRAPH:
+        return (
+          <BarGraphComponent
+            keyId={index} key={index}
+            componentData={component}
+            getSlides={this.props.getSlides}
+            deckId={this.props.deckObject.id} selectedSlide={selectedSlide}
+          />
+        );
+        break;
+
+      case ENUMS.SLIDE_COMPONENT.TYPES.PIE_GRAPH:
+        return (
+          <PieGraphComponent
+            keyId={index} key={index}
+            componentData={component}
+            getSlides={this.props.getSlides}
+            deckId={this.props.deckObject.id} selectedSlide={selectedSlide}
+          />
+        );
+        break;
+
+      default :
+        return null;
+        break;
+    }
   }
 
   render(){
