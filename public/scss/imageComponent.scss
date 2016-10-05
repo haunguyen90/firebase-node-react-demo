@@ -1,0 +1,15 @@
+.imageupload-component {
+  .box__dragndrop,
+  .box__uploading,
+  .box__success,
+  .box__error {
+    display: none;
+  }
+}
+
+#uploadingImageTabs{
+  .selected-image{
+    border-color: #337ab7;
+    border-width: 2px;
+  }
+}
