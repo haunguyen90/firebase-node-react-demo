@@ -5,6 +5,22 @@
   .box__error {
     display: none;
   }
+
+  .box__input{
+    text-align: center;
+
+    .uploadButton{
+      .fileInputLabel{
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .circular-progress{
+    width: 50px;
+    margin: auto;
+    padding: 10px 0;
+  }
 }
 
 #uploadingImageTabs{
@@ -12,4 +28,29 @@
     border-color: #337ab7;
     border-width: 2px;
   }
+}
+
+.uploadimage-modal{
+  .uploadimage-body{
+    min-height: 400px;
+  }
+}
+
+.library-images-list{
+  max-height: 350px;
+  height: 350px;
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+  margin: 0 0 10px 0 !important;
+
+  .thumbnail{
+    img{
+      height: 100px !important;
+    }
+  }
+}
+
+.button-wrapper{
+  text-align: right;
+  padding: 0 30px !important;
 }

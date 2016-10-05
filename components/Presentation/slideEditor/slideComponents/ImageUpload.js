@@ -1,7 +1,8 @@
 import React from 'react';
-import {Row, Button, } from 'react-bootstrap';
+import {Row, Button, Col} from 'react-bootstrap';
 import {isMounted} from '~/lib/react/reactLib.js';
 import {findIndex} from 'underscore';
+import { Circle } from 'rc-progress';
 
 class ImageUpload extends React.Component {
   constructor(props) {
@@ -22,7 +23,7 @@ class ImageUpload extends React.Component {
   renderUploadText() {
     if (this.checkDragNDropFeature()) {
       return (
-        <span class="box__dragndrop">Drop file here to Upload OR </span>
+        <span className="box__dragndrop">Drop file here to Upload OR </span>
       );
     }
   }
@@ -115,28 +116,37 @@ class ImageUpload extends React.Component {
     } else {
       //TODO: return failed if user is not login
       console.log('No user is login');
-    };
+    }
   }
 
 
   render() {
+    const {isUploading, uploadPercent} = this.state;
     return (
       <Row className="imageupload-component">
-        <form className="box" method="post" action="" encType="multipart/form-data">
-          <div className="box__input">
-            <input className="box__file" onChange={this.onInputFileChange.bind(this)} type="file" name="file" id="fileInput" accept='image/*'/>
-            <p>{this.renderUploadText()}</p>
-            <Button className="uploadButton" bsStyle="primary" block>
-              <label htmlFor="fileInput" className="fileInputLabel">
-                <i className="fa fa-upload"></i>
-                <span className="label-text">UPLOAD</span>
-              </label>
-            </Button>
-          </div>
-          <div className="box__uploading">Uploading&hellip;</div>
-          <div className="box__success">Done!</div>
-          <div className="box__error">Error! <span></span>.</div>
-        </form>
+        <Col xs={12}>
+          <form className="box" method="post" action="" encType="multipart/form-data">
+            <div className="box__input">
+              <input className="box__file" onChange={this.onInputFileChange.bind(this)} type="file" name="file" id="fileInput" accept='image/*'/>
+              <p>{this.renderUploadText()}</p>
+
+              {isUploading?
+                <div className="circular-progress">
+                  <Circle percent={uploadPercent} strokeWidth="4" strokeColor="#D3D3D3" />
+                </div> : null
+              }
+
+              <Button className="uploadButton" bsStyle="default">
+                <label htmlFor="fileInput" className="fileInputLabel">
+                  <span className="label-text">SELECT FILE</span>
+                </label>
+              </Button>
+            </div>
+            <div className="box__uploading">Uploading&hellip;</div>
+            <div className="box__success">Done!</div>
+            <div className="box__error">Error! <span></span>.</div>
+          </form>
+        </Col>
       </Row>
     )
   }
@@ -149,6 +159,6 @@ ImageUpload.propTypes = {
   getSlides : React.PropTypes.func,
   closeShareWindow : React.PropTypes.func,
   handleUploadImageTabSelect : React.PropTypes.func
-}
+};
 
 export default ImageUpload;

@@ -24,7 +24,7 @@ class UploadImageModal extends React.Component {
         </Modal.Header>
         <Modal.Body>
           <div>
-            <Row>
+            <Row className="uploadimage-body">
               <div>
                 <Tabs id="uploadingImageTabs" activeKey={this.state.imageUploadActiveTab} onSelect={this.handleUploadImageTabSelect.bind(this)}>
                   <Tab eventKey={1} title="UPLOAD">

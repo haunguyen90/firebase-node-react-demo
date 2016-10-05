@@ -1,6 +1,6 @@
 import React from 'react';
 import {Row, Col, Thumbnail, Button} from 'react-bootstrap';
-import {map, findIndex} from 'underscore';
+import {map, findIndex, isObject} from 'underscore';
 
 
 class ImageLibrary extends React.Component {
@@ -19,12 +19,14 @@ class ImageLibrary extends React.Component {
     assetRef.orderByChild("uid").equalTo(firebase.auth().currentUser.uid)
     .on("value", (data) => {
       const userAssets = data.val();
-      const userImages = map(Object.keys(userAssets), (assetsId) => {
-        let assetsObject = userAssets[assetsId];
-        assetsObject.id = assetsId;
-        return assetsObject;
-      })
-      this.setState({userImages : userImages});
+      if(isObject(userAssets)){
+        const userImages = map(Object.keys(userAssets), (assetsId) => {
+          let assetsObject = userAssets[assetsId];
+          assetsObject.id = assetsId;
+          return assetsObject;
+        });
+        this.setState({userImages : userImages});
+      }
     });
   }
 
@@ -68,8 +70,7 @@ class ImageLibrary extends React.Component {
   render() {
     return (
       <div>
-        <Row>
-
+        <Row className="library-images-list">
           {this.state.userImages.map((userImage, index) => {
             let activeImageClass = "";
             if(userImage.id == this.state.selectedImage)
@@ -77,7 +78,6 @@ class ImageLibrary extends React.Component {
             return (
               <Col xs={3} md={3} key={index}>
                 <Thumbnail className={activeImageClass} onClick={this.onSelectImage.bind(this, userImage.id)} href="#" alt="171x180" src={userImage.url}/>
-
               </Col>
             )
           })}
@@ -85,10 +85,12 @@ class ImageLibrary extends React.Component {
 
         </Row>
         <Row>
-          <Button
-            disabled={!this.state.selectedImage}
-            onClick= {this.chooseImage}
-            >Add image</Button>
+          <Col xs={12} className="button-wrapper">
+            <Button
+              disabled={!this.state.selectedImage}
+              onClick= {this.chooseImage}
+              >Add image</Button>
+          </Col>
         </Row>
       </div>
 
