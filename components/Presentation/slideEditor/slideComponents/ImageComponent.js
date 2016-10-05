@@ -11,6 +11,7 @@ import {ENUMS} from '~/lib/_required/enums.js';
 import Confirm from 'react-confirm-bootstrap';
 
 import SlideComponent from './SlideComponent.js';
+import UploadImageModal from './UploadImageModal.js';
 
 class ImageComponent extends SlideComponent {
   constructor(props){
@@ -22,8 +23,7 @@ class ImageComponent extends SlideComponent {
 
     this.state = extend({
       text: captionText,
-      isUploading: false,
-      uploadPercent: 0
+      showModal: false
     }, this.state);
     this.handleChange = this.handleChange.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
@@ -42,93 +42,12 @@ class ImageComponent extends SlideComponent {
     }
   }
 
-  updatePhotoURLToDB(downloadURL){
-    const {selectedSlide, keyId, deckId, getSlides} = this.props;
-
-    if(selectedSlide.components && selectedSlide.components[keyId]){
-      const slides = getSlides();
-      const currentSlideIndex = findIndex(slides, (slide) => {
-        return slide.slideId == selectedSlide.slideId
-      });
-
-      if(currentSlideIndex >= 0){
-        let component = selectedSlide.components[keyId];
-        component.image = downloadURL;
-
-        let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
-        deckDataRef.set(component);
-      }
-    }
+  showImageModal() {
+    this.setState({ showModal : true});
   }
 
-  onInputFileChange(evt){
-    evt.stopPropagation();
-    evt.preventDefault();
-
-    const pattern = /^image\/(gif|jpg|jpeg|tiff|png)$/i;
-
-    const storageRef = firebase.storage().ref();
-    const file = evt.target.files[0];
-
-    if(!pattern.test(file.type)){
-      this.props.handleAlertShow("File type not support");
-      return false;
-    }
-
-    const metadata = {
-      'contentType': file.type
-    };
-
-    // Upload file and metadata to the object
-    const uploadTask = storageRef.child('images/' + file.name).put(file, metadata);
-
-    const instance = this;
-    // Listen for state changes, errors, and completion of the upload.
-    uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
-      (snapshot) => {
-        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        if(isMounted(instance)){
-          this.setState({isUploading: true});
-          this.setState({uploadPercent: progress});
-        }
-        console.log('Upload is ' + progress + '% done');
-        switch (snapshot.state) {
-          case firebase.storage.TaskState.PAUSED: // or 'paused'
-            console.log('Upload is paused');
-            break;
-          case firebase.storage.TaskState.RUNNING: // or 'running'
-            console.log('Upload is running');
-            break;
-        }
-      }, (error) => {
-        switch (error.code) {
-          case 'storage/unauthorized':
-            console.error(error);
-            // User doesn't have permission to access the object
-            break;
-
-          case 'storage/canceled':
-            console.error(error);
-            // User canceled the upload
-            break;
-
-          case 'storage/unknown':
-            console.error(error);
-            // Unknown error occurred, inspect error.serverResponse
-            break;
-        }
-      }, () => {
-        // Upload completed successfully, now we can get the download URL
-        const downloadURL = uploadTask.snapshot.downloadURL;
-        setTimeout(() =>{
-          if(isMounted(instance)){
-            this.setState({isUploading: false});
-            this.setState({uploadPercent: 0});
-            this.updatePhotoURLToDB(downloadURL);
-          }
-        }, 175);
-      });
+  closeShareWindow() {
+    this.setState({ showModal : false});
   }
 
   render(){
@@ -136,8 +55,12 @@ class ImageComponent extends SlideComponent {
     const {text, isUploading, uploadPercent} = this.state;
 
     let imageURL = ENUMS.MISC.NO_IMAGE_AVAILABLE;
-    if(componentData.image)
-      imageURL = componentData.image;
+    if(componentData.assetId) {
+      let assetRef = firebase.database().ref('userAssets/' + componentData.assetId);
+      assetRef.on("value", (result) => {
+        imageURL = result.val().url;
+      });
+    }
 
     return (
       <div className="slide-component image-component row">
@@ -152,10 +75,8 @@ class ImageComponent extends SlideComponent {
             }
 
             <div className="box__input">
-              <input className="box__file" onChange={this.onInputFileChange.bind(this)} type="file" name="file" id="fileInput" accept='image/*'/>
-              <Button className="uploadButton" bsStyle="primary" block>
-
-                <label htmlFor="fileInput" className="fileInputLabel">
+              <Button className="uploadButton" bsStyle="primary" onClick={this.showImageModal.bind(this)} block>
+                <label className="fileInputLabel">
                   <i className="fa fa-upload"></i>
                   <span className="label-text">UPLOAD</span>
                 </label>
@@ -185,6 +106,13 @@ class ImageComponent extends SlideComponent {
             <FormControl.Feedback />
           </FormGroup>
         </Col>
+        <UploadImageModal
+          showModal={this.state.showModal}
+          closeShareWindow={this.closeShareWindow.bind(this)}
+          {...this.props}
+        />
+
+
       </div>
     )
   }

@@ -104,7 +104,8 @@ class ContentView extends React.Component {
         componentData = extend(componentData, {
           type: ENUMS.SLIDE_COMPONENT.TYPES.IMAGE,
           text: "",
-          image: ENUMS.MISC.NO_IMAGE_AVAILABLE
+          assetId: "",
+          // image: ENUMS.MISC.NO_IMAGE_AVAILABLE
         });
         components.push(componentData);
         break;
