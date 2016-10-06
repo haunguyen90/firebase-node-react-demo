@@ -23,7 +23,8 @@ class ImageComponent extends SlideComponent {
 
     this.state = extend({
       text: captionText,
-      showModal: false
+      showModal: false,
+      imageURL: ENUMS.MISC.NO_IMAGE_AVAILABLE
     }, this.state);
     this.handleChange = this.handleChange.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
@@ -42,6 +43,28 @@ class ImageComponent extends SlideComponent {
     }
   }
 
+  componentDidMount() {
+    const {componentData, deckId, selectedSlide, keyId, getSlides} = this.props;
+    const slides = getSlides();
+    const currentSlideIndex = findIndex(slides, (slide) => {
+      return slide.slideId == selectedSlide.slideId
+    });
+    if(componentData.assetId && isMount(this)) {
+      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
+      deckDataRef.on("value", (result) => {
+        let assetRef = firebase.database().ref('userAssets/' + componentData.assetId);
+        assetRef.once("value").then( (result) => {
+          this.setState({imageURL: result.val().url});
+        });
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
+    deckDataRef.off();
+  }
+
   showImageModal() {
     this.setState({ showModal : true});
   }
@@ -51,16 +74,9 @@ class ImageComponent extends SlideComponent {
   }
 
   render(){
-    const {componentData, keyId} = this.props;
+    const {keyId} = this.props;
     const {text, isUploading, uploadPercent} = this.state;
 
-    let imageURL = ENUMS.MISC.NO_IMAGE_AVAILABLE;
-    if(componentData.assetId) {
-      let assetRef = firebase.database().ref('userAssets/' + componentData.assetId);
-      assetRef.on("value", (result) => {
-        imageURL = result.val().url;
-      });
-    }
 
     return (
       <div className="slide-component image-component row">
@@ -71,7 +87,7 @@ class ImageComponent extends SlideComponent {
               <div className="circular-progress">
                 <Circle percent={uploadPercent} strokeWidth="4" strokeColor="#D3D3D3" />
               </div> :
-              <Thumbnail className="image-thumbnail" href="#" alt="171x180" src={imageURL} />
+              <Thumbnail className="image-thumbnail" href="#" alt="171x180" src={this.state.imageURL} />
             }
 
             <div className="box__input">

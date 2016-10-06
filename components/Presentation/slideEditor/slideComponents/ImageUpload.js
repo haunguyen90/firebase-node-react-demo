@@ -4,6 +4,7 @@ import {isMounted} from '~/lib/react/reactLib.js';
 import {findIndex} from 'underscore';
 import { Circle } from 'rc-progress';
 
+
 class ImageUpload extends React.Component {
   constructor(props) {
     super(props);
@@ -28,6 +29,31 @@ class ImageUpload extends React.Component {
     }
   }
 
+  onInitDragDrop(){
+    if (this.checkDragNDropFeature()) {
+
+      let droppedFiles = false;
+      const $form = $(this.refs.uploadForm);
+      $form.on('drag dragstart dragend dragover dragenter dragleave drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      })
+        .on('dragover dragenter', () => {
+          $form.addClass('is-dragover');
+        })
+        .on('dragleave dragend drop', () => {
+          $form.removeClass('is-dragover');
+        })
+        .on('drop', (e) => {
+          //droppedFiles = e.originalEvent.dataTransfer.files;
+          this.handleUploadFile(e.originalEvent.dataTransfer.files[0]);
+        });
+
+    }
+  }
+
+
+
   updatePhotoURLToDB(downloadURL){
     const {selectedSlide, keyId, deckId, getSlides} = this.props;
 
@@ -39,17 +65,14 @@ class ImageUpload extends React.Component {
       type: "IMAGE",
       url : downloadURL
     });
-    
+
   }
 
-  onInputFileChange(evt){
-    evt.stopPropagation();
-    evt.preventDefault();
-
+  handleUploadFile(file) {
     const pattern = /^image\/(gif|jpg|jpeg|tiff|png)$/i;
 
     const storageRef = firebase.storage().ref();
-    const file = evt.target.files[0];
+
 
     if(!pattern.test(file.type)){
       this.props.handleAlertShow("File type not support");
@@ -119,13 +142,28 @@ class ImageUpload extends React.Component {
     }
   }
 
+  onInputFileChange(evt){
+    evt.stopPropagation();
+    evt.preventDefault();
+
+    const file = evt.target.files[0];
+    this.handleUploadFile(file);
+
+  }
+
+  componentDidMount(){
+    this.onInitDragDrop();
+  }
 
   render() {
+    let formClass = "box";
     const {isUploading, uploadPercent} = this.state;
+    if(this.checkDragNDropFeature())
+      formClass+= " has-advanced-upload";
     return (
       <Row className="imageupload-component">
         <Col xs={12}>
-          <form className="box" method="post" action="" encType="multipart/form-data">
+          <form ref="uploadForm" className={formClass}>
             <div className="box__input">
               <input className="box__file" onChange={this.onInputFileChange.bind(this)} type="file" name="file" id="fileInput" accept='image/*'/>
               <p>{this.renderUploadText()}</p>

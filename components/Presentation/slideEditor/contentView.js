@@ -124,8 +124,8 @@ class ContentView extends React.Component {
           yLabel: "",
           xMax: 3,
           yMax: "240",
-          groups:  ",,",
-          sets: [
+          xData:  ",,",
+          yData: [
             {values: "", name: ""},
             {values: "", name: ""}
           ],

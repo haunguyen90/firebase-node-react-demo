@@ -4,7 +4,7 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Thumbnail, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
-import {extend, map, each, isArray, findIndex} from 'underscore';
+import {extend, map, each, isArray, findIndex, max} from 'underscore';
 import ReactDOM from 'react-dom';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
@@ -57,15 +57,15 @@ class BarGraphComponent extends GraphComponent {
 
   convertJSONDataToRows(){
     const {componentData} = this.props;
-    if(componentData && componentData.groups && typeof componentData.groups == "string"){
-      const groupsRows = componentData.groups.split(",");
+    if(componentData && componentData.xData && typeof componentData.xData == "string"){
+      const groupsRows = componentData.xData.split(",");
       let rows = map(groupsRows, (row, rowIdx) => {
         let rowData = {
           id: rowIdx + 1,
           xAxis: row
         };
 
-        each(componentData.sets, (col, colIdx) => {
+        each(componentData.yData, (col, colIdx) => {
           const fieldName = `yAxis${colIdx + 1}`;
           let arrayValue = [];
           if(col.values && typeof col.values == "string")
@@ -81,8 +81,8 @@ class BarGraphComponent extends GraphComponent {
       const firstRow = {
         id: 0,
         xAxis: "",
-        yAxis1: componentData.sets[0].name,
-        yAxis2: componentData.sets[1].name
+        yAxis1: componentData.yData[0].name,
+        yAxis2: componentData.yData[1].name
       };
       rows.unshift(firstRow);
 
@@ -106,8 +106,8 @@ class BarGraphComponent extends GraphComponent {
     let JSONData = {
       xMax: rows.length - 2,
       yMax: "240",
-      groups: [],
-      sets: [
+      xData: [],
+      yData: [
         {values: [], name: "Data 1"},
         {values: [], name: "Data 2"}
       ]
@@ -121,19 +121,25 @@ class BarGraphComponent extends GraphComponent {
       }
 
       if(rowIdx > 0){
-        JSONData.groups.push(row.xAxis);
-        JSONData.sets[0].values.push(row.yAxis1);
-        JSONData.sets[1].values.push(row.yAxis2);
+        JSONData.xData.push(row.xAxis);
+        JSONData.yData[0].values.push(row.yAxis1);
+        JSONData.yData[1].values.push(row.yAxis2);
       }else if(rowIdx == 0){
-        JSONData.sets[0].name = row.yAxis1;
-        JSONData.sets[1].name = row.yAxis2;
+        JSONData.yData[0].name = row.yAxis1;
+        JSONData.yData[1].name = row.yAxis2;
       }
     });
-    JSONData.sets[0].values = JSONData.sets[0].values.join();
-    JSONData.sets[1].values = JSONData.sets[1].values.join();
-    JSONData.xMax = JSONData.groups.length;
-    JSONData.groups = JSONData.groups.join();
 
+    JSONData.yData[0].values = JSONData.yData[0].values.join();
+    JSONData.yData[1].values = JSONData.yData[1].values.join();
+    let yValues = ((JSONData.yData[0].values.concat(",").concat(JSONData.yData[1].values))).split(",");
+    for(let i=0; i<yValues.length; i++) { yValues[i] = +yValues[i]; }
+    if (yValues.length > 0){
+      JSONData.yMax = max(yValues);
+    }
+    JSONData.xMax = JSONData.xData.length;
+    JSONData.xData = JSONData.xData.join();
+    yValues = {};
     return JSONData;
   }
 

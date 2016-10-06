@@ -3,6 +3,7 @@
  */
 import React from 'react';
 import {Link, withRouter} from 'react-router';
+import ReactDOM from 'react-dom';
 import {PageHeader, FormGroup, ControlLabel, FormControl, HelpBlock, Alert, Image, Button} from 'react-bootstrap';
 
 class Login extends React.Component {
@@ -58,7 +59,7 @@ class Login extends React.Component {
       }else{
         this.setState({currentUid: null});
       }
-      
+
       document.getElementById('loading').style.display = 'none';
       document.getElementById('loaded').style.display = 'block';
       if(user)
@@ -100,8 +101,8 @@ class Login extends React.Component {
 
   onLoginSubmit(e){
     e.preventDefault();
-    const email = this.refs.email.value.trim();
-    const password = this.refs.password.value.trim();
+    const email = e.target.emailInput.value.trim();
+    const password = e.target.passwordInput.value.trim();
 
     const emailPatt = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if(!emailPatt.test(email)){
@@ -137,6 +138,7 @@ class Login extends React.Component {
               className="email validate"
               required
               ref="email"
+              name="emailInput"
               placeholder="Email"
             />
 
@@ -148,6 +150,7 @@ class Login extends React.Component {
               className="password validate"
               required
               ref="password"
+              name="passwordInput"
               placeholder="Password"
               />
 
@@ -201,7 +204,7 @@ class Login extends React.Component {
       </div>
     )
   }
-  
+
   render(){
     return (
       <div className="login-page">
