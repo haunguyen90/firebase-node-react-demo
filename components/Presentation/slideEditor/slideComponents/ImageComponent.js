@@ -61,6 +61,11 @@ class ImageComponent extends SlideComponent {
   }
 
   componentWillUnmount() {
+    const {deckId, selectedSlide, keyId, getSlides} = this.props;
+    const slides = getSlides();
+    const currentSlideIndex = findIndex(slides, (slide) => {
+      return slide.slideId == selectedSlide.slideId
+    });
     let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
     deckDataRef.off();
   }
