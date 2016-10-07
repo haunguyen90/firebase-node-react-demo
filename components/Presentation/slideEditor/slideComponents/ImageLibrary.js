@@ -1,6 +1,8 @@
 import React from 'react';
 import {Row, Col, Thumbnail, Button} from 'react-bootstrap';
 import {map, findIndex, isObject} from 'underscore';
+import {getDownloadURL} from '~/lib/firebaseHelpers/storageHelper.js';
+import ThumbnailImage from './ThumbnailImage.js';
 
 
 class ImageLibrary extends React.Component {
@@ -8,15 +10,19 @@ class ImageLibrary extends React.Component {
     super(props);
     this.state = {
       userImages : [],
-      selectedImage : null
+      selectedImage : null,
+      imageURL : ""
     }
 
     this.chooseImage = this.chooseImage.bind(this);
+    this.getUserLibrary = this.getUserLibrary.bind(this);
+    this.onSelectImage = this.onSelectImage.bind(this);
   }
 
   getUserLibrary() {
     const assetRef = firebase.database().ref('userAssets');
-    assetRef.orderByChild("uid").equalTo(firebase.auth().currentUser.uid)
+    const uid = firebase.auth().currentUser.uid;
+    assetRef.orderByChild("uid").equalTo(uid)
     .on("value", (data) => {
       const userAssets = data.val();
       if(isObject(userAssets)){
@@ -69,12 +75,15 @@ class ImageLibrary extends React.Component {
         <Row className="library-images-list">
           {this.state.userImages.map((userImage, index) => {
             let activeImageClass = "";
-            if(userImage.id == this.state.selectedImage)
+            if(userImage.id == this.state.selectedImage){
               activeImageClass = "selected-image";
+            }
+
             return (
-              <Col xs={3} md={3} key={index}>
-                <Thumbnail className={activeImageClass} onClick={this.onSelectImage.bind(this, userImage.id)} href="#" alt="171x180" src={userImage.url}/>
-              </Col>
+              <ThumbnailImage
+                activeImageClass={activeImageClass}
+                onSelectImage={this.onSelectImage}
+                userAsset={userImage} key={index}/>
             )
           })}
 

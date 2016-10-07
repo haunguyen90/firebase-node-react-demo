@@ -54,18 +54,16 @@ class ImageUpload extends React.Component {
 
 
 
-  updatePhotoURLToDB(downloadURL){
-    const {selectedSlide, keyId, deckId, getSlides} = this.props;
-
+  updatePhotoNameToDB(name){
     // Upload image completed. Save data to UserAsset and Open LIBRARY tab
     this.props.handleUploadImageTabSelect(2);
+    const uid = firebase.auth().currentUser.uid;
     let newUserAssetKey = firebase.database().ref().child('userAssets').push().key;
     firebase.database().ref('userAssets/' + newUserAssetKey).set({
-      uid: firebase.auth().currentUser.uid,
+      uid: uid,
       type: "IMAGE",
-      url : downloadURL
+      fileName: name
     });
-
   }
 
   handleUploadFile(file) {
@@ -82,10 +80,10 @@ class ImageUpload extends React.Component {
     const metadata = {
       'contentType': file.type
     };
-
+    const curUser = firebase.auth().currentUser;
     // Upload file and metadata to the object, each user has its folder to store image
-    if (firebase.auth().currentUser) {
-      const uploadTask = storageRef.child('images/' + firebase.auth().currentUser.uid + '/' +file.name).put(file, metadata);
+    if (curUser) {
+      const uploadTask = storageRef.child('images/' + curUser.uid + '/' +file.name + '-' + curUser.uid).put(file, metadata);
       const instance = this;
       // Listen for state changes, errors, and completion of the upload.
       uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
@@ -127,12 +125,13 @@ class ImageUpload extends React.Component {
           }
         }, () => {
           // Upload completed successfully, now we can get the download URL
-          const downloadURL = uploadTask.snapshot.downloadURL;
+          // const downloadURL = uploadTask.snapshot.downloadURL;
           setTimeout(() =>{
             if(isMounted(instance)){
               this.setState({isUploading: false});
               this.setState({uploadPercent: 0});
-              this.updatePhotoURLToDB(downloadURL);
+              // this.updatePhotoURLToDB(downloadURL);
+              this.updatePhotoNameToDB(file.name);
             }
           }, 175);
         })

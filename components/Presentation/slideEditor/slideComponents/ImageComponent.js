@@ -12,6 +12,7 @@ import Confirm from 'react-confirm-bootstrap';
 
 import SlideComponent from './SlideComponent.js';
 import UploadImageModal from './UploadImageModal.js';
+import {getDownloadURL} from '~/lib/firebaseHelpers/storageHelper.js';
 
 class ImageComponent extends SlideComponent {
   constructor(props){
@@ -49,12 +50,17 @@ class ImageComponent extends SlideComponent {
     const currentSlideIndex = findIndex(slides, (slide) => {
       return slide.slideId == selectedSlide.slideId
     });
+    const curUser = firebase.auth().currentUser.uid;
     if(componentData.assetId && isMounted(this)) {
       let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
       deckDataRef.on("value", (result) => {
         let assetRef = firebase.database().ref('userAssets/' + componentData.assetId);
         assetRef.once("value").then( (result) => {
-          this.setState({imageURL: result.val().url});
+          if(result.val()){
+            getDownloadURL("images/" + curUser + "/" + result.val().fileName + "-" + curUser, (url) => {
+                this.setState({imageURL: url});
+            });
+          }
         });
       });
     }
