@@ -35,12 +35,12 @@ class DesignView extends React.Component {
   PlayerReady() {
     console.log("PlayerReady");
     this.setState({playerReady: true});
-    this.PlayerSetSlide(0);
+    this.PlayerSetSlide(this.props.currentSlideIndex);
   }
 
   PlayerShow() {
     if (this.state.playerReady) {
-      this.PlayerSetSlide(0);
+      this.PlayerSetSlide(this);
     } else {
       this.PlayerLoadData();
     }
@@ -109,7 +109,9 @@ class DesignView extends React.Component {
     }
   }
 
-  componentDidMount(){}
+  componentDidMount(){
+    
+  }
 
   render(){
     let className = "";
