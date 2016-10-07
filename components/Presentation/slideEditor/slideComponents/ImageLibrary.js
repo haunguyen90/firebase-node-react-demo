@@ -52,15 +52,11 @@ class ImageLibrary extends React.Component {
       });
 
       if(currentSlideIndex >= 0){
-
         // Assign new upload image asset to image component
         let component = selectedSlide.components[keyId];
         component.assetId = selectedImage;
-
         let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
         deckDataRef.set(component);
-
-
         this.props.closeShareWindow();
       }
     }
@@ -96,6 +92,14 @@ class ImageLibrary extends React.Component {
 
     )
   }
+}
+
+ImageLibrary.propTypes = {
+  selectedSlide : React.PropTypes.object,
+  keyId : React.PropTypes.number,
+  deckId : React.PropTypes.string,
+  getSlides : React.PropTypes.func,
+  closeShareWindow : React.PropTypes.func
 }
 
 export default ImageLibrary;

@@ -36,10 +36,10 @@ class SignUp extends React.Component {
   onSignUpSubmit(e){
     e.preventDefault();
     this.setState({SIGN_UP_ERROR: null});
-    const fullName = this.refs.fullName.value.trim();
-    const email = this.refs.email.value.trim();
-    const confirmEmail = this.refs.confirmEmail.value.trim();
-    const password = this.refs.password.value.trim();
+    const fullName = e.target.fullNameInput.value.trim();
+    const email = e.target.emailInput.value.trim();
+    const confirmEmail = e.target.confirmEmailInput.value.trim();
+    const password = e.target.passwordInput.value.trim();
 
     const emailPatt = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if(!emailPatt.test(email)){
@@ -121,6 +121,7 @@ class SignUp extends React.Component {
                 className="full-name validate"
                 required
                 ref="fullName"
+                name="fullNameInput"
                 placeholder="Full Name"
               />
             </FormGroup>
@@ -131,6 +132,7 @@ class SignUp extends React.Component {
                 className="email validate"
                 required
                 ref="email"
+                name="emailInput"
                 placeholder="Email"
                 />
             </FormGroup>
@@ -141,6 +143,7 @@ class SignUp extends React.Component {
                 className="confirm-email validate"
                 required
                 ref="confirmEmail"
+                name="confirmEmailInput"
                 placeholder="Confirm Email"
                 />
             </FormGroup>
@@ -151,6 +154,7 @@ class SignUp extends React.Component {
                 className="password validate"
                 required
                 ref="password"
+                name="passwordInput"
                 placeholder="Password"
                 />
             </FormGroup>
