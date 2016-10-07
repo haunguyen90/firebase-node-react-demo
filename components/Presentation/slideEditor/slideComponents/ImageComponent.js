@@ -49,7 +49,7 @@ class ImageComponent extends SlideComponent {
     const currentSlideIndex = findIndex(slides, (slide) => {
       return slide.slideId == selectedSlide.slideId
     });
-    if(componentData.assetId && isMount(this)) {
+    if(componentData.assetId && isMounted(this)) {
       let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
       deckDataRef.on("value", (result) => {
         let assetRef = firebase.database().ref('userAssets/' + componentData.assetId);
