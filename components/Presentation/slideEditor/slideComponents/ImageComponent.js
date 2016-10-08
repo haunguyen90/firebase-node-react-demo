@@ -38,7 +38,47 @@ class ImageComponent extends SlideComponent {
   }
 
   componentDidUpdate(prevProps, prevState){
-    if(JSON.stringify(prevProps.componentData) && JSON.stringify(this.props.componentData)){
+    if(prevProps.selectedSlide && prevProps.selectedSlide.slideId != this.props.selectedSlide.slideId){
+      const {deckId, selectedSlide, keyId, getSlides} = this.props;
+      const prevSelectedSlide = prevProps.selectedSlide;
+      const slides = getSlides();
+      const currentSlideIndex = findIndex(slides, (slide) => {
+        return slide.slideId == selectedSlide.slideId
+      });
+
+      const prevSlideIndex = findIndex(slides, (slide) => {
+        return slide.slideId == prevSelectedSlide.slideId
+      });
+      const curUser = firebase.auth().currentUser.uid;
+
+      let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
+      let prevDeckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + prevSlideIndex + '/components/' + keyId);
+      prevDeckDataRef.off();
+
+      if(isMounted(this)) {
+        deckDataRef.on("value", (result) => {
+          const newComponentData = result.val();
+          if(newComponentData && newComponentData.assetId){
+            let assetRef = firebase.database().ref('userAssets/' + newComponentData.assetId);
+
+            assetRef.once("value").then( (result) => {
+              if(result.val()){
+                getDownloadURL("images/" + curUser + "/" + result.val().fileName + "-" + curUser, (url) => {
+                  if(url)
+                    this.setState({imageURL: url});
+                  else
+                    this.setState({imageURL: ENUMS.MISC.NO_IMAGE_AVAILABLE});
+                });
+              }
+            });
+          }
+
+        });
+      }
+
+    }
+
+    if(JSON.stringify(prevProps.componentData) != JSON.stringify(this.props.componentData)){
       if(this.props.componentData.text != prevProps.componentData.text)
         this.setState({text: this.props.componentData.text});
     }
@@ -51,17 +91,25 @@ class ImageComponent extends SlideComponent {
       return slide.slideId == selectedSlide.slideId
     });
     const curUser = firebase.auth().currentUser.uid;
-    if(componentData.assetId && isMounted(this)) {
+    if(isMounted(this)) {
       let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + currentSlideIndex + '/components/' + keyId);
       deckDataRef.on("value", (result) => {
-        let assetRef = firebase.database().ref('userAssets/' + componentData.assetId);
-        assetRef.once("value").then( (result) => {
-          if(result.val()){
-            getDownloadURL("images/" + curUser + "/" + result.val().fileName + "-" + curUser, (url) => {
-                this.setState({imageURL: url});
-            });
-          }
-        });
+        const newComponentData = result.val();
+        if(newComponentData && newComponentData.assetId){
+          let assetRef = firebase.database().ref('userAssets/' + newComponentData.assetId);
+
+          assetRef.once("value").then( (result) => {
+            if(result.val()){
+              getDownloadURL("images/" + curUser + "/" + result.val().fileName + "-" + curUser, (url) => {
+                if(url)
+                  this.setState({imageURL: url});
+                else
+                  this.setState({imageURL: ENUMS.MISC.NO_IMAGE_AVAILABLE});
+              });
+            }
+          });
+        }
+
       });
     }
   }
@@ -94,13 +142,7 @@ class ImageComponent extends SlideComponent {
         <Col sm={2}>
           <FormGroup controlId={"componentImagePic-" + keyId}>
             <ControlLabel>IMAGE</ControlLabel>
-            {isUploading?
-              <div className="circular-progress">
-                <Circle percent={uploadPercent} strokeWidth="4" strokeColor="#D3D3D3" />
-              </div> :
-              <Thumbnail className="image-thumbnail" href="#" alt="171x180" src={this.state.imageURL} />
-            }
-
+            <Thumbnail className="image-thumbnail" href="#" alt="171x180" src={this.state.imageURL} />
             <div className="box__input">
               <Button className="uploadButton" bsStyle="primary" onClick={this.showImageModal.bind(this)} block>
                 <label className="fileInputLabel">
