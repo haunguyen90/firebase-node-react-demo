@@ -285,6 +285,41 @@ content-view-component
       margin-bottom: 5px;
     }
 
+    &.model-component{
+      .image-thumbnail{
+        margin-bottom: 5px;
+      }
+
+      .caption-area{
+        min-height: 150px;
+        resize: none;
+      }
+
+      .uploadButton{
+        padding: 0;
+        .fa.fa-upload{
+          display: none;
+        }
+
+        @media #{$media-large-phone}{
+          .fa.fa-upload{
+            display: block;
+          }
+
+          .label-text{
+            display: none;
+          }
+        }
+
+      }
+
+      .fileInputLabel{
+        display: block;
+        margin-bottom: 0;
+        padding: 6px 12px;
+      }
+    }
+
     &.image-component{
       .image-thumbnail{
         margin-bottom: 5px;

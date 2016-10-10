@@ -65,7 +65,7 @@ class DeckSlides extends React.Component {
       mountDesignView: false,
       selectedSlide: {},
       currentSlideIndex: -1,
-      deckData: this.props.deckData
+      deckData: {}
     };
     this.onSortEnd = this.onSortEnd.bind(this);
     this.getViewActive = this.getViewActive.bind(this);
@@ -179,7 +179,8 @@ class DeckSlides extends React.Component {
   }
 
   updateAssetURL(currentSlideIndex, keyId, url) {
-    let deckDataTemp = this.props.deckData;
+    let deckDataTemp = {}
+    Object.assign(deckDataTemp,this.props.deckData);
     deckDataTemp.slides[currentSlideIndex].components[keyId].assetUrl = url;
     this.setState({deckData : deckDataTemp });
   }

@@ -17,6 +17,7 @@ import TextAreaComponent from './slideComponents/TextAreaComponent.js';
 import BulletComponent from './slideComponents/BulletComponent.js';
 import BarGraphComponent from './slideComponents/BarGraphComponent.js';
 import PieGraphComponent from './slideComponents/PieGraphComponent.js';
+import ModelComponent from './slideComponents/ModelComponent.js';
 
 class ContentView extends React.Component {
   constructor(props) {
@@ -104,8 +105,16 @@ class ContentView extends React.Component {
         componentData = extend(componentData, {
           type: ENUMS.SLIDE_COMPONENT.TYPES.IMAGE,
           text: "",
-          assetId: "",
-          // image: ENUMS.MISC.NO_IMAGE_AVAILABLE
+          assetId: ""
+        });
+        components.push(componentData);
+        break;
+
+      case ENUMS.SLIDE_COMPONENT.TYPES.MODEL:
+        componentData = extend(componentData, {
+          type: ENUMS.SLIDE_COMPONENT.TYPES.MODEL,
+          text: "",
+          assetId: ""
         });
         components.push(componentData);
         break;
@@ -206,6 +215,9 @@ class ContentView extends React.Component {
           </Col>
           <Col xs={4}>
             <a href="#" onClick={this.onAddComponent.bind(this, ENUMS.SLIDE_COMPONENT.TYPES.PIE_GRAPH)} className="add-component-action add-pie-graph">Pie Graph</a>
+          </Col>
+          <Col xs={4}>
+            <a href="#" onClick={this.onAddComponent.bind(this, ENUMS.SLIDE_COMPONENT.TYPES.MODEL)} className="add-component-action add-pie-graph">Model</a>
           </Col>
         </Row>
       </Popover>
@@ -332,6 +344,20 @@ class ContentView extends React.Component {
             getSlides={this.props.getSlides}
             deckId={this.props.deckObject.id} selectedSlide={selectedSlide}
           />
+        );
+        break;
+
+      case ENUMS.SLIDE_COMPONENT.TYPES.MODEL:
+        return (
+          <ModelComponent
+            keyId={index} key={index}
+            componentData={component}
+            deckId={this.props.deckObject.id}
+            selectedSlide={selectedSlide}
+            getSlides={this.props.getSlides}
+            handleAlertShow={this.handleAlertShow}
+            updateAssetURL={this.props.updateAssetURL}
+            />
         );
         break;
 
