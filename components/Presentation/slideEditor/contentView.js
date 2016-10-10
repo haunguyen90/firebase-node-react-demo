@@ -286,7 +286,8 @@ class ContentView extends React.Component {
             selectedSlide={selectedSlide}
             getSlides={this.props.getSlides}
             handleAlertShow={this.handleAlertShow}
-          />
+            updateAssetURL={this.props.updateAssetURL}
+            />
         );
         break;
 
@@ -377,7 +378,8 @@ class ContentView extends React.Component {
 ContentView.propTypes = {
   deckObject: React.PropTypes.object,
   selectedSlide: React.PropTypes.object,
-  getSlides: React.PropTypes.func
+  getSlides: React.PropTypes.func,
+
 };
 
 export default withRouter(ContentView, {withRef: true});

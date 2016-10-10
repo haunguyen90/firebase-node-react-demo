@@ -64,10 +64,14 @@ class ImageComponent extends SlideComponent {
             assetRef.once("value").then( (result) => {
               if(result.val()){
                 getDownloadURL("images/" + curUser + "/" + result.val().fileName + "-" + curUser, (url) => {
-                  if(url)
+                  if(url){
                     this.setState({imageURL: url});
-                  else
+                    this.props.updateAssetURL(currentSlideIndex, keyId, url);
+                  }
+                  else {
                     this.setState({imageURL: ENUMS.MISC.NO_IMAGE_AVAILABLE});
+                    this.props.updateAssetURL(currentSlideIndex, keyId, url);
+                  }
                 });
               }
             });
@@ -101,10 +105,14 @@ class ImageComponent extends SlideComponent {
           assetRef.once("value").then( (result) => {
             if(result.val()){
               getDownloadURL("images/" + curUser + "/" + result.val().fileName + "-" + curUser, (url) => {
-                if(url)
+                if(url){
                   this.setState({imageURL: url});
-                else
+                  this.props.updateAssetURL(currentSlideIndex, keyId, url);
+                }
+                else {
                   this.setState({imageURL: ENUMS.MISC.NO_IMAGE_AVAILABLE});
+                  this.props.updateAssetURL(currentSlideIndex, keyId, url);
+                }
               });
             }
           });
@@ -188,7 +196,7 @@ class ImageComponent extends SlideComponent {
 }
 
 ImageComponent.propTypes = {
-  handleAlertShow: React.PropTypes.func
+  handleAlertShow: React.PropTypes.func,
 };
 
 export default withRouter(ImageComponent, {withRef: true});
