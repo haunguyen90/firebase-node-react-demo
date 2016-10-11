@@ -64,15 +64,13 @@ class DeckSlides extends React.Component {
       viewState: 1,
       mountDesignView: false,
       selectedSlide: {},
-      currentSlideIndex: -1,
-      deckData: {}
+      currentSlideIndex: -1
     };
     this.onSortEnd = this.onSortEnd.bind(this);
     this.getViewActive = this.getViewActive.bind(this);
     this.onSelectSlide = this.onSelectSlide.bind(this);
     this.onAddSlide = this.onAddSlide.bind(this);
     this.getSlides = this.getSlides.bind(this);
-    this.updateAssetURL = this.updateAssetURL.bind(this);
   }
 
   onSortEnd({oldIndex, newIndex}){
@@ -178,13 +176,6 @@ class DeckSlides extends React.Component {
     return false;
   }
 
-  updateAssetURL(currentSlideIndex, keyId, url) {
-    let deckDataTemp = {}
-    Object.assign(deckDataTemp,this.props.deckData);
-    deckDataTemp.slides[currentSlideIndex].components[keyId].assetUrl = url;
-    this.setState({deckData : deckDataTemp });
-  }
-
 
   componentDidUpdate(prevProps, prevState){
     if(JSON.stringify(prevProps.deckData) != JSON.stringify(this.props.deckData)){
@@ -242,7 +233,6 @@ class DeckSlides extends React.Component {
                 deckObject={this.props.deckObject}
                 selectedSlide={this.state.selectedSlide}
                 getSlides={this.getSlides}
-                updateAssetURL={this.updateAssetURL}
               />
               : null
             }
@@ -252,7 +242,7 @@ class DeckSlides extends React.Component {
                 viewState={this.state.viewState}
                 currentSlideIndex={this.state.currentSlideIndex}
                 deckObject={this.props.deckObject}
-                deckData={this.state.deckData}
+                deckData={this.props.deckData}
               /> : null
             }
 

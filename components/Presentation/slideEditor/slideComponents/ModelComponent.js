@@ -66,11 +66,9 @@ class ModelComponent extends SlideComponent {
                 getDownloadURL("images/" + curUser + "/" + result.val().fileName + "-" + curUser, (url) => {
                   if(url){
                     this.setState({imageURL: url});
-                    this.props.updateAssetURL(currentSlideIndex, keyId, url);
                   }
                   else {
                     this.setState({imageURL: ENUMS.MISC.NO_IMAGE_AVAILABLE});
-                    this.props.updateAssetURL(currentSlideIndex, keyId, url);
                   }
                 });
               }
@@ -107,11 +105,9 @@ class ModelComponent extends SlideComponent {
               getDownloadURL("images/" + curUser + "/" + result.val().fileName + "-" + curUser, (url) => {
                 if(url){
                   this.setState({imageURL: url});
-                  this.props.updateAssetURL(currentSlideIndex, keyId, url);
                 }
                 else {
-                  this.setState({imageURL: ENUMS.MISC.NO_IMAGE_AVAILABLE});
-                  this.props.updateAssetURL(currentSlideIndex, keyId, url);
+                  this.setState({imageURL: ENUMS.MISC.NO_IMAGE_AVAILABLE});                  
                 }
               });
             }

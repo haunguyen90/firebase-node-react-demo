@@ -6,7 +6,8 @@ import {Row, Button, Col} from 'react-bootstrap';
 import {isMounted} from '~/lib/react/reactLib.js';
 import {findIndex} from 'underscore';
 import { Circle } from 'rc-progress';
-import Parser from 'objtojs';
+import parseWFObj from 'wavefront-obj-parser';
+//import fs2 from 'fs2';
 
 
 class ModelUpload extends React.Component {
@@ -72,39 +73,22 @@ class ModelUpload extends React.Component {
   }
 
   handleUploadFile(file) {
-    const pattern = /^image\/(obj|fbx|3ds)$/i;
-
-    const storageRef = firebase.storage().ref();
-
-
-    // if(!pattern.test(file.type)){
-    //   this.props.handleAlertShow("File type not support");
-    //   return false;
-    // }
-
-    const metadata = {
-      'contentType': file.type
-    };
     const curUser = firebase.auth().currentUser;
     // Upload file and metadata to the object, each user has its folder to store image
     if (curUser) {
-      let JSON  =  {};
-      const options = {
-                parseComments: false,
-                verbose: false,
-                logging: false,
-                returnJSON: false,
-                saveJSON: true,
-                parseMTLFile: false,
-                returnMTLJSON: false,
-                saveMTLJSON: false
-              };
-      Parser.parse(file, options, function(err, data){
-        this.setState({modelJSON : data});
+      const storageRef = firebase.storage().ref();
+      let wavefrontString = "";
+      fs.readFile(document.getElementById("fileInput").value, (err, data) => {
+        if (err) throw err;
+        wavefrontString = data.toString('utf8');
+        const parsedJSON = parseWFObj(wavefrontString);
       });
-      const uploadTask = storageRef.child('images/' + curUser.uid + '/' +file.name + '-' + curUser.uid).put(file, metadata);
+      const metadata = {
+        'contentType': file.type
+      };
+      const uploadTask = storageRef.child('models/' + curUser.uid + '/' +file.name + '-' + curUser.uid).put(file, metadata);
       const instance = this;
-      // Listen for state changes, errors, and completion of the upload.
+      //Listen for state changes, errors, and completion of the upload.
       uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
         (snapshot) => {
           // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
@@ -153,7 +137,7 @@ class ModelUpload extends React.Component {
               this.updatePhotoNameToDB(file.name);
             }
           }, 175);
-        })
+       })
     } else {
       //TODO: return failed if user is not login
       console.log('No user is login');

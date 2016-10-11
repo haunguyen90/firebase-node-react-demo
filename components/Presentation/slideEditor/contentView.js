@@ -298,7 +298,6 @@ class ContentView extends React.Component {
             selectedSlide={selectedSlide}
             getSlides={this.props.getSlides}
             handleAlertShow={this.handleAlertShow}
-            updateAssetURL={this.props.updateAssetURL}
             />
         );
         break;
@@ -355,8 +354,7 @@ class ContentView extends React.Component {
             deckId={this.props.deckObject.id}
             selectedSlide={selectedSlide}
             getSlides={this.props.getSlides}
-            handleAlertShow={this.handleAlertShow}
-            updateAssetURL={this.props.updateAssetURL}
+            handleAlertShow={this.handleAlertShow}            
             />
         );
         break;
