@@ -53,7 +53,7 @@ class DesignView extends React.Component {
     this.AddAssetURL();
 
     let jsonMeta = JSON.stringify(this.props.deckObject);
-    let jsonDeck = JSON.stringify(this.props.deckData);
+    let jsonDeck = JSON.stringify(this.state.deckData);
     // test data
     if (jsonDeck == null) {
       jsonDeck = '{"slides":[{"components":[{"fontSize":"12pt","text":"Title for slide 2","type":"TITLE"},{"fontSize":"12pt","text":"","type":"TEXT"}],"keyId":1,"slideId":"-KS7joxL4-KAgC46vCzu","title":"Slide 2","type":"COMPONENT"},{"components":[{"fontSize":"12pt","text":"Title for slide 3","type":"TITLE"},{"fontSize":"12pt","text":"Text 1","type":"TEXT"},{"fontSize":"12pt","text":"Text 2","type":"TEXT"},{"fontSize":"12pt","text":"Text 3","type":"TEXT"}],"keyId":0,"slideId":"-KS7jp8aOmPJBpOwd6Op","title":"Slide 3","type":"COMPONENT"},{"components":[{"fontSize":"12pt","image":"https://firebasestorage.googleapis.com/v0/b/prezvr.appspot.com/o/images%2Fcar-showroom.png?alt=media&token=78e03419-c20a-4e00-a297-4695040d4b03","text":"Car Showroom","type":"IMAGE"}],"keyId":2,"slideId":"-KS6MrnRj-iGbK-hAJYh","title":"Slide 3","type":"COMPONENT"}]}';
