@@ -1,6 +1,7 @@
 import React from 'react';
 import { Col, Thumbnail} from 'react-bootstrap';
 import {getDownloadURL} from '~/lib/firebaseHelpers/storageHelper.js';
+import {ENUMS} from '~/lib/_required/enums.js';
 
 class ThumbnailImage extends React.Component {
   constructor (props) {
@@ -21,7 +22,11 @@ class ThumbnailImage extends React.Component {
   getDownloadImageURL() {
     const {userAsset} = this.props;
     const uid = firebase.auth().currentUser.uid;
-    getDownloadURL("images/" + uid + "/" + userAsset.fileName + "-" + uid, this.getURLCallBack);
+    if (userAsset.type === "IMAGE") {
+      getDownloadURL("images/" + uid + "/" + userAsset.fileName + "-" + uid, this.getURLCallBack);
+    } else {
+      this.setState({imageURL : ENUMS.MISC.NO_IMAGE_AVAILABLE}) ;
+    }
   }
 
   componentDidMount(){
@@ -40,7 +45,9 @@ class ThumbnailImage extends React.Component {
       <Col xs={3} md={3} >
         <Thumbnail className={activeImageClass}
           onClick={this.onSelectImage}
-          href="#" alt="171x180" src={imageURL}/>
+          href="#" alt="171x180"
+          src={imageURL}/>
+        {this.props.userAsset.type === "MODEL" ? <p>{this.props.userAsset.fileName}</p> : null}
       </Col>
     )
   }

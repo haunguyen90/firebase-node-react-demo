@@ -28,8 +28,10 @@ class ImageLibrary extends React.Component {
       if(isObject(userAssets)){
         const userImages = map(Object.keys(userAssets), (assetsId) => {
           let assetsObject = userAssets[assetsId];
-          assetsObject.id = assetsId;
-          return assetsObject;
+          if (assetsObject.type == "IMAGE") {
+            assetsObject.id = assetsId;
+            return assetsObject;
+          }
         });
         this.setState({userImages : userImages});
       }
@@ -74,6 +76,7 @@ class ImageLibrary extends React.Component {
       <div>
         <Row className="library-images-list">
           {this.state.userImages.map((userImage, index) => {
+            if (!userImage) { return null} ;
             let activeImageClass = "";
             if(userImage.id == this.state.selectedImage){
               activeImageClass = "selected-image";

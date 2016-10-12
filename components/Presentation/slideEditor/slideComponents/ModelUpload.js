@@ -7,7 +7,8 @@ import {isMounted} from '~/lib/react/reactLib.js';
 import {findIndex} from 'underscore';
 import { Circle } from 'rc-progress';
 import parseWFObj from 'wavefront-obj-parser';
-//import fs2 from 'fs2';
+import { saveAs } from 'file-saver';
+//import * as fs from 'fs-web';
 
 
 class ModelUpload extends React.Component {
@@ -62,31 +63,90 @@ class ModelUpload extends React.Component {
 
   updatePhotoNameToDB(name){
     // Upload image completed. Save data to UserAsset and Open LIBRARY tab
-    this.props.handleUploadImageTabSelect(2);
+    this.props.handleUploadModelTabSelect(2);
     const uid = firebase.auth().currentUser.uid;
     let newUserAssetKey = firebase.database().ref().child('userAssets').push().key;
     firebase.database().ref('userAssets/' + newUserAssetKey).set({
       uid: uid,
-      type: "IMAGE",
-      fileName: name
+      type: "MODEL",
+      fileName: name + "-" + (new Date().getTime()),
+      JSON: JSON.stringify(this.state.modelJSON),
+      scale: 1,
+      rotateX: 0,
+      rotateY: 0,
+      rotateZ: 0
     });
+  }
+
+  startRead() {
+    // obtain input element through DOM
+    const file = document.getElementById('fileInput').files[0];
+    if(file){
+      this.getAsText(file);
+    }
+  }
+
+  getAsText(readFile) {
+
+    let reader = new FileReader();
+
+    // Read file into memory as UTF-16
+    reader.readAsText(readFile, "UTF-8");
+
+    // Handle progress, success, and errors
+    reader.onprogress = this.updateProgress;
+    reader.onload = this.loaded.bind(this);
+    reader.onerror = this.errorHandler;
+  }
+
+  updateProgress(evt) {
+    if (evt.lengthComputable) {
+      // evt.loaded and evt.total are ProgressEvent properties
+      const loaded = (evt.loaded / evt.total);
+      if (loaded < 1) {
+        // Increase the prog bar length
+        // style.width = (loaded * 200) + "px";
+      }
+    }
+  }
+
+  loaded(evt) {
+    // Obtain the read file data
+    const fileString = evt.target.result;
+    // xhr.send(fileString)
+    let wavefrontString = fileString;
+    const parsedJSON = parseWFObj(wavefrontString);
+    let bb = new Blob([JSON.stringify(parsedJSON)],{type: "application/json"});
+    // let saveAs = window.saveAs(bb, "/images/tmp.json");
+    // fileSaver.onwriteend = () => {
+    //   console("write to temp file complete");
+    // };
+    //fs.writeFile("images/tmp.json", JSON.stringify(parsedJSON));
+    //  (err) => {
+    //   if (err) throw err;
+    //   console.log('It\'s saved!');
+    // });
+    //saveAs(bb, "/images/tmp.json");
+    this.setState({modelJSON : parsedJSON});
+  }
+
+  errorHandler(evt) {
+    if(evt.target.error.name == "NotReadableError") {
+      console.log("This file could not be read")// The file could not be read
+    }
   }
 
   handleUploadFile(file) {
     const curUser = firebase.auth().currentUser;
     // Upload file and metadata to the object, each user has its folder to store image
     if (curUser) {
-      const storageRef = firebase.storage().ref();
-      let wavefrontString = "";
-      fs.readFile(document.getElementById("fileInput").value, (err, data) => {
-        if (err) throw err;
-        wavefrontString = data.toString('utf8');
-        const parsedJSON = parseWFObj(wavefrontString);
-      });
+      // Read file and build JSON string
+      this.startRead();
       const metadata = {
         'contentType': file.type
       };
-      const uploadTask = storageRef.child('models/' + curUser.uid + '/' +file.name + '-' + curUser.uid).put(file, metadata);
+      const storageRef = firebase.storage().ref();
+      const uploadTask = storageRef.child('models/' + curUser.uid + '/' + file.name + "-" + (new Date().getTime())).put(file, metadata);
       const instance = this;
       //Listen for state changes, errors, and completion of the upload.
       uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
