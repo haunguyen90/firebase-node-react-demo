@@ -26,7 +26,7 @@ class DesignView extends React.Component {
     this.PlayerLoadData = this.PlayerLoadData.bind(this);
     window.PlayerSetSlide = this.PlayerSetSlide.bind(this);
     this.PlayerSetSlide = this.PlayerSetSlide.bind(this);
-    this.AddAssertURL = this.AddAssertURL.bind(this);
+    this.AddAssetURL = this.AddAssetURL.bind(this);
   }
 
   PlayerInitialized() {
@@ -50,7 +50,7 @@ class DesignView extends React.Component {
   }
 
   PlayerLoadData() {
-    this.AddAssertURL();
+    this.AddAssetURL();
 
     let jsonMeta = JSON.stringify(this.props.deckObject);
     let jsonDeck = JSON.stringify(this.props.deckData);
@@ -74,7 +74,7 @@ class DesignView extends React.Component {
     SendMessage("Manager", "WebShowSlide", slideIndex);
   }
 
-  AddAssertURL() {
+  AddAssetURL() {
     let deckDataExtend = {};
     Object.assign(deckDataExtend, this.props.deckData);
     deckDataExtend.slides.forEach((slide,index) => {
@@ -91,7 +91,7 @@ class DesignView extends React.Component {
                   const curUser = firebase.auth().currentUser.uid;
                   getDownloadURL("images/" + curUser + "/" + result.val().fileName + "-" + curUser, (url) => {
                     if(url){
-                      component.assertUrl = url;
+                      component.assetUrl = url;
                     };
                   });
                 };
@@ -105,7 +105,7 @@ class DesignView extends React.Component {
   }
 
   componentDidMount() {
-    this.AddAssertURL();
+    this.AddAssetURL();
   }
 
   componentWillMount(){
