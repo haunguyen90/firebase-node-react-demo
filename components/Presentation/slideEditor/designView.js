@@ -4,14 +4,16 @@
 import React from 'react';
 import {Link, withRouter} from 'react-router';
 import {Image, PageHeader, Row, Col, Panel, FormGroup, FormControl, ControlLabel, HelpBlock, ButtonGroup, Button} from 'react-bootstrap';
-import scriptLoader from 'react-async-script-loader'
+import scriptLoader from 'react-async-script-loader';
+import {getDownloadURL} from '~/lib/firebaseHelpers/storageHelper.js';
 
 class DesignView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       playerInitialized: false,
-      playerReady: false
+      playerReady: false,
+      deckData: {}
     };
 
     window.PlayerInitialized = this.PlayerInitialized.bind(this);
@@ -24,6 +26,7 @@ class DesignView extends React.Component {
     this.PlayerLoadData = this.PlayerLoadData.bind(this);
     window.PlayerSetSlide = this.PlayerSetSlide.bind(this);
     this.PlayerSetSlide = this.PlayerSetSlide.bind(this);
+    this.AddAssertURL = this.AddAssertURL.bind(this);
   }
 
   PlayerInitialized() {
@@ -47,32 +50,7 @@ class DesignView extends React.Component {
   }
 
   PlayerLoadData() {
-    const {deckId} = this.props.deckObject.id;
-    const curUser = firebase.auth().currentUser.uid;
-    let deckDataExtend = {};
-    Object.assign(deckDataExtend, this.props.deckData);
-    deckDataExtend.slides.forEach((slide,index) => {
-      slide.components.forEach((component, comIndex) => {
-        if (component.type == "IMAGE"){
-          let deckDataRef = firebase.database().ref('deckData/' + deckId + '/slides/' + index + '/components/' + comIndex);
-          deckDataRef.on("value", (result) => {
-            const newComponentData = result.val();
-            if(newComponentData && newComponentData.assetId){
-              let assetRef = firebase.database().ref('userAssets/' + newComponentData.assetId);
-              assetRef.once("value").then( (result) => {
-                if(result.val()){
-                  getDownloadURL("images/" + curUser + "/" + result.val().fileName + "-" + curUser, (url) => {
-                    if(url){
-                      component.assertUrl = url;
-                    };
-                  });
-                };
-              });
-            };
-          });
-        };
-      });
-    });
+    this.AddAssertURL();
 
     let jsonMeta = JSON.stringify(this.props.deckObject);
     let jsonDeck = JSON.stringify(this.props.deckData);
@@ -94,6 +72,40 @@ class DesignView extends React.Component {
   PlayerSetSlide(slideIndex) {
     if ( !this.state.playerInitialized || !this.state.playerReady) return;
     SendMessage("Manager", "WebShowSlide", slideIndex);
+  }
+
+  AddAssertURL() {
+    let deckDataExtend = {};
+    Object.assign(deckDataExtend, this.props.deckData);
+    deckDataExtend.slides.forEach((slide,index) => {
+      slide.components.forEach((component, comIndex) => {
+        if (component.type == "IMAGE"){
+          const {deckId} = this.props.deckObject.id;
+          let deckDataRef = firebase.database().ref('deckData/' + this.props.deckObject.id + '/slides/' + index + '/components/' + comIndex);
+          deckDataRef.on("value", (result) => {
+            const newComponentData = result.val();
+            if(newComponentData && newComponentData.assetId){
+              let assetRef = firebase.database().ref('userAssets/' + newComponentData.assetId);
+              assetRef.once("value").then( (result) => {
+                if(result.val()){
+                  const curUser = firebase.auth().currentUser.uid;
+                  getDownloadURL("images/" + curUser + "/" + result.val().fileName + "-" + curUser, (url) => {
+                    if(url){
+                      component.assertUrl = url;
+                    };
+                  });
+                };
+              });
+            };
+          });
+        };
+      });
+    });
+    this.setState({deckData: deckDataExtend});
+  }
+
+  componentDidMount() {
+    this.AddAssertURL();
   }
 
   componentWillMount(){
