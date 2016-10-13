@@ -73,18 +73,23 @@ app.get('/bundle.js', function(req, res, next) {
 
 });
 
-app.get('/deck', function(req, res, next) {
-  console.log("start");
-  var firebase = require('firebase');
-  //var underscore = require('underscore');
-  var promises = [];
-  var assets = []
-  res.setHeader('Content-Type', 'text/application/json');
-  var deckDataRef = firebase.database().ref('deckData/-KRYojjoQUh-cb-hMbWY'); // + deckId);
+app.get('/deck/:id', function(req, res, next) {
+
+  console.log('start');
+  const deckId = req.params.id;
+  const firebase = require('firebase');
+  const gcloud = require('gcloud')({
+    projectId: 'prezvr',
+    keyFilename: './vincent-firebase.json'
+  });
+  const gcs = gcloud.storage();
+  const bucket = gcs.bucket('prezvr.appspot.com');
+  res.setHeader('Content-Type', 'application/json');
+  const deckDataRef = firebase.database().ref('deckData/' + deckId);
   deckDataRef.once('value').then(function(resultDeckData) {
     let resultDeckDataVal = resultDeckData.val()
-    console.log(resultDeckData.val());
-    var assetIds = [];
+    let assetIds = [];
+    let assets = [];
     resultDeckDataVal.slides.forEach((slide,index) => {
       slide.components.forEach((component, comIndex) => {
         if (component.assetId) {
@@ -92,39 +97,86 @@ app.get('/deck', function(req, res, next) {
         }
       });
     });
-    console.log(assetIds);
-
-    Promise.all(assetIds.map((assetId, index) => {
-      //var uid = firebase.auth().currentUser.uid;
-      console.log(assetId);
-      var assetRef = firebase.database().ref('userAssets/' + assetId);
-      assetRef.once('value').then((result) => {
-        if (result.val()){
-          assets.push(result.val());
-          console.log(assets);
-        }
-      });
-    })).then( () => {
-      resultDeckDataVal.slides.forEach((slide,index) => {
-        console.log('loop slide');
-        console.log(assets);
-        slide.components.forEach((component, comIndex) => {
-          console.log(component);
-          assets.forEach((asset, index) => {
-            console.log('loop component');
+    const getAssertFunc = (assetId, index) => {
+      return new Promise( (resolve, reject) => {
+        const assetRef = firebase.database().ref('userAssets/' + assetId);
+        resolve(
+        assetRef.once('value').then((result) => {
+          let asset = result.val();
+          if (asset){
+            asset.id = assetId;
             console.log(asset);
-            if (asset.key === component.assetId) {
-              component.asset.fileName = asset.fileName;
-              component.asset.type = asset.type;
-              component.asset.uid = asset.uid;
+            assets.push(asset);
+            return asset;
+          }
+        }));
+      });
+    };
+    const getDownloadUrlFunc = (asset,index) => {
+      return new Promise( (resolve, reject) => {
+        if (asset) {
+          const curUser = asset.uid;
+          let link = "";
+          if (asset.type === "IMAGE") {
+            link = "images/" + curUser + "/" + asset.fileName + "-" + curUser;
+          } else if (asset.type === "OBJECT") {
+            link = "models/" + curUser + "/" + asset.fileName;
+          };
+          resolve(
+            bucket.file(link).getSignedUrl({
+              action: 'read',
+              expires: '03-17-2025'
+            }, function(err, url) {
+              if (err) {
+                console.error(err);
+                reject(error);
+                return;
+              }
+              asset.assetUrl = url;
+              console.log("-----2131231231");
+              console.log(asset);
+              return asset;
+            })
+          );
+        };
+      });
+    };
+    const processFunc = (asset,index) => {
+      if (asset) {
+        console.log("3");
+        console.log('loop slide');
+        let slides = resultDeckDataVal.slides;
+        console.log(slides);
+        slides.forEach((slide, index) => {
+          slide.components.forEach((component, comIndex) => {
+            if ((component.type === "OBJECT" || component.type === "IMAGE") && asset.id === component.assetId) {
+              console.log('--------component set');
+              component.asset = asset;
               console.log(component);
-            }
+
+            };
           });
         });
-      });
-      console.log(resultDeckDataVal)
+      }
+    };
+    Promise.all(assetIds.map(getAssertFunc))
+    // .then( assets => {
+    //   return Promise.all(assets.map(getDownloadUrlFunc))
+    // })
+    .then( assets => {
+      console.log('4');
+      assets.map(processFunc);
       res.json(resultDeckDataVal);
+      return res;
     });
+
+    // Promise.all(assets.map(getDownloadUrlFunc))
+    // .then( assets => {
+    //   assets.map(processFunc);
+    //   res.json(resultDeckDataVal);
+    //   return res;
+    // })
+
   });
 });
 
