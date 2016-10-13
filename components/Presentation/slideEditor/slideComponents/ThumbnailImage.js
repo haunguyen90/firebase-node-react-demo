@@ -47,7 +47,7 @@ class ThumbnailImage extends React.Component {
           onClick={this.onSelectImage}
           href="#" alt="171x180"
           src={imageURL}/>
-        {this.props.userAsset.type === "MODEL" ? <p>{this.props.userAsset.fileName}</p> : null}
+        {this.props.userAsset.type === "OBJECT" ? <p>{this.props.userAsset.fileName}</p> : null}
       </Col>
     )
   }

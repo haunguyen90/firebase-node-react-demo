@@ -68,8 +68,8 @@ class ModelUpload extends React.Component {
     let newUserAssetKey = firebase.database().ref().child('userAssets').push().key;
     firebase.database().ref('userAssets/' + newUserAssetKey).set({
       uid: uid,
-      type: "MODEL",
-      fileName: name + "-" + (new Date().getTime()),
+      type: "OBJECT",
+      fileName: name ,
       JSON: JSON.stringify(this.state.modelJSON),
       scale: 1,
       rotateX: 0,
@@ -142,11 +142,12 @@ class ModelUpload extends React.Component {
     if (curUser) {
       // Read file and build JSON string
       this.startRead();
+      const fileName =  file.name + "-" + (new Date().getTime());
       const metadata = {
         'contentType': file.type
       };
       const storageRef = firebase.storage().ref();
-      const uploadTask = storageRef.child('models/' + curUser.uid + '/' + file.name + "-" + (new Date().getTime())).put(file, metadata);
+      const uploadTask = storageRef.child('models/' + curUser.uid + '/' + fileName).put(file, metadata);
       const instance = this;
       //Listen for state changes, errors, and completion of the upload.
       uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
@@ -194,7 +195,7 @@ class ModelUpload extends React.Component {
               this.setState({isUploading: false});
               this.setState({uploadPercent: 0});
               // this.updatePhotoURLToDB(downloadURL);
-              this.updatePhotoNameToDB(file.name);
+              this.updatePhotoNameToDB(fileName);
             }
           }, 175);
        })

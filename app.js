@@ -73,6 +73,61 @@ app.get('/bundle.js', function(req, res, next) {
 
 });
 
+app.get('/deck', function(req, res, next) {
+  console.log("start");
+  var firebase = require('firebase');
+  //var underscore = require('underscore');
+  var promises = [];
+  var assets = []
+  res.setHeader('Content-Type', 'text/application/json');
+  var deckDataRef = firebase.database().ref('deckData/-KRYojjoQUh-cb-hMbWY'); // + deckId);
+  deckDataRef.once('value').then(function(resultDeckData) {
+    let resultDeckDataVal = resultDeckData.val()
+    console.log(resultDeckData.val());
+    var assetIds = [];
+    resultDeckDataVal.slides.forEach((slide,index) => {
+      slide.components.forEach((component, comIndex) => {
+        if (component.assetId) {
+          assetIds.push(component.assetId);
+        }
+      });
+    });
+    console.log(assetIds);
+
+    Promise.all(assetIds.map((assetId, index) => {
+      //var uid = firebase.auth().currentUser.uid;
+      console.log(assetId);
+      var assetRef = firebase.database().ref('userAssets/' + assetId);
+      assetRef.once('value').then((result) => {
+        if (result.val()){
+          assets.push(result.val());
+          console.log(assets);
+        }
+      });
+    })).then( () => {
+      resultDeckDataVal.slides.forEach((slide,index) => {
+        console.log('loop slide');
+        console.log(assets);
+        slide.components.forEach((component, comIndex) => {
+          console.log(component);
+          assets.forEach((asset, index) => {
+            console.log('loop component');
+            console.log(asset);
+            if (asset.key === component.assetId) {
+              component.asset.fileName = asset.fileName;
+              component.asset.type = asset.type;
+              component.asset.uid = asset.uid;
+              console.log(component);
+            }
+          });
+        });
+      });
+      console.log(resultDeckDataVal)
+      res.json(resultDeckDataVal);
+    });
+  });
+});
+
 app.use(function(req, res) {
   Router.match({ routes: routes.default, location: req.url }, function(err, redirectLocation, renderProps) {
     if (err) {

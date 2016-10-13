@@ -79,7 +79,7 @@ class DesignView extends React.Component {
     Object.assign(deckDataExtend, this.props.deckData);
     deckDataExtend.slides.forEach((slide,index) => {
       slide.components.forEach((component, comIndex) => {
-        if (component.type == "IMAGE"){
+        if (component.type == "IMAGE" || component.type == "OBJECT"){
           const {deckId} = this.props.deckObject.id;
           let deckDataRef = firebase.database().ref('deckData/' + this.props.deckObject.id + '/slides/' + index + '/components/' + comIndex);
           deckDataRef.on("value", (result) => {
@@ -89,11 +89,19 @@ class DesignView extends React.Component {
               assetRef.once("value").then( (result) => {
                 if(result.val()){
                   const curUser = firebase.auth().currentUser.uid;
-                  getDownloadURL("images/" + curUser + "/" + result.val().fileName + "-" + curUser, (url) => {
-                    if(url){
-                      component.assetUrl = url;
-                    };
-                  });
+                  if (component.type == "IMAGE") {
+                    getDownloadURL("images/" + curUser + "/" + result.val().fileName + "-" + curUser, (url) => {
+                      if(url){
+                        component.assetUrl = url;
+                      };
+                    });
+                  } else if (component.type == "OBJECT") {
+                    getDownloadURL("models/" + curUser + "/" + result.val().fileName, (url) => {
+                      if(url){
+                        component.assetUrl = url;
+                      };
+                    });
+                  }
                 };
               });
             };

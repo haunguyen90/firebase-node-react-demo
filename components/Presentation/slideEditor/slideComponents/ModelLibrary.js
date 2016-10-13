@@ -35,7 +35,7 @@ class ModelLibrary extends React.Component {
       if(isObject(userAssets)){
         const userModels = map(Object.keys(userAssets), (assetsId) => {
           let assetsObject = userAssets[assetsId];
-          if (assetsObject.type == "MODEL"){
+          if (assetsObject.type == "OBJECT"){
             assetsObject.id = assetsId;
             return assetsObject;
           }

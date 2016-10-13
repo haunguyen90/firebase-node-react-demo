@@ -110,9 +110,9 @@ class ContentView extends React.Component {
         components.push(componentData);
         break;
 
-      case ENUMS.SLIDE_COMPONENT.TYPES.MODEL:
+      case ENUMS.SLIDE_COMPONENT.TYPES.OBJECT:
         componentData = extend(componentData, {
-          type: ENUMS.SLIDE_COMPONENT.TYPES.MODEL,
+          type: ENUMS.SLIDE_COMPONENT.TYPES.OBJECT,
           text: "",
           assetId: ""
         });
@@ -217,7 +217,7 @@ class ContentView extends React.Component {
             <a href="#" onClick={this.onAddComponent.bind(this, ENUMS.SLIDE_COMPONENT.TYPES.PIE_GRAPH)} className="add-component-action add-pie-graph">Pie Graph</a>
           </Col>
           <Col xs={4}>
-            <a href="#" onClick={this.onAddComponent.bind(this, ENUMS.SLIDE_COMPONENT.TYPES.MODEL)} className="add-component-action add-pie-graph">Model</a>
+            <a href="#" onClick={this.onAddComponent.bind(this, ENUMS.SLIDE_COMPONENT.TYPES.OBJECT)} className="add-component-action add-pie-graph">Model</a>
           </Col>
         </Row>
       </Popover>
@@ -346,7 +346,7 @@ class ContentView extends React.Component {
         );
         break;
 
-      case ENUMS.SLIDE_COMPONENT.TYPES.MODEL:
+      case ENUMS.SLIDE_COMPONENT.TYPES.OBJECT:
         return (
           <ModelComponent
             keyId={index} key={index}
@@ -354,7 +354,7 @@ class ContentView extends React.Component {
             deckId={this.props.deckObject.id}
             selectedSlide={selectedSlide}
             getSlides={this.props.getSlides}
-            handleAlertShow={this.handleAlertShow}            
+            handleAlertShow={this.handleAlertShow}
             />
         );
         break;
