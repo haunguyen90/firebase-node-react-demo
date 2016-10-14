@@ -90,7 +90,7 @@ class DesignView extends React.Component {
                 if(result.val()){
                   const curUser = firebase.auth().currentUser.uid;
                   if (component.type == "IMAGE") {
-                    getDownloadURL("images/" + curUser + "/" + result.val().fileName + "-" + curUser, (url) => {
+                    getDownloadURL("images/" + curUser + "/" + result.val().fileName, (url) => {
                       if(url){
                         component.assetUrl = url;
                       };

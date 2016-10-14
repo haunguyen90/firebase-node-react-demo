@@ -23,7 +23,7 @@ class ThumbnailImage extends React.Component {
     const {userAsset} = this.props;
     const uid = firebase.auth().currentUser.uid;
     if (userAsset.type === "IMAGE") {
-      getDownloadURL("images/" + uid + "/" + userAsset.fileName + "-" + uid, this.getURLCallBack);
+      getDownloadURL("images/" + uid + "/" + userAsset.fileName, this.getURLCallBack);
     } else {
       this.setState({imageURL : ENUMS.MISC.NO_IMAGE_AVAILABLE}) ;
     }

@@ -70,7 +70,7 @@ class ImageUpload extends React.Component {
     const pattern = /^image\/(gif|jpg|jpeg|tiff|png)$/i;
 
     const storageRef = firebase.storage().ref();
-
+    const fileName =  file.name + "-" + (new Date().getTime());
 
     if(!pattern.test(file.type)){
       this.props.handleAlertShow("File type not support");
@@ -83,7 +83,7 @@ class ImageUpload extends React.Component {
     const curUser = firebase.auth().currentUser;
     // Upload file and metadata to the object, each user has its folder to store image
     if (curUser) {
-      const uploadTask = storageRef.child('images/' + curUser.uid + '/' +file.name + '-' + curUser.uid).put(file, metadata);
+      const uploadTask = storageRef.child('images/' + curUser.uid + '/' + fileName).put(file, metadata);
       const instance = this;
       // Listen for state changes, errors, and completion of the upload.
       uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
@@ -131,7 +131,7 @@ class ImageUpload extends React.Component {
               this.setState({isUploading: false});
               this.setState({uploadPercent: 0});
               // this.updatePhotoURLToDB(downloadURL);
-              this.updatePhotoNameToDB(file.name);
+              this.updatePhotoNameToDB(fileName);
             }
           }, 175);
         })
