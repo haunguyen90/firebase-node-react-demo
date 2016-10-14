@@ -74,54 +74,54 @@ app.get('/bundle.js', function(req, res, next) {
 });
 
 app.get('/deck/:id', function(req, res, next) {
-
   console.log('start');
-  const deckId = req.params.id;
-  const firebase = require('firebase');
-  const gcloud = require('gcloud')({
+  var deckId = req.params.id;
+  var firebase = require('firebase');
+  var gcloud = require('gcloud')({
     projectId: 'prezvr',
     keyFilename: './vincent-firebase.json'
   });
-  const gcs = gcloud.storage();
-  const bucket = gcs.bucket('prezvr.appspot.com');
+  var gcs = gcloud.storage();
+  var bucket = gcs.bucket('prezvr.appspot.com');
   res.setHeader('Content-Type', 'application/json');
-  const deckDataRef = firebase.database().ref('deckData/' + deckId);
+  var deckDataRef = firebase.database().ref('deckData/' + deckId);
   deckDataRef.once('value').then(function(resultDeckData) {
-    let resultDeckDataVal = resultDeckData.val()
-    let assetIds = [];
-    let assets = [];
-    resultDeckDataVal.slides.forEach((slide,index) => {
-      slide.components.forEach((component, comIndex) => {
+    var resultDeckDataVal = resultDeckData.val()
+    var assetIds = [];
+    // let assets = [];
+    resultDeckDataVal.slides.forEach(function(slide,index) {
+      slide.components.forEach(function(component, comIndex) {
         if (component.assetId) {
           assetIds.push(component.assetId);
         }
       });
     });
-    const getAssertFunc = (assetId, index) => {
-      return new Promise( (resolve, reject) => {
-        const assetRef = firebase.database().ref('userAssets/' + assetId);
+    var getAssertFunc = function(assetId, index) {
+      return new Promise( function(resolve, reject) {
+        var assetRef = firebase.database().ref('userAssets/' + assetId);
         resolve(
-        assetRef.once('value').then((result) => {
-          let asset = result.val();
+        assetRef.once('value').then(function(result) {
+          var asset = result.val();
           if (asset){
             asset.id = assetId;
-            console.log(asset);
-            assets.push(asset);
+            //console.log(asset);
+            // assets.push(asset);
             return asset;
           }
         }));
       });
     };
-    const getDownloadUrlFunc = (asset,index) => {
-      return new Promise( (resolve, reject) => {
+    var getDownloadUrlFunc = function(asset,index) {
+      return new Promise( function(resolve, reject) {
         if (asset) {
-          const curUser = asset.uid;
-          let link = "";
+          var curUser = asset.uid;
+          var link = "";
           if (asset.type === "IMAGE") {
             link = "images/" + curUser + "/" + asset.fileName + "-" + curUser;
           } else if (asset.type === "OBJECT") {
             link = "models/" + curUser + "/" + asset.fileName;
           };
+          //link = "images/XI0LVuvfgJMya8pQi7R9COiJ34Q2/0-02-06-2a92e13672d4a10e164dbc0b63365b6ce61434fd32c5c24d2bfb52892ed1853e_full.jpg-XI0LVuvfgJMya8pQi7R9COiJ34Q2";
           resolve(
             bucket.file(link).getSignedUrl({
               action: 'read',
@@ -133,22 +133,23 @@ app.get('/deck/:id', function(req, res, next) {
                 return;
               }
               asset.assetUrl = url;
-              console.log("-----2131231231");
+              console.log("-----asset with URL");
               console.log(asset);
+              //resolve();
               return asset;
             })
           );
         };
       });
     };
-    const processFunc = (asset,index) => {
+    var processFunc = function(asset,index) {
       if (asset) {
         console.log("3");
         console.log('loop slide');
-        let slides = resultDeckDataVal.slides;
+        var slides = resultDeckDataVal.slides;
         console.log(slides);
-        slides.forEach((slide, index) => {
-          slide.components.forEach((component, comIndex) => {
+        slides.forEach(function(slide, index) {
+          slide.components.forEach(function(component, comIndex) {
             if ((component.type === "OBJECT" || component.type === "IMAGE") && asset.id === component.assetId) {
               console.log('--------component set');
               component.asset = asset;
@@ -163,12 +164,13 @@ app.get('/deck/:id', function(req, res, next) {
     // .then( assets => {
     //   return Promise.all(assets.map(getDownloadUrlFunc))
     // })
-    .then( assets => {
+    .then( function(assets) {
       console.log('4');
       assets.map(processFunc);
       res.json(resultDeckDataVal);
       return res;
-    });
+    })
+    .catch( function(err) { console.log(error)});
 
     // Promise.all(assets.map(getDownloadUrlFunc))
     // .then( assets => {
