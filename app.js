@@ -117,7 +117,7 @@ app.get('/deck/:id', function(req, res, next) {
           var curUser = asset.uid;
           var link = "";
           if (asset.type === "IMAGE") {
-            link = "images/" + curUser + "/" + asset.fileName + "-" + curUser;
+            link = "images/" + curUser + "/" + asset.fileName;
           } else if (asset.type === "OBJECT") {
             link = "models/" + curUser + "/" + asset.fileName;
           };

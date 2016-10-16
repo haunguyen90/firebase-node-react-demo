@@ -17,7 +17,8 @@ class ModelUpload extends React.Component {
     this.state = {
       isUploading: false,
       uploadPercent: 0,
-      modelJSON: {}
+      objFile: {},
+      fileName: ""
     }
   }
 
@@ -63,42 +64,34 @@ class ModelUpload extends React.Component {
 
   updatePhotoNameToDB(name){
     // Upload image completed. Save data to UserAsset and Open LIBRARY tab
-    this.props.handleUploadModelTabSelect(2);
     const uid = firebase.auth().currentUser.uid;
     let newUserAssetKey = firebase.database().ref().child('userAssets').push().key;
     firebase.database().ref('userAssets/' + newUserAssetKey).set({
       uid: uid,
       type: "OBJECT",
       fileName: name ,
-      JSON: JSON.stringify(this.state.modelJSON),
+      fileNameJSON: name + '-JSON',
       scale: 1,
       rotateX: 0,
       rotateY: 0,
       rotateZ: 0
     });
+    this.props.handleUploadModelTabSelect(2);
   }
 
-  startRead() {
+  parseFileToJSON() {
     // obtain input element through DOM
     const file = document.getElementById('fileInput').files[0];
     if(file){
-      this.getAsText(file);
+      let reader = new FileReader();
+      // Read file into memory as UTF-16
+      reader.readAsText(file, "UTF-8");
+      // Handle progress, success, and errors
+      reader.onprogress = this.updateProgress;
+      reader.onload = this.loaded.bind(this);
+      reader.onerror = this.errorHandler;
     }
   }
-
-  getAsText(readFile) {
-
-    let reader = new FileReader();
-
-    // Read file into memory as UTF-16
-    reader.readAsText(readFile, "UTF-8");
-
-    // Handle progress, success, and errors
-    reader.onprogress = this.updateProgress;
-    reader.onload = this.loaded.bind(this);
-    reader.onerror = this.errorHandler;
-  }
-
   updateProgress(evt) {
     if (evt.lengthComputable) {
       // evt.loaded and evt.total are ProgressEvent properties
@@ -113,21 +106,21 @@ class ModelUpload extends React.Component {
   loaded(evt) {
     // Obtain the read file data
     const fileString = evt.target.result;
-    // xhr.send(fileString)
     let wavefrontString = fileString;
     const parsedJSON = parseWFObj(wavefrontString);
-    let bb = new Blob([JSON.stringify(parsedJSON)],{type: "application/json"});
-    // let saveAs = window.saveAs(bb, "/images/tmp.json");
-    // fileSaver.onwriteend = () => {
-    //   console("write to temp file complete");
-    // };
-    //fs.writeFile("images/tmp.json", JSON.stringify(parsedJSON));
-    //  (err) => {
-    //   if (err) throw err;
-    //   console.log('It\'s saved!');
-    // });
-    //saveAs(bb, "/images/tmp.json");
-    this.setState({modelJSON : parsedJSON});
+    this.setState({uploadPercent : 100/3});
+    const curUser = firebase.auth().currentUser;
+    if (curUser) {
+      const fileName =  this.state.objFile.name + "-" + (new Date().getTime());
+      this.setState({fileName : fileName});
+      // Upload JSON file
+      this.writeParsedJSONToFile(parsedJSON);
+      // Upload OBJ file
+      this.uploadModelFile(this.state.objFile)
+    } else {
+      //TODO: return failed if user is not login
+      console.log('No user is login');
+    }
   }
 
   errorHandler(evt) {
@@ -136,73 +129,88 @@ class ModelUpload extends React.Component {
     }
   }
 
-  handleUploadFile(file) {
+  writeParsedJSONToFile(parsedJSON) {
+    const fileName = this.state.fileName + '-JSON';
     const curUser = firebase.auth().currentUser;
-    // Upload file and metadata to the object, each user has its folder to store image
-    if (curUser) {
-      // Read file and build JSON string
-      this.startRead();
-      const fileName =  file.name + "-" + (new Date().getTime());
-      const metadata = {
-        'contentType': file.type
-      };
-      const storageRef = firebase.storage().ref();
-      const uploadTask = storageRef.child('models/' + curUser.uid + '/' + fileName).put(file, metadata);
-      const instance = this;
-      //Listen for state changes, errors, and completion of the upload.
-      uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
-        (snapshot) => {
-          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          if(isMounted(instance)){
-            this.setState({isUploading: true});
-            this.setState({uploadPercent: progress});
-          }
-          console.log('Upload is ' + progress + '% done');
-          switch (snapshot.state) {
-            case firebase.storage.TaskState.PAUSED: // or 'paused'
-              console.log('Upload is paused');
-              break;
-            case firebase.storage.TaskState.RUNNING: // or 'running'
-              console.log('Upload is running');
-              break;
-          }
-          if (firebase.storage.TaskState.SUCCESS) {
+    const uploadJSONTask = firebase.storage().ref()
+    .child('models/' + curUser.uid + '/' + fileName ).putString(JSON.stringify(parsedJSON));
+    this.uploadFile(uploadJSONTask, fileName);
 
-          }
-        }, (error) => {
-          switch (error.code) {
-            case 'storage/unauthorized':
-              console.error(error);
-              // User doesn't have permission to access the object
-              break;
+  }
 
-            case 'storage/canceled':
-              console.error(error);
-              // User canceled the upload
-              break;
-
-            case 'storage/unknown':
-              console.error(error);
-              // Unknown error occurred, inspect error.serverResponse
-              break;
-          }
-        }, () => {
-          // Upload completed successfully, now we can get the download URL
-          // const downloadURL = uploadTask.snapshot.downloadURL;
-          setTimeout(() =>{
-            if(isMounted(instance)){
-              this.setState({isUploading: false});
-              this.setState({uploadPercent: 0});
-              // this.updatePhotoURLToDB(downloadURL);
-              this.updatePhotoNameToDB(fileName);
-            }
-          }, 175);
-       })
-    } else {
-      //TODO: return failed if user is not login
-      console.log('No user is login');
+  handleProcessCircle() {
+    this.setState({uploadPercent : this.state.uploadPercent + 100/3});
+    if (this.state.uploadPercent === 100) {
+      this.setState({
+        isUploading: false,
+        uploadPercent: 0
+      });
     }
+  }
+
+  handleUploadFile(file) {
+    this.parseFileToJSON();
+  }
+  uploadModelFile(file){
+    const curUser = firebase.auth().currentUser;
+    const storageRef = firebase.storage().ref();
+    const metadata = {
+      'contentType': file.type
+    };
+    const uploadTask = storageRef.child('models/' + curUser.uid + '/' + this.state.fileName).put(file, metadata);
+    this.uploadFile(uploadTask, this.state.fileName);
+    this.setState({uploadPercent : this.state.uploadPercent + 100/3});
+  }
+
+  uploadFile(uploadTask, fileName){
+    const instance = this;
+    uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+      (snapshot) => {
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        if(isMounted(instance)){
+          this.setState({isUploading: true});
+          //this.setState({uploadPercent: progress});
+        }
+        console.log('Upload is ' + progress + '% done');
+        switch (snapshot.state) {
+          case firebase.storage.TaskState.PAUSED: // or 'paused'
+            console.log('Upload is paused');
+            break;
+          case firebase.storage.TaskState.RUNNING: // or 'running'
+            console.log('Upload is running');
+            break;
+        }
+        if (firebase.storage.TaskState.SUCCESS) {
+          console.log('Uploaded file');
+        }
+      }, (error) => {
+        switch (error.code) {
+          case 'storage/unauthorized':
+            console.error(error);
+            // User doesn't have permission to access the object
+            break;
+
+          case 'storage/canceled':
+            console.error(error);
+            // User canceled the upload
+            break;
+
+          case 'storage/unknown':
+            console.error(error);
+            // Unknown error occurred, inspect error.serverResponse
+            break;
+        }
+      }, () => {
+        // Upload completed successfully, now we can get the download URL
+        // const downloadURL = uploadTask.snapshot.downloadURL;
+        setTimeout(() =>{
+          if(isMounted(instance)){
+            this.handleProcessCircle();
+            this.updatePhotoNameToDB(this.state.fileName);
+          }
+        }, 175);
+     })
   }
 
   onInputFileChange(evt){
@@ -210,6 +218,7 @@ class ModelUpload extends React.Component {
     evt.preventDefault();
 
     const file = evt.target.files[0];
+    this.setState({objFile : file});
     this.handleUploadFile(file);
 
   }
