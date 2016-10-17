@@ -8,6 +8,7 @@ import React from 'react';
 import {Link} from 'react-router';
 import { withRouter } from 'react-router'
 import {PageHeader, FormGroup, ControlLabel, FormControl, HelpBlock, Alert, Image, Button} from 'react-bootstrap';
+import {getDownloadURL} from '~/lib/firebaseHelpers/storageHelper.js';
 
 class SignUp extends React.Component {
   constructor(props) {
@@ -25,12 +26,10 @@ class SignUp extends React.Component {
       picUrl: picUrl
     };
 
-    const Database = firebase.database();
-    const newUserKey = Database.ref().child('users').push().key;
-
-    let updates = {};
-    updates['/users/' + newUserKey] = newUser;
-    return Database.ref().update(updates);
+    //const Database = firebase.database();
+    //const newUserKey = Database.ref().child('users').push().key;
+    return firebase.database().ref('users/' + uid).set(newUser);
+    //return Database.ref().update(updates);
   }
 
   onSignUpSubmit(e){

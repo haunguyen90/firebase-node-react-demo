@@ -77,7 +77,7 @@ app.get('/deck/:id', function(req, res, next) {
   console.log('start');
   var deckId = req.params.id;
   var firebase = require('firebase');
-  var gcloud = require('gcloud')({
+  var gcloud = require('google-cloud')({
     projectId: 'prezvr',
     keyFilename: './vincent-firebase.json'
   });
