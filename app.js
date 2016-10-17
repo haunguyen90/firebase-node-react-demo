@@ -19,6 +19,12 @@ var literalify = require('literalify');
 var babelify = require('babelify');
 
 var routes = require('./routes/index.js');
+var Promise = require('bluebird');
+var firebase = require('firebase');
+var gcloud = require('google-cloud')({
+                      projectId: 'prezvr',
+                      keyFilename: './vincent-firebase.json'
+                    });
 
 var app = express();
 app.use("/stylesheets", sassMiddleware({
@@ -76,11 +82,6 @@ app.get('/bundle.js', function(req, res, next) {
 app.get('/deck/:id', function(req, res, next) {
   console.log('start');
   var deckId = req.params.id;
-  var firebase = require('firebase');
-  var gcloud = require('google-cloud')({
-    projectId: 'prezvr',
-    keyFilename: './vincent-firebase.json'
-  });
   var gcs = gcloud.storage();
   var bucket = gcs.bucket('prezvr.appspot.com');
   res.setHeader('Content-Type', 'application/json');
@@ -88,7 +89,6 @@ app.get('/deck/:id', function(req, res, next) {
   deckDataRef.once('value').then(function(resultDeckData) {
     var resultDeckDataVal = resultDeckData.val()
     var assetIds = [];
-    // let assets = [];
     resultDeckDataVal.slides.forEach(function(slide,index) {
       slide.components.forEach(function(component, comIndex) {
         if (component.assetId) {
@@ -100,52 +100,42 @@ app.get('/deck/:id', function(req, res, next) {
       return new Promise( function(resolve, reject) {
         var assetRef = firebase.database().ref('userAssets/' + assetId);
         resolve(
-        assetRef.once('value').then(function(result) {
-          var asset = result.val();
-          if (asset){
-            asset.id = assetId;
-            //console.log(asset);
-            // assets.push(asset);
-            return asset;
-          }
-        }));
+          assetRef.once('value').then(function(result) {
+            var asset = result.val();
+            if (asset){
+              asset.id = assetId;
+              console.log("1");
+              console.log(asset);
+              return asset;
+            }
+          })
+        );
       });
     };
     var getDownloadUrlFunc = function(asset,index) {
-      return new Promise( function(resolve, reject) {
-        if (asset) {
-          var curUser = asset.uid;
-          var link = "";
-          if (asset.type === "IMAGE") {
-            link = "images/" + curUser + "/" + asset.fileName;
-          } else if (asset.type === "OBJECT") {
-            link = "models/" + curUser + "/" + asset.fileName;
-          };
-          //link = "images/XI0LVuvfgJMya8pQi7R9COiJ34Q2/0-02-06-2a92e13672d4a10e164dbc0b63365b6ce61434fd32c5c24d2bfb52892ed1853e_full.jpg-XI0LVuvfgJMya8pQi7R9COiJ34Q2";
-          resolve(
-            bucket.file(link).getSignedUrl({
-              action: 'read',
-              expires: '03-17-2025'
-            }, function(err, url) {
-              if (err) {
-                console.error(err);
-                reject(error);
-                return;
-              }
-              asset.assetUrl = url;
-              console.log("-----asset with URL");
-              console.log(asset);
-              //resolve();
-              return asset;
-            })
-          );
+      if (asset) {
+        console.log("2");
+        var curUser = asset.uid;
+        var link = "";
+        if (asset.type === "IMAGE") {
+          link = "images/" + curUser + "/" + asset.fileName;
+        } else if (asset.type === "OBJECT") {
+          link = "models/" + curUser + "/" + asset.fileName;
         };
-      });
+        return Promise.promisifyAll(bucket.file(link)).getSignedUrlAsync({
+            action: 'read',
+            expires: '03-17-2025'
+          }).catch(function(error) { console.log("error");})
+          .then(  function(url) {
+            asset.assetUrl = url;
+            console.log("-----asset with URL");
+            console.log(asset);
+            return asset;
+          });
+      };
     };
     var processFunc = function(asset,index) {
       if (asset) {
-        console.log("3");
-        console.log('loop slide');
         var slides = resultDeckDataVal.slides;
         console.log(slides);
         slides.forEach(function(slide, index) {
@@ -154,31 +144,20 @@ app.get('/deck/:id', function(req, res, next) {
               console.log('--------component set');
               component.asset = asset;
               console.log(component);
-
             };
           });
         });
       }
     };
     Promise.all(assetIds.map(getAssertFunc))
-    // .then( assets => {
-    //   return Promise.all(assets.map(getDownloadUrlFunc))
-    // })
     .then( function(assets) {
-      console.log('4');
+      return Promise.all(assets.map(getDownloadUrlFunc))
+    })
+    .then( function(assets) {
       assets.map(processFunc);
       res.json(resultDeckDataVal);
       return res;
-    })
-    .catch( function(err) { console.log(error)});
-
-    // Promise.all(assets.map(getDownloadUrlFunc))
-    // .then( assets => {
-    //   assets.map(processFunc);
-    //   res.json(resultDeckDataVal);
-    //   return res;
-    // })
-
+    });
   });
 });
 
