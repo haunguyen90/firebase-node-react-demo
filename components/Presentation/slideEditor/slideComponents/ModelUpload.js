@@ -18,7 +18,8 @@ class ModelUpload extends React.Component {
       isUploading: false,
       uploadPercent: 0,
       objFile: {},
-      fileName: ""
+      fileName: "",
+      insertData: false
     }
   }
 
@@ -63,20 +64,23 @@ class ModelUpload extends React.Component {
 
 
   updatePhotoNameToDB(name){
-    // Upload image completed. Save data to UserAsset and Open LIBRARY tab
-    const uid = firebase.auth().currentUser.uid;
-    let newUserAssetKey = firebase.database().ref().child('userAssets').push().key;
-    firebase.database().ref('userAssets/' + newUserAssetKey).set({
-      uid: uid,
-      type: "OBJECT",
-      fileName: name ,
-      fileNameJSON: name + '-JSON',
-      scale: 1,
-      rotateX: 0,
-      rotateY: 0,
-      rotateZ: 0
-    });
-    this.props.handleUploadModelTabSelect(2);
+    if (!this.state.insertData) {
+      // Upload image completed. Save data to UserAsset and Open LIBRARY tab
+      const uid = firebase.auth().currentUser.uid;
+      let newUserAssetKey = firebase.database().ref().child('userAssets').push().key;
+      firebase.database().ref('userAssets/' + newUserAssetKey).set({
+        uid: uid,
+        type: "OBJECT",
+        fileName: name ,
+        fileNameJSON: name + '-JSON',
+        scale: 1,
+        rotateX: 0,
+        rotateY: 0,
+        rotateZ: 0
+      });
+      this.props.handleUploadModelTabSelect(2);
+      this.setState({ insertData: true});
+    }
   }
 
   parseFileToJSON() {
