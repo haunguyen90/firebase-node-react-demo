@@ -39,6 +39,7 @@
 .library-images-list{
   max-height: 450px;
   height: 400px;
+  overflow-y: scroll;
   border-bottom: 1px solid #ccc;
   padding: 10px;
   margin: 0 0 10px 0 !important;
