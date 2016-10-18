@@ -111,7 +111,7 @@ class ModelLibrary extends React.Component {
         <Row>
           { this.state.selectedModel ?
           <Col xs={12} className="adjust-text">
-            <a href="#" onClick={() => window.open('/adjustModel','_blank')}>Adjust model</a>
+            <a href="#" onClick={this.showAdjustModelModal.bind(this)}>Adjust model</a>
           </Col> : null }
           <Col xs={9} xs={12} mdPush={3} md={9} className="button-wrapper">
             <Button
@@ -120,9 +120,9 @@ class ModelLibrary extends React.Component {
               >Add model</Button>
           </Col>
         </Row>
+        <AdjustModelModal showModal={this.state.showModal}
+        closeShareWindow={this.closeShareWindow.bind(this)}/>
       </div>
-        // <AdjustModelModal showModal={this.state.showModal}
-        // closeShareWindow={this.closeShareWindow.bind(this)}/>
     )
   }
 }

@@ -134,6 +134,26 @@ app.get('/deck/:id', function(req, res, next) {
           });
       };
     };
+    var getDownloadAssetUrlFunc = function(asset,index) {
+      if (asset) {
+        var curUser = asset.uid;
+        var link = "";
+        if (asset.type === "OBJECT") {
+          link = "models/" + curUser + "/" + asset.fileName + '-JSON';
+          return Promise.promisifyAll(bucket.file(link)).getSignedUrlAsync({
+            action: 'read',
+            expires: '03-17-2025'
+          })
+          .catch(function(error) { console.log("error");})
+          .then(  function(url) {
+            asset.assetUrlJson = url.split("?")[0];
+            console.log("-----asset with URL");
+            console.log(asset);
+            return asset;
+          });
+        };
+      };
+    };
     var processFunc = function(asset,index) {
       if (asset) {
         var slides = resultDeckDataVal.slides;
@@ -152,6 +172,9 @@ app.get('/deck/:id', function(req, res, next) {
     Promise.all(assetIds.map(getAssertFunc))
     .then( function(assets) {
       return Promise.all(assets.map(getDownloadUrlFunc))
+    })
+    .then( function(assets) {
+      return Promise.all(assets.map(getDownloadAssetUrlFunc))
     })
     .then( function(assets) {
       assets.map(processFunc);

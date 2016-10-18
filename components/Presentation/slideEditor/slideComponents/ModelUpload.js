@@ -54,8 +54,9 @@ class ModelUpload extends React.Component {
           $form.removeClass('is-dragover');
         })
         .on('drop', (e) => {
-          //droppedFiles = e.originalEvent.dataTransfer.files;
-          this.handleUploadFile(e.originalEvent.dataTransfer.files[0]);
+          const file =  e.originalEvent.dataTransfer.files[0];
+          this.setState({objFile : file});
+          this.parseFileToJSON(file);
         });
 
     }
@@ -83,9 +84,9 @@ class ModelUpload extends React.Component {
     }
   }
 
-  parseFileToJSON() {
+  parseFileToJSON(file) {
     // obtain input element through DOM
-    const file = document.getElementById('fileInput').files[0];
+    // const file = document.getElementById('fileInput').files[0];
     if(file){
       let reader = new FileReader();
       // Read file into memory as UTF-16
@@ -152,8 +153,9 @@ class ModelUpload extends React.Component {
     }
   }
 
-  handleUploadFile(file) {
-    this.parseFileToJSON();
+  handleUploadFile() {
+    const file = document.getElementById('fileInput').files[0];
+    this.parseFileToJSON(file);
   }
   uploadModelFile(file){
     const curUser = firebase.auth().currentUser;
@@ -223,7 +225,7 @@ class ModelUpload extends React.Component {
 
     const file = evt.target.files[0];
     this.setState({objFile : file});
-    this.handleUploadFile(file);
+    this.handleUploadFile();
 
   }
 
