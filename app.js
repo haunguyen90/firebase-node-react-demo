@@ -127,7 +127,7 @@ app.get('/deck/:id', function(req, res, next) {
             expires: '03-17-2025'
           }).catch(function(error) { console.log("error");})
           .then(  function(url) {
-            asset.assetUrl = url;
+            asset.assetUrl = url.split("?")[0];
             console.log("-----asset with URL");
             console.log(asset);
             return asset;

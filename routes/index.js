@@ -7,6 +7,7 @@ import SignUp from '../components/SignUp/SignUp.js';
 import UserAccount from '../components/Account/UserAccount.js';
 import Dashboard from '../components/Dashboard/Dashboard.js';
 import Presentation from '../components/Presentation/Presentation.js';
+import AdjustModelModal from '../components/Presentation/slideEditor/slideComponents/AdjustModelModal.js';
 
 import firebase from "firebase";
 
@@ -31,6 +32,7 @@ export default (
     <Route path='sign-up' component={SignUp} />
     <Route path='dashboard' component={Dashboard}/>
     <Route path='account' component={UserAccount}/>
+    <Route path='adjustModel' component={AdjustModelModal}/>
     <Route path='presentation/:id' component={Presentation}/>
   </Route>
 );

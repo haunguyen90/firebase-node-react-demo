@@ -14,18 +14,19 @@ class AdjustModelModal extends React.Component {
 
   render(){
     return  (
-      <Modal show={this.props.showModal} onHide={this.props.closeShareWindow} className="uploadmodel-modal">
-        <Modal.Header closeButton>
-          <Modal.Title>Add Model</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div>
-            <Row className="uploadmodel-body">
-
-            </Row>
-          </div>
-        </Modal.Body>
-      </Modal>
+      <p>Adjust Model</p>
+      // <Modal show={this.props.showModal} onHide={this.props.closeShareWindow} className="uploadmodel-modal">
+      //   <Modal.Header closeButton>
+      //     <Modal.Title>Add Model</Modal.Title>
+      //   </Modal.Header>
+      //   <Modal.Body>
+      //     <div>
+      //       <Row className="uploadmodel-body">
+      //
+      //       </Row>
+      //     </div>
+      //   </Modal.Body>
+      // </Modal>
 
     )
   }
