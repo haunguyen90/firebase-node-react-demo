@@ -191,7 +191,6 @@ class ContentView extends React.Component {
         console.error("Could not find slide index when delete slide");
       }
     }
-
   }
 
   getAddComponentPopover(){

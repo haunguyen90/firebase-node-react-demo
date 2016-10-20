@@ -162,7 +162,7 @@ class BarGraphComponent extends GraphComponent {
 
     if(arrayCellValue.length > 0 || (arrayCellValue.length == 0 && row.id == 0)){
       this.onUpdateComponent();
-    }else if(arrayCellValue.length == 0 && row.id < rows.length){
+    }else if(arrayCellValue.length == 0 && row.id < rows.length && rows.length > 3){
       if(!componentData.init)
         this.removeEmptyRow(row.id);
     }
