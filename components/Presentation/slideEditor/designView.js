@@ -159,7 +159,6 @@ class DesignView extends React.Component {
     }
   }
 
-
   render(){
     let className = "";
     if(this.props.viewState == 1)

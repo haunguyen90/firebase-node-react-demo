@@ -135,31 +135,34 @@ app.get('/deck/:id', function(req, res, next) {
       };
     };
     var getDownloadAssetUrlFunc = function(asset,index) {
-      if (asset) {
-        var curUser = asset.uid;
-        var link = "";
-        if (asset.type === "OBJECT") {
-          link = "models/" + curUser + "/" + asset.fileName + '-JSON';
-          return Promise.promisifyAll(bucket.file(link)).getSignedUrlAsync({
-            action: 'read',
-            expires: '03-17-2025'
-          })
-          .catch(function(error) { console.log("error");})
-          .then(  function(url) {
-            asset.assetUrlJson = url.split("?")[0];
-            console.log("-----asset with URL");
-            console.log(asset);
-            return asset;
-          });
-        };
-      };
+      var curUser = asset.uid;
+      var link = "";
+      if (asset && asset.type === "OBJECT") {
+        link = "models/" + curUser + "/" + asset.fileName + '-JSON';
+        return Promise.promisifyAll(bucket.file(link)).getSignedUrlAsync({
+          action: 'read',
+          expires: '03-17-2025'
+        })
+        .catch(function(error) { console.log("error");})
+        .then(  function(url) {
+          asset.assetUrlJson = url.split("?")[0];
+          console.log("-----asset with URL JSON");
+          console.log(asset);
+          return asset;
+        });
+      } else {
+        return asset;
+      }
     };
     var processFunc = function(asset,index) {
+      console.log("----+++++log");
+      console.log(asset);
       if (asset) {
         var slides = resultDeckDataVal.slides;
         console.log(slides);
         slides.forEach(function(slide, index) {
           slide.components.forEach(function(component, comIndex) {
+
             if ((component.type === "OBJECT" || component.type === "IMAGE") && asset.id === component.assetId) {
               console.log('--------component set');
               component.asset = asset;
