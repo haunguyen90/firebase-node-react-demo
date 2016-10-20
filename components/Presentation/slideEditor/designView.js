@@ -77,39 +77,41 @@ class DesignView extends React.Component {
   AddAssetURL() {
     let deckDataExtend = {};
     Object.assign(deckDataExtend, this.props.deckData);
-    deckDataExtend.slides.forEach((slide,index) => {
-      slide.components.forEach((component, comIndex) => {
-        if (component.type == "IMAGE" || component.type == "OBJECT"){
-          const {deckId} = this.props.deckObject.id;
-          let deckDataRef = firebase.database().ref('deckData/' + this.props.deckObject.id + '/slides/' + index + '/components/' + comIndex);
-          deckDataRef.on("value", (result) => {
-            const newComponentData = result.val();
-            if(newComponentData && newComponentData.assetId){
-              let assetRef = firebase.database().ref('userAssets/' + newComponentData.assetId);
-              assetRef.once("value").then( (result) => {
-                if(result.val()){
-                  const curUser = firebase.auth().currentUser.uid;
-                  if (component.type == "IMAGE") {
-                    getDownloadURL("images/" + curUser + "/" + result.val().fileName, (url) => {
-                      if(url){
-                        component.assetUrl = url;
-                      };
-                    });
-                  } else if (component.type == "OBJECT") {
-                    getDownloadURL("models/" + curUser + "/" + result.val().fileName, (url) => {
-                      if(url){
-                        component.assetUrl = url;
-                      };
-                    });
-                  }
-                };
-              });
-            };
-          });
-        };
+    if (deckDataExtend) {
+      deckDataExtend.slides.forEach((slide,index) => {
+        slide.components.forEach((component, comIndex) => {
+          if (component.type == "IMAGE" || component.type == "OBJECT"){
+            const {deckId} = this.props.deckObject.id;
+            let deckDataRef = firebase.database().ref('deckData/' + this.props.deckObject.id + '/slides/' + index + '/components/' + comIndex);
+            deckDataRef.on("value", (result) => {
+              const newComponentData = result.val();
+              if(newComponentData && newComponentData.assetId){
+                let assetRef = firebase.database().ref('userAssets/' + newComponentData.assetId);
+                assetRef.once("value").then( (result) => {
+                  if(result.val()){
+                    const curUser = firebase.auth().currentUser.uid;
+                    if (component.type == "IMAGE") {
+                      getDownloadURL("images/" + curUser + "/" + result.val().fileName, (url) => {
+                        if(url){
+                          component.assetUrl = url;
+                        };
+                      });
+                    } else if (component.type == "OBJECT") {
+                      getDownloadURL("models/" + curUser + "/" + result.val().fileName, (url) => {
+                        if(url){
+                          component.assetUrl = url;
+                        };
+                      });
+                    }
+                  };
+                });
+              };
+            });
+          };
+        });
       });
-    });
-    this.setState({deckData: deckDataExtend});
+      this.setState({deckData: deckDataExtend});
+    };
   }
 
   componentDidMount() {
