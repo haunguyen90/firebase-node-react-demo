@@ -36,7 +36,7 @@ class PieGraphComponent extends GraphComponent {
   beforeSaveCell(row, cellName, cellValue){
     console.log(cellValue);
     const pattern = /^\d+$/;
-    if(cellName == "yData" && !pattern.test(cellValue)){
+    if(cellValue && cellName == "yData" && !pattern.test(cellValue)){
       //const rowsRollback = this.convertJSONDataToRows();
       //this.setState({rows: rowsRollback});
       return false;
