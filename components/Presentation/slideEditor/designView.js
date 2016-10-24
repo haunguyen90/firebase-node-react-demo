@@ -115,6 +115,7 @@ class DesignView extends React.Component {
   }
 
   componentDidMount() {
+
     this.AddAssetURL();
   }
 
@@ -134,7 +135,11 @@ class DesignView extends React.Component {
 
   componentWillReceiveProps ({ isScriptLoaded, isScriptLoadSucceed }) {
     if (isScriptLoaded && !this.props.isScriptLoaded) { // load finished
+      console.log('--------------load scripts')
       if (isScriptLoadSucceed) {
+        console.log('--------------load scripts succeed')
+        loadModule();
+        loadPlugin();
 
       }
       else this.props.onError()
@@ -185,7 +190,7 @@ DesignView.propTypes = {
 };
 
 export default scriptLoader(
-  '/Development/UnityLoader.js',
-  '/TemplateData/UnityProgress.js'
+  '/Development/UnityLoader.js?cachebuster=' + (new Date().getTime()),
+  '/TemplateData/UnityProgress.js?cachebuster=' + (new Date().getTime())
   //'/Development/WebPlayer.js'
 )(DesignView);
